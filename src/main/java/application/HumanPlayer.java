@@ -1,18 +1,14 @@
 package application;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
-@Component
 public class HumanPlayer implements Player {
     private final Counter.COLOUR counterColour;
     private final MessageProducer producer;
 
-    @Autowired
+
     public HumanPlayer(Counter.COLOUR counterColour, MessageProducer producer) {
         this.counterColour = counterColour;
         this.producer = producer;

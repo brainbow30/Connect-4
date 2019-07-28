@@ -49,6 +49,7 @@ public class BoardTest {
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter1, board.getCounter(positionBuilder.build()).get());
 
+
     }
 
     @Test

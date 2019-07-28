@@ -3,7 +3,6 @@ package application;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -22,9 +21,14 @@ class Game {
     private final MessageProducer messageProducer;
     private List<Board> previousBoards = new LinkedList<>();
 
+    @Value("${computer1.moveFunction}")
+    private Integer computer1MoveFunction;
+    @Value("${computer2.moveFunction}")
+    private Integer computer2MoveFunction;
+
 
     @Autowired
-    public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson) {
+    public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson, @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction) {
 
         this.board = board;
         this.messageProducer = messageProducer;
@@ -32,17 +36,18 @@ class Game {
         if (humanPlayer1) {
             this.player1 = new HumanPlayer(Counter.COLOUR.WHITE, messageProducer);
         } else {
-            //computer player1
+            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction);
         }
         if (humanPlayer2) {
             this.player2 = new HumanPlayer(Counter.COLOUR.BLACK, messageProducer);
         } else {
-            //computer player2
+
+            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction);
         }
         currentTurnsPlayer = player1;
     }
 
-    public void play() {
+    public Player play() {
         int numberOfConcecutivePasses = 0;
         while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConcecutivePasses < 2) {
             System.out.println("board = " + board.printBoard());
@@ -62,7 +67,7 @@ class Game {
             }
 
         }
-        endGame(board);
+        return endGame(board);
 
 
     }
@@ -74,7 +79,7 @@ class Game {
     }
 
 
-    @KafkaListener(topics = "${player1.topic}", groupId = "foo")
+    //@KafkaListener(topics = "${player1.topic}", groupId = "foo")
     public void player1Turn(String data) {
         try {
             //System.out.println("player1 received board");
@@ -117,7 +122,7 @@ class Game {
 
     }
 
-    @KafkaListener(topics = "${player2.topic}", groupId = "bar")
+    //@KafkaListener(topics = "${player2.topic}", groupId = "bar")
     public void player2Turn(String data) {
 
         try {
@@ -159,15 +164,35 @@ class Game {
 
     }
 
-    private void endGame(Board board) {
-        Counter.COLOUR winner = board.getWinner();
+    private Player endGame(Board board) {
+        System.out.println("final board = " + board.printBoard());
+        Counter.COLOUR winner = board.getWinner(true);
         if (winner.equals(Counter.COLOUR.WHITE)) {
             System.out.println("White wins");
+            if (player1.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+                return player1;
+            } else {
+                return player2;
+            }
         } else if (winner.equals(Counter.COLOUR.BLACK)) {
             System.out.println("Black wins");
+            if (player1.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+                return player1;
+            } else {
+                return player2;
+            }
         } else {
             System.out.println("Draw");
+            return null;
         }
-        System.exit(0);
+
+    }
+
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
     }
 }
