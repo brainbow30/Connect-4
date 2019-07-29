@@ -89,7 +89,8 @@ public class ComputerPlayer implements Player {
         ImmutablePosition bestMove = null;
         Counter counter = new Counter(this.getCounterColour());
         for (ImmutablePosition position : validMoves) {
-            Integer numberOfWins = simulateGame(board.clone(), position, counter, board.getCountersPlayed());
+            Integer numberOfWins = 0;
+            //simulateGame(board.clone(), position, counter, board.getCountersPlayed());
             if (numberOfWins > mostWins) {
                 bestMove = position;
                 mostWins = numberOfWins;
@@ -100,49 +101,49 @@ public class ComputerPlayer implements Player {
         return bestMove;
     }
 
-    private Integer simulateGame(Board board, ImmutablePosition position, Counter counter, Integer countersPlayed) {
-        board.addCounter(counter, position);
-        countersPlayed++;
-        //System.out.println("board = " + board.printBoard());
-        if (countersPlayed < Math.pow(board.getBoardSize(), 2)) {
-            Counter.COLOUR newColour;
-            if (counter.getColour().equals(Counter.COLOUR.WHITE)) {
-                newColour = Counter.COLOUR.BLACK;
-            } else {
-                newColour = Counter.COLOUR.WHITE;
-            }
-            Counter newCounter = new Counter(newColour);
-
-            ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(newCounter.getColour());
-
-            if (validMoves.size() == 0) {
-                newCounter.flip();
-                validMoves = board.getValidMoves(newCounter.getColour());
-            }
-            Random random = new Random();
-            if (validMoves.size() == 0) {
-                if (board.getWinner(false) == null) {
-                    return 0;
-                } else if (board.getWinner(false).equals(this.counterColour)) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-            return simulateGame(board.clone(), validMoves.get(random.nextInt(validMoves.size())), newCounter, countersPlayed);
-
-
-        } else {
-
-            if (board.getWinner(false) == null) {
-                return 0;
-            } else if (board.getWinner(false).equals(this.counterColour)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-
-    }
+//    private Integer simulateGame(Board board, ImmutablePosition position, Counter counter, Integer countersPlayed) {
+//        board.addCounter(counter, position);
+//        countersPlayed++;
+//        //System.out.println("board = " + board.printBoard());
+//        if (countersPlayed < Math.pow(board.getBoardSize(), 2)) {
+//            Counter.COLOUR newColour;
+//            if (counter.getColour().equals(Counter.COLOUR.WHITE)) {
+//                newColour = Counter.COLOUR.BLACK;
+//            } else {
+//                newColour = Counter.COLOUR.WHITE;
+//            }
+//            Counter newCounter = new Counter(newColour);
+//
+//            ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(newCounter.getColour());
+//
+//            if (validMoves.size() == 0) {
+//                newCounter.flip();
+//                validMoves = board.getValidMoves(newCounter.getColour());
+//            }
+//            Random random = new Random();
+//            if (validMoves.size() == 0) {
+//                if (board.getWinner(false) == null) {
+//                    return 0;
+//                } else if (board.getWinner(false).equals(this.counterColour)) {
+//                    return 1;
+//                } else {
+//                    return 0;
+//                }
+//            }
+//            return simulateGame(board.clone(), validMoves.get(random.nextInt(validMoves.size())), newCounter, countersPlayed);
+//
+//
+//        } else {
+//
+//            if (board.getWinner(false) == null) {
+//                return 0;
+//            } else if (board.getWinner(false).equals(this.counterColour)) {
+//                return 1;
+//            } else {
+//                return 0;
+//            }
+//        }
+//
+//    }
 
 }
