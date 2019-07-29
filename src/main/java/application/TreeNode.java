@@ -96,7 +96,7 @@ public class TreeNode {
             counter.flip();
             validMoves = board.getValidMoves(counter.getColour());
             if (validMoves.size() == 0) {
-                //System.out.println("board = " + board.printBoard());
+
                 Counter.COLOUR winner = board.getWinner(false);
 
                 if (winner == null) {

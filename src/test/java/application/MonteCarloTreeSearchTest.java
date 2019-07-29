@@ -10,6 +10,8 @@ public class MonteCarloTreeSearchTest {
     @Test
     public void test() {
         monteCarloTreeSearch = new MonteCarloTreeSearch(board, Counter.COLOUR.WHITE, 5.0);
+        ImmutablePosition position = monteCarloTreeSearch.run();
+        System.out.println("position = " + position);
 
     }
 }

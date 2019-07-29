@@ -7,11 +7,14 @@ import java.util.Random;
 public class MonteCarloTreeSearch {
 
     private TreeNode root;
+    private static double epsilon = 1e-6;
 
     public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Double waitTime) {
-        this.root = new TreeNode(null, board, colour, colour);
+        this.root = new TreeNode(null, board, colour, colour, null);
         root.visited();
+    }
 
+    public ImmutablePosition run() {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + 5000;
 
@@ -29,16 +32,25 @@ public class MonteCarloTreeSearch {
 
 
         }
-        for (TreeNode node : root.getChildren()) {
-            System.out.println();
-            System.out.println("wins = " + node.getNumberOfWins());
-            System.out.println("runs = " + node.getNumberOfSimulations());
-        }
+        return selectNode(root).getPositionToCreate();
     }
 
     private TreeNode selectNode(TreeNode node) {
         Random random = new Random();
-        return node.getChildren().get(random.nextInt(node.getChildren().size()));
+        TreeNode selected = null;
+        double bestValue = Double.MIN_VALUE;
+        for (TreeNode child : node.getChildren()) {
+            double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
+                    Math.sqrt(Math.log(node.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
+                    random.nextDouble() * epsilon;
+            // small random number to break ties randomly in unexpanded nodes
+            if (uctValue > bestValue) {
+                selected = child;
+                bestValue = uctValue;
+            }
+        }
+        return selected;
+
     }
 
     private void propagateResult(TreeNode node, Integer result) {

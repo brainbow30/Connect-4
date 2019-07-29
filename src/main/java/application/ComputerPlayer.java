@@ -26,7 +26,7 @@ public class ComputerPlayer implements Player {
         if (this.moveFunction.equals(1)) {
             position = getNextPositionHuerstic(board);
         } else if (this.moveFunction.equals(2)) {
-            position = getNextPositionBruteForce(board);
+            position = getNextPositionMCTS(board);
         } else {
             System.out.println("random move");
             Random random = new Random();
@@ -83,22 +83,10 @@ public class ComputerPlayer implements Player {
 
     }
 
-    private ImmutablePosition getNextPositionBruteForce(Board board) {
-        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(this.getCounterColour());
-        Integer mostWins = -1;
-        ImmutablePosition bestMove = null;
-        Counter counter = new Counter(this.getCounterColour());
-        for (ImmutablePosition position : validMoves) {
-            Integer numberOfWins = 0;
-            //simulateGame(board.clone(), position, counter, board.getCountersPlayed());
-            if (numberOfWins > mostWins) {
-                bestMove = position;
-                mostWins = numberOfWins;
-            }
+    private ImmutablePosition getNextPositionMCTS(Board board) {
+        MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, 5.0);
+        return monteCarloTreeSearch.run();
 
-        }
-
-        return bestMove;
     }
 
 //    private Integer simulateGame(Board board, ImmutablePosition position, Counter counter, Integer countersPlayed) {
