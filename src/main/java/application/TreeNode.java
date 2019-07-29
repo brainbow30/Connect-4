@@ -15,12 +15,14 @@ public class TreeNode {
     private final Counter.COLOUR rootColour;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
+    private ImmutablePosition positionToCreate;
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour) {
+    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
         this.rootColour = colour;
+        this.positionToCreate = position;
 
 
     }
@@ -46,10 +48,14 @@ public class TreeNode {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour);
+            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
             builder.add(childNode);
         }
         return builder.build();
+    }
+
+    public ImmutablePosition getPositionToCreate() {
+        return positionToCreate;
     }
 
     public void visited() {
@@ -128,6 +134,7 @@ public class TreeNode {
     }
 
     private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
+        //todo change to select method from MonteCarloTreeSearch.java
         Random random = new Random();
         return validMoves.get(random.nextInt(validMoves.size()));
     }
