@@ -7,16 +7,19 @@ import java.util.Random;
 public class MonteCarloTreeSearch {
 
     private TreeNode root;
+    private Integer waitTime;
     private static double epsilon = 1e-6;
 
-    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Double waitTime) {
+
+    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime) {
         this.root = new TreeNode(null, board, colour, colour, null);
         root.visited();
+        this.waitTime = waitTime;
     }
 
     public ImmutablePosition run() {
         long startTime = System.currentTimeMillis();
-        long endTime = startTime + 5000;
+        long endTime = startTime + waitTime;
 
         while (System.currentTimeMillis() < endTime) {
 
@@ -32,6 +35,7 @@ public class MonteCarloTreeSearch {
 
 
         }
+
         return selectNode(root).getPositionToCreate();
     }
 

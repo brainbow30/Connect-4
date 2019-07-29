@@ -79,10 +79,9 @@ public class TreeNode {
     }
 
     public ImmutableList<TreeNode> getChildren() {
-        if (children == null) {
-            children = generateChildren();
-        }
-        return children;
+
+        return generateChildren();
+
 
     }
 
