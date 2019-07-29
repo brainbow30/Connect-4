@@ -1,6 +1,8 @@
 package application;
 
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.Random;
 
 
@@ -30,6 +32,8 @@ public class MonteCarloTreeSearch {
                     selectedNode = selectNode(selectedNode);
                 } catch (IllegalArgumentException e) {
                     //todo fix, should already exit loop on terminal
+                    selectedNode = selectedNode.getParent();
+                    break;
 //                    System.out.println("selectedNodeTerminal = " + selectedNode.isTerminalNode());
 //                    System.out.println("parent = " + selectedNode.getParent().getCurrentBoard().printBoard());
 //                    System.out.println("selectedNode = " + selectedNode.getCurrentBoard().printBoard());
@@ -58,7 +62,8 @@ public class MonteCarloTreeSearch {
     private TreeNode selectNode(TreeNode node) {
 
         Random random = new Random();
-        return node.getChildren().get(random.nextInt(node.getChildren().size()));
+        ImmutableList<TreeNode> children = node.getChildren();
+        return children.get(random.nextInt(children.size()));
 
     }
 

@@ -66,6 +66,7 @@ public class ComputerPlayer implements Player {
     }
 
     private ImmutablePosition getNextPositionHuerstic(Board board) {
+        System.out.println(counterColour + "'s Turn");
         ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(this.counterColour);
         Counter counter = new Counter(this.counterColour);
         Double bestBoardHeurstic = Double.MIN_VALUE;
@@ -86,6 +87,7 @@ public class ComputerPlayer implements Player {
 
     private ImmutablePosition getNextPositionMCTS(Board board) {
         //todo get position from mcts
+        System.out.println(counterColour + "'s Turn");
         MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime);
         return monteCarloTreeSearch.run();
 

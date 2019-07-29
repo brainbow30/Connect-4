@@ -193,4 +193,8 @@ class Game {
     public Player getPlayer2() {
         return player2;
     }
+
+    public void reset() {
+        board.reset();
+    }
 }

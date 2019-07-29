@@ -47,6 +47,7 @@ class Application {
                 //play locally
                 for (int i = 0; i < numberOfGames; i++) {
                     System.out.println("Local Game");
+                    game.reset();
                     Player winner = game.play();
                     if (winner.equals(game.getPlayer1())) {
                         player1Wins++;

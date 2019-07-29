@@ -37,6 +37,9 @@ public class Board implements Serializable {
         this.verifier = verifier;
     }
 
+    public void reset() {
+        this.board = setupBoard();
+    }
     private ImmutableList<ImmutableList<Optional<Counter>>> setupBoard() {
         ImmutableList.Builder<ImmutableList<Optional<Counter>>> boardBuilder = ImmutableList.builder();
 
