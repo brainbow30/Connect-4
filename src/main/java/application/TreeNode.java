@@ -15,14 +15,12 @@ public class TreeNode {
     private final Counter.COLOUR rootColour;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
-    private ImmutablePosition positionToCreate;
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
+    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
         this.rootColour = colour;
-        this.positionToCreate = position;
 
 
     }
@@ -48,14 +46,10 @@ public class TreeNode {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
+            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour);
             builder.add(childNode);
         }
         return builder.build();
-    }
-
-    public ImmutablePosition getPositionToCreate() {
-        return positionToCreate;
     }
 
     public void visited() {
@@ -79,9 +73,10 @@ public class TreeNode {
     }
 
     public ImmutableList<TreeNode> getChildren() {
-
-        return generateChildren();
-
+        if (children == null) {
+            children = generateChildren();
+        }
+        return children;
 
     }
 
@@ -101,7 +96,7 @@ public class TreeNode {
             counter.flip();
             validMoves = board.getValidMoves(counter.getColour());
             if (validMoves.size() == 0) {
-
+                //System.out.println("board = " + board.printBoard());
                 Counter.COLOUR winner = board.getWinner(false);
 
                 if (winner == null) {
@@ -133,7 +128,6 @@ public class TreeNode {
     }
 
     private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
-        //todo change to select method from MonteCarloTreeSearch.java
         Random random = new Random();
         return validMoves.get(random.nextInt(validMoves.size()));
     }
@@ -147,5 +141,7 @@ public class TreeNode {
 
     }
 
-
+    public Board getCurrentBoard() {
+        return currentBoard;
+    }
 }

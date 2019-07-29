@@ -85,9 +85,10 @@ public class ComputerPlayer implements Player {
     }
 
     private ImmutablePosition getNextPositionMCTS(Board board) {
+        //todo get position from mcts
         MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime);
-        return monteCarloTreeSearch.run();
-
+        monteCarloTreeSearch.run();
+        return null;
     }
 
 }
