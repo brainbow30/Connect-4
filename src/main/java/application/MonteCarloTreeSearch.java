@@ -31,7 +31,7 @@ public class MonteCarloTreeSearch {
                 try {
                     selectedNode = selectNode(selectedNode);
                 } catch (IllegalArgumentException e) {
-                    //todo fix, should already exit loop on terminal
+                    //todo fix is terminal node issue
                     selectedNode = selectedNode.getParent();
                     break;
 //                    System.out.println("selectedNodeTerminal = " + selectedNode.isTerminalNode());
@@ -60,7 +60,7 @@ public class MonteCarloTreeSearch {
     }
 
     private TreeNode selectNode(TreeNode node) {
-
+//todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
         return children.get(random.nextInt(children.size()));

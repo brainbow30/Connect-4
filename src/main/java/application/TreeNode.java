@@ -135,6 +135,7 @@ public class TreeNode {
     }
 
     private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
+        //todo improve select function
         Random random = new Random();
         return validMoves.get(random.nextInt(validMoves.size()));
     }
@@ -148,7 +149,4 @@ public class TreeNode {
 
     }
 
-    public Board getCurrentBoard() {
-        return currentBoard;
-    }
 }
