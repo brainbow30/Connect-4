@@ -15,12 +15,14 @@ public class TreeNode {
     private final Counter.COLOUR rootColour;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
+    private ImmutablePosition positionToCreateBoard;
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour) {
+    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
         this.rootColour = colour;
+        this.positionToCreateBoard = position;
 
 
     }
@@ -46,10 +48,14 @@ public class TreeNode {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour);
+            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
             builder.add(childNode);
         }
         return builder.build();
+    }
+
+    public ImmutablePosition getPositionToCreateBoard() {
+        return positionToCreateBoard;
     }
 
     public void visited() {
@@ -89,6 +95,7 @@ public class TreeNode {
     }
 
     public Integer simulateGame(Board board, Counter.COLOUR colour) {
+
         Counter counter = new Counter(colour);
 
         ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(colour);
