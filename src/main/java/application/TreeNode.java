@@ -2,8 +2,6 @@ package application;
 
 import com.google.common.collect.ImmutableList;
 
-import java.util.Random;
-
 
 public class TreeNode {
     private TreeNode parent;
@@ -21,7 +19,7 @@ public class TreeNode {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
-        this.rootColour = colour;
+        this.rootColour = rootColour;
         this.positionToCreateBoard = position;
 
 
@@ -100,48 +98,68 @@ public class TreeNode {
 
     public Integer simulateGame(Board board, Counter.COLOUR colour) {
 
-        Counter counter = new Counter(colour);
+        Counter.COLOUR newColour;
+        if (colour.equals(Counter.COLOUR.WHITE)) {
+            newColour = Counter.COLOUR.BLACK;
+        } else {
+            newColour = Counter.COLOUR.WHITE;
+        }
 
         ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(colour);
         if (validMoves.size() == 0) {
-            counter.flip();
-            validMoves = board.getValidMoves(counter.getColour());
+            validMoves = board.getValidMoves(newColour);
             if (validMoves.size() == 0) {
-                //System.out.println("board = " + board.printBoard());
+
                 Counter.COLOUR winner = board.getWinner(false);
 
                 if (winner == null) {
                     return 0;
                 } else if (winner.equals(rootColour)) {
 
-                    return 0;
+                    return 1;
 
                 } else {
-                    return 1;
+                    return 0;
                 }
 
+            } else {
+                Counter.COLOUR temp = colour;
+                //this.colour=newColour;
+                colour = newColour;
+                newColour = temp;
             }
+
         }
-        ImmutablePosition nextMove = pickNextMove(board, validMoves);
+        Counter counter = new Counter(colour);
+        ImmutablePosition nextMove = pickNextMove(board, validMoves, colour);
 
         board.addCounter(counter, nextMove);
-
-        Counter.COLOUR newColour;
-        if (counter.getColour().equals(Counter.COLOUR.WHITE)) {
-            newColour = Counter.COLOUR.BLACK;
-        } else {
-            newColour = Counter.COLOUR.WHITE;
-        }
 
         return simulateGame(board.clone(), newColour);
 
 
     }
 
-    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
+    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves, Counter.COLOUR colour) {
         //todo improve select function
-        Random random = new Random();
-        return validMoves.get(random.nextInt(validMoves.size()));
+
+
+        Counter counter = new Counter(colour);
+
+
+        Double bestBoardHeurstic = Double.MIN_VALUE;
+        ImmutablePosition bestMove = null;
+        for (ImmutablePosition position : validMoves) {
+            Board futureBoard = board.clone();
+            futureBoard.addCounter(counter, position);
+
+            Double boardHeurstic = futureBoard.getBoardHeurstic(this.rootColour);
+            if (boardHeurstic > bestBoardHeurstic) {
+                bestBoardHeurstic = boardHeurstic;
+                bestMove = position;
+            }
+        }
+        return bestMove;
     }
 
     public void addResult(Integer result) {

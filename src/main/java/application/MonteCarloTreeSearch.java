@@ -30,6 +30,7 @@ public class MonteCarloTreeSearch {
             TreeNode selectedNode = selectNode(root);
             while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
                     selectedNode = selectNode(selectedNode);
+
             }
 
             Integer result = selectedNode.simulateGame();
@@ -38,12 +39,9 @@ public class MonteCarloTreeSearch {
 
 
         }
-        for (TreeNode node : root.getChildren()) {
-            System.out.println();
-            System.out.println("wins = " + node.getNumberOfWins());
-            System.out.println("runs = " + node.getNumberOfSimulations());
-        }
-        TreeNode newNode = selectNode(root);
+
+        TreeNode newNode = selectMove(root);
+
         return newNode.getPositionToCreateBoard();
 
 
@@ -51,15 +49,19 @@ public class MonteCarloTreeSearch {
 
     }
 
-    private TreeNode selectNode2(TreeNode node) {
+    private TreeNode selectNode(TreeNode node) {
 //todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
+        if (node.getChildren().size() == 0) {
+            node.setTerminalNode();
+            return node;
+        }
         return children.get(random.nextInt(children.size()));
 
     }
 
-    private TreeNode selectNode(TreeNode node) {
+    private TreeNode selectMove(TreeNode node) {
 //todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
