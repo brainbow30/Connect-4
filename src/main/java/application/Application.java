@@ -18,6 +18,10 @@ class Application {
     @Value("${localGame}")
     Boolean localGame;
 
+    @Value("${numberOfGames}")
+    Integer numberOfGames;
+
+
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(Application.class);
@@ -38,9 +42,20 @@ class Application {
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
             if (localGame) {
+                Integer player1Wins = 0;
+
                 //play locally
-                System.out.println("Local Game");
-                game.play();
+                for (int i = 0; i < numberOfGames; i++) {
+                    System.out.println("Local Game");
+                    game.reset();
+                    Player winner = game.play();
+                    if (winner.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+                        player1Wins++;
+                    }
+                }
+                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + (numberOfGames - player1Wins));
+
+
                 //play over kafka
             } else {
                 System.out.println("Kafka Game");

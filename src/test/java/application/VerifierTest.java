@@ -23,7 +23,7 @@ public class VerifierTest {
         builder.x(5);
         builder.y(3);
         position = builder.build();
-        assertEquals(true, verifier.validMove(board, counter, position));
+        assertEquals(true, verifier.validMove(board, counter.getColour(), position));
 
 
     }
@@ -38,7 +38,7 @@ public class VerifierTest {
         builder.x(2);
         builder.y(4);
         position = builder.build();
-        assertEquals(true, verifier.validMove(board, counter, position));
+        assertEquals(true, verifier.validMove(board, counter.getColour(), position));
 
 
     }
@@ -54,13 +54,13 @@ public class VerifierTest {
         builder.x(5);
         builder.y(3);
         position = builder.build();
-        assertEquals(true, verifier.validMove(board, counter, position));
+        assertEquals(true, verifier.validMove(board, counter.getColour(), position));
         board.addCounter(counter, position);
 
         builder.y(2);
         position = builder.build();
         counter = new Counter(Counter.COLOUR.BLACK);
-        assertEquals(true, verifier.validMove(board, counter, position));
+        assertEquals(true, verifier.validMove(board, counter.getColour(), position));
 
 
     }
@@ -75,7 +75,7 @@ public class VerifierTest {
         builder.y(3);
         builder.x(2);
         position = builder.build();
-        assertEquals(false, verifier.validMove(board, counter, position));
+        assertEquals(false, verifier.validMove(board, counter.getColour(), position));
 
     }
 
@@ -89,7 +89,7 @@ public class VerifierTest {
         builder.y(3);
         builder.x(1);
         position = builder.build();
-        assertEquals(false, verifier.validMove(board, counter, position));
+        assertEquals(false, verifier.validMove(board, counter.getColour(), position));
 
     }
 
@@ -103,7 +103,7 @@ public class VerifierTest {
         builder.y(3);
         builder.x(3);
         position = builder.build();
-        assertEquals(false, verifier.validMove(board, counter, position));
+        assertEquals(false, verifier.validMove(board, counter.getColour(), position));
 
     }
 
