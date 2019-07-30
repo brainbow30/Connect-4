@@ -144,6 +144,7 @@ public class TreeNode {
 
     private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
         //todo change to uct
+        //todo change so that children nodes have simulation number and wins and are not recalculated every turn
         Random random = new Random();
         return validMoves.get(random.nextInt(validMoves.size()));
 
