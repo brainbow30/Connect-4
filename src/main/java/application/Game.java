@@ -174,7 +174,7 @@ class Game {
             }
         } else if (winner.equals(Counter.COLOUR.BLACK)) {
             System.out.println("Black wins");
-            if (player1.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+            if (player1.getCounterColour().equals(Counter.COLOUR.BLACK)) {
                 return player1;
             } else {
                 return player2;
