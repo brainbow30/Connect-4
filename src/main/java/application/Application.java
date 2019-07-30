@@ -27,9 +27,6 @@ class Application {
         SpringApplication application = new SpringApplication(Application.class);
 
         Properties properties = new Properties();
-        properties.put("board.size", 4);
-        properties.put("player1.human", true);
-        properties.put("player2.human", true);
         properties.put("player1.topic", UUID.randomUUID());
         properties.put("player2.topic", UUID.randomUUID());
         application.setDefaultProperties(properties);
