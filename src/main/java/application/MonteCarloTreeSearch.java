@@ -10,6 +10,7 @@ public class MonteCarloTreeSearch {
 
     private TreeNode root;
     private Integer waitTime;
+    private static double epsilon = 1e-6;
 
     public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime) {
         this.root = new TreeNode(null, board, colour, colour, null);
@@ -28,16 +29,7 @@ public class MonteCarloTreeSearch {
 
             TreeNode selectedNode = selectNode(root);
             while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
-                try {
                     selectedNode = selectNode(selectedNode);
-                } catch (IllegalArgumentException e) {
-                    //todo fix is terminal node issue
-                    selectedNode = selectedNode.getParent();
-                    break;
-//                    System.out.println("selectedNodeTerminal = " + selectedNode.isTerminalNode());
-//                    System.out.println("parent = " + selectedNode.getParent().getCurrentBoard().printBoard());
-//                    System.out.println("selectedNode = " + selectedNode.getCurrentBoard().printBoard());
-                }
             }
 
             Integer result = selectedNode.simulateGame();
@@ -46,11 +38,11 @@ public class MonteCarloTreeSearch {
 
 
         }
-//        for (TreeNode node : root.getChildren()) {
-//            System.out.println();
-//            System.out.println("wins = " + node.getNumberOfWins());
-//            System.out.println("runs = " + node.getNumberOfSimulations());
-//        }
+        for (TreeNode node : root.getChildren()) {
+            System.out.println();
+            System.out.println("wins = " + node.getNumberOfWins());
+            System.out.println("runs = " + node.getNumberOfSimulations());
+        }
         TreeNode newNode = selectNode(root);
         return newNode.getPositionToCreateBoard();
 
@@ -59,11 +51,38 @@ public class MonteCarloTreeSearch {
 
     }
 
-    private TreeNode selectNode(TreeNode node) {
+    private TreeNode selectNode2(TreeNode node) {
 //todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
         return children.get(random.nextInt(children.size()));
+
+    }
+
+    private TreeNode selectNode(TreeNode node) {
+//todo improve select function
+        Random random = new Random();
+        ImmutableList<TreeNode> children = node.getChildren();
+        Double bestValue = Double.MIN_VALUE;
+        TreeNode selected = null;
+        for (TreeNode child : children) {
+            double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
+                    Math.sqrt(Math.log(node.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
+                    random.nextDouble() * epsilon;
+            //System.out.println("uctValue = " + uctValue);
+            if (uctValue > bestValue) {
+                selected = child;
+                bestValue = uctValue;
+            }
+
+        }
+        if (selected == null) {
+            node.setTerminalNode();
+            return node;
+        }
+
+        return selected;
+
 
     }
 

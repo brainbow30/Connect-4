@@ -86,6 +86,10 @@ public class TreeNode {
 
     }
 
+    public void setTerminalNode() {
+        terminalNode = true;
+    }
+
     public Boolean isTerminalNode() {
         return terminalNode;
     }
