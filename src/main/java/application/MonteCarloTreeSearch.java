@@ -46,7 +46,6 @@ public class MonteCarloTreeSearch {
         }
 
         TreeNode newNode = selectMove(root);
-        System.out.println();
         System.out.println("selected");
         System.out.println("wins = " + newNode.getNumberOfWins());
         System.out.println("played = " + newNode.getNumberOfSimulations());
