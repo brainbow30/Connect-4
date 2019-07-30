@@ -142,11 +142,7 @@ public class TreeNode {
 
     private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves, Counter.COLOUR colour) {
         //todo improve select function
-
-
         Counter counter = new Counter(colour);
-
-
         Double bestBoardHeurstic = Double.MIN_VALUE;
         ImmutablePosition bestMove = null;
         for (ImmutablePosition position : validMoves) {
