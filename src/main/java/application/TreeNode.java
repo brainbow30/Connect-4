@@ -2,6 +2,8 @@ package application;
 
 import com.google.common.collect.ImmutableList;
 
+import java.util.Random;
+
 
 public class TreeNode {
     private TreeNode parent;
@@ -131,7 +133,7 @@ public class TreeNode {
 
         }
         Counter counter = new Counter(colour);
-        ImmutablePosition nextMove = pickNextMove(board, validMoves, colour);
+        ImmutablePosition nextMove = pickNextMove(board, validMoves);
 
         board.addCounter(counter, nextMove);
 
@@ -140,22 +142,11 @@ public class TreeNode {
 
     }
 
-    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves, Counter.COLOUR colour) {
-        //todo improve select function
-        Counter counter = new Counter(colour);
-        Double bestBoardHeurstic = Double.MIN_VALUE;
-        ImmutablePosition bestMove = null;
-        for (ImmutablePosition position : validMoves) {
-            Board futureBoard = board.clone();
-            futureBoard.addCounter(counter, position);
+    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
+        //todo change to uct
+        Random random = new Random();
+        return validMoves.get(random.nextInt(validMoves.size()));
 
-            Double boardHeurstic = futureBoard.getBoardHeurstic(this.rootColour);
-            if (boardHeurstic > bestBoardHeurstic) {
-                bestBoardHeurstic = boardHeurstic;
-                bestMove = position;
-            }
-        }
-        return bestMove;
     }
 
     public void addResult(Integer result) {
