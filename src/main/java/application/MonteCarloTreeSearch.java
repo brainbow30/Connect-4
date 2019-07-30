@@ -39,8 +39,17 @@ public class MonteCarloTreeSearch {
 
 
         }
+        for (TreeNode node : root.getChildren()) {
+            System.out.println();
+            System.out.println("wins = " + node.getNumberOfWins());
+            System.out.println("played = " + node.getNumberOfSimulations());
+        }
 
         TreeNode newNode = selectMove(root);
+        System.out.println();
+        System.out.println("selected");
+        System.out.println("wins = " + newNode.getNumberOfWins());
+        System.out.println("played = " + newNode.getNumberOfSimulations());
 
         return newNode.getPositionToCreateBoard();
 
