@@ -36,14 +36,11 @@ public class MonteCarloTreeSearch {
             TreeNode selectedNode = selectNode(root);
             while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
                     selectedNode = selectNode(selectedNode);
-
             }
 
             Integer result = selectedNode.simulateGame();
             propagateResult(selectedNode, result);
             selectedNode.visited();
-
-
         }
         for (TreeNode node : root.getChildren()) {
             System.out.println();
@@ -52,19 +49,14 @@ public class MonteCarloTreeSearch {
         }
 
         TreeNode newNode = selectMove(root);
-        System.out.println("selected");
+        System.out.println("\nselected");
         System.out.println("wins = " + newNode.getNumberOfWins());
         System.out.println("played = " + newNode.getNumberOfSimulations());
 
         return newNode.getPositionToCreateBoard();
-
-
-
-
     }
 
     private TreeNode selectNode(TreeNode node) {
-//todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
         if (node.getChildren().size() == 0) {
@@ -75,7 +67,7 @@ public class MonteCarloTreeSearch {
         double bestValue = 0;
         int i = 0;
         for (TreeNode child : children) {
-            double heursticValue = child.getCurrentBoard().getBoardHeurstic(colour);
+            double heursticValue = child.getCurrentBoard().getBoardHeurstic(colour, 1);
 
             double randomValue = random.nextDouble();
 
@@ -93,7 +85,6 @@ public class MonteCarloTreeSearch {
     }
 
     private TreeNode selectMove(TreeNode node) {
-//todo improve select function
         Random random = new Random();
         ImmutableList<TreeNode> children = node.getChildren();
         Double bestValue = Double.MIN_VALUE;
