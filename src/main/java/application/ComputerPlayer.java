@@ -95,16 +95,15 @@ public class ComputerPlayer implements Player {
         MonteCarloTreeSearch monteCarloTreeSearch;
         TreeNode currentNode;
         if (previousNode != null) {
-            currentNode = previousNode.findChildBoardMatch(board);
 
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode, this.counterColour, waitTime, heursticWeighting, randomWeighting);
+            currentNode = previousNode.findChildBoardMatch(board);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), this.counterColour, waitTime, heursticWeighting, randomWeighting);
 
         } else {
             monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
         }
         currentNode = monteCarloTreeSearch.run();
         this.previousNode = currentNode;
-        System.out.println("NodeFrom = " + previousNode.getCurrentBoard().printBoard());
         return currentNode.getPositionToCreateBoard();
 
     }

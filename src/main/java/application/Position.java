@@ -2,8 +2,10 @@ package application;
 
 import org.immutables.value.Value;
 
+import java.io.Serializable;
+
 @Value.Immutable
-interface Position {
+interface Position extends Serializable {
     Integer x();
 
     Integer y();

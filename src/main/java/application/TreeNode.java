@@ -2,10 +2,11 @@ package application;
 
 import com.google.common.collect.ImmutableList;
 
+import java.io.*;
 import java.util.Random;
 
 
-public class TreeNode {
+public class TreeNode implements Serializable {
     private TreeNode parent;
     private Integer numberOfWins = 0;
     private Integer numberOfSimulations = 0;
@@ -191,7 +192,7 @@ public class TreeNode {
         for (TreeNode child : this.getChildren()) {
             //todo override equals method in board
             if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
-                return child;
+                return child.clone();
             }
         }
         //todo replace null
@@ -201,5 +202,30 @@ public class TreeNode {
     public void setRoot() {
         this.parent = null;
         this.positionToCreateBoard = null;
+    }
+
+    @Override
+    public TreeNode clone() {
+        try {
+            TreeNode newTreeNode;
+            ByteArrayInputStream bis;
+            ObjectInputStream ois;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(this);
+            oos.flush();
+            byte[] data = bos.toByteArray();
+            bis = new ByteArrayInputStream(data);
+            ois = new ObjectInputStream(bis);
+            newTreeNode = (TreeNode) ois.readObject();
+            return newTreeNode;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
