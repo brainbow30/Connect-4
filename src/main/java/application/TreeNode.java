@@ -105,7 +105,7 @@ public class TreeNode implements Serializable {
     }
 
     public Integer simulateGame(Board board, Counter.COLOUR colour) {
-
+        //todo simulate game through treenodes not through board
         Counter.COLOUR newColour;
         if (colour.equals(Counter.COLOUR.WHITE)) {
             newColour = Counter.COLOUR.BLACK;
@@ -192,6 +192,7 @@ public class TreeNode implements Serializable {
         for (TreeNode child : this.getChildren()) {
             //todo override equals method in board
             if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
+                System.out.println("childSims = " + child.getNumberOfSimulations());
                 return child.clone();
             }
         }
