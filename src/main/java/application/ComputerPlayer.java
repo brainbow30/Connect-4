@@ -12,6 +12,7 @@ public class ComputerPlayer implements Player {
     private final Integer waitTime;
     private final double heursticWeighting;
     private final double randomWeighting;
+    private TreeNode previousNode;
 
     private Integer moveFunction;
 
@@ -24,7 +25,7 @@ public class ComputerPlayer implements Player {
         this.waitTime = waitTime;
         this.heursticWeighting = heursticWeighting;
         this.randomWeighting = randomWeighting;
-
+        this.previousNode = null;
     }
 
     public Board playTurn(Board board) {
@@ -91,10 +92,20 @@ public class ComputerPlayer implements Player {
     }
 
     private ImmutablePosition getNextPositionMCTS(Board board) {
-        System.out.println(counterColour + "'s Turn");
-        System.out.println("counterColour = " + counterColour);
-        MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
-        return monteCarloTreeSearch.run();
+        MonteCarloTreeSearch monteCarloTreeSearch;
+        TreeNode currentNode;
+        if (previousNode != null) {
+            currentNode = previousNode.findChildBoardMatch(board);
+
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
+
+        } else {
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
+        }
+        currentNode = monteCarloTreeSearch.run();
+        this.previousNode = currentNode;
+        System.out.println("NodeFrom = " + previousNode.getCurrentBoard().printBoard());
+        return currentNode.getPositionToCreateBoard();
 
     }
 

@@ -27,7 +27,7 @@ public class MonteCarloTreeSearch {
 
     }
 
-    public ImmutablePosition run() {
+    public TreeNode run() {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + waitTime;
 
@@ -53,7 +53,7 @@ public class MonteCarloTreeSearch {
         System.out.println("wins = " + newNode.getNumberOfWins());
         System.out.println("played = " + newNode.getNumberOfSimulations());
 
-        return newNode.getPositionToCreateBoard();
+        return newNode;
     }
 
     private TreeNode selectNode(TreeNode node) {

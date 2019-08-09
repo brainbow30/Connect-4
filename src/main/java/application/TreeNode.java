@@ -100,7 +100,7 @@ public class TreeNode {
     }
 
     public Integer simulateGame() {
-        return simulateGame(this.currentBoard, this.colour);
+        return simulateGame(this.currentBoard.clone(), this.colour);
     }
 
     public Integer simulateGame(Board board, Counter.COLOUR colour) {
@@ -185,5 +185,17 @@ public class TreeNode {
 
     public Board getCurrentBoard() {
         return currentBoard;
+    }
+
+    public TreeNode findChildBoardMatch(Board board) {
+        for (TreeNode child : this.getChildren()) {
+            //todo override equals method in board
+            if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
+                System.out.println("equals");
+                return child;
+            }
+        }
+        //todo replace null
+        return null;
     }
 }
