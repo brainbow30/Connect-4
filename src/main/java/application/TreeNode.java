@@ -26,7 +26,7 @@ public class TreeNode implements Serializable {
         this.colour = colour;
         this.rootColour = rootColour;
         this.positionToCreateBoard = position;
-
+        this.children = ImmutableList.of();
         this.heursticWeighting = heursticWeighting;
         this.randomWeighting = randomWeighting;
 
@@ -85,8 +85,8 @@ public class TreeNode implements Serializable {
     }
 
     public ImmutableList<TreeNode> getChildren() {
-        if (children == null) {
-            children = generateChildren();
+        if (children.isEmpty()) {
+            children = ImmutableList.copyOf(generateChildren());
         }
         return children;
 
@@ -170,15 +170,15 @@ public class TreeNode implements Serializable {
             }
             i++;
         }
-        return validMoves.get(random.nextInt(validMoves.size()));
+        return validMoves.get(bestIndex);
 
 
     }
 
     public void addResult(Integer result) {
-        numberOfSimulations++;
+        this.numberOfSimulations++;
         if (result.equals(1)) {
-            numberOfWins++;
+            this.numberOfWins++;
         }
 
 

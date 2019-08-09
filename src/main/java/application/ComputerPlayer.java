@@ -97,6 +97,7 @@ public class ComputerPlayer implements Player {
         if (previousNode != null) {
 
             currentNode = previousNode.findChildBoardMatch(board);
+            //todo check values are propagating correctly
             monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), this.counterColour, waitTime, heursticWeighting, randomWeighting);
 
         } else {
