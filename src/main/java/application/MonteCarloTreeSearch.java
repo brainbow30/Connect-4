@@ -27,10 +27,28 @@ public class MonteCarloTreeSearch {
 
     }
 
+    public MonteCarloTreeSearch(TreeNode node, Counter.COLOUR colour, Integer waitTime, double heursticWeighting, double randomWeighting) {
+        this.root = node;
+        root.visited();
+        root.setRoot();
+        this.colour = colour;
+        this.waitTime = waitTime;
+        this.heursticWeighting = heursticWeighting;
+        this.randomWeighting = randomWeighting;
+
+
+    }
+
     public TreeNode run() {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + waitTime;
 
+        System.out.println("\nbefore");
+        for (TreeNode node : root.getChildren()) {
+            System.out.println();
+            System.out.println("wins = " + node.getNumberOfWins());
+            System.out.println("played = " + node.getNumberOfSimulations());
+        }
         while (System.currentTimeMillis() < endTime) {
 
             TreeNode selectedNode = selectNode(root);
@@ -42,6 +60,7 @@ public class MonteCarloTreeSearch {
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
+        System.out.println("\nafter");
         for (TreeNode node : root.getChildren()) {
             System.out.println();
             System.out.println("wins = " + node.getNumberOfWins());

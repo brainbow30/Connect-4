@@ -191,11 +191,15 @@ public class TreeNode {
         for (TreeNode child : this.getChildren()) {
             //todo override equals method in board
             if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
-                System.out.println("equals");
                 return child;
             }
         }
         //todo replace null
         return null;
+    }
+
+    public void setRoot() {
+        this.parent = null;
+        this.positionToCreateBoard = null;
     }
 }
