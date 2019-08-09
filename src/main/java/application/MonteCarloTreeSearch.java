@@ -11,12 +11,18 @@ public class MonteCarloTreeSearch {
     private TreeNode root;
     private Integer waitTime;
     private static double epsilon = 1e-6;
+    private Counter.COLOUR colour;
+    private final double heursticWeighting;
+    private final double randomWeighting;
 
-    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime) {
-        this.root = new TreeNode(null, board, colour, colour, null);
+
+    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime, double heursticWeighting, double randomWeighting) {
+        this.root = new TreeNode(null, board, colour, colour, null, heursticWeighting, randomWeighting);
         root.visited();
-
+        this.colour = colour;
         this.waitTime = waitTime;
+        this.heursticWeighting = heursticWeighting;
+        this.randomWeighting = randomWeighting;
 
 
     }
@@ -65,7 +71,24 @@ public class MonteCarloTreeSearch {
             node.setTerminalNode();
             return node;
         }
-        return children.get(random.nextInt(children.size()));
+        int bestIndex = 0;
+        double bestValue = 0;
+        int i = 0;
+        for (TreeNode child : children) {
+            double heursticValue = child.getCurrentBoard().getBoardHeurstic(colour);
+
+            double randomValue = random.nextDouble();
+
+            double combinedValue = (heursticValue * heursticWeighting) + (randomValue * randomWeighting);
+
+            if (combinedValue > bestValue) {
+                bestValue = combinedValue;
+                bestIndex = i;
+            }
+            i++;
+        }
+
+        return children.get(bestIndex);
 
     }
 

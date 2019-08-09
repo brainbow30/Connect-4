@@ -16,13 +16,18 @@ public class TreeNode {
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
     private ImmutablePosition positionToCreateBoard;
+    private double heursticWeighting;
+    private double randomWeighting;
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
+    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position, double heursticWeighting, double randomWeighting) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
         this.rootColour = rootColour;
         this.positionToCreateBoard = position;
+
+        this.heursticWeighting = heursticWeighting;
+        this.randomWeighting = randomWeighting;
 
 
     }
@@ -48,7 +53,7 @@ public class TreeNode {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
+            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move, heursticWeighting, randomWeighting);
             builder.add(childNode);
         }
         return builder.build();
@@ -107,9 +112,9 @@ public class TreeNode {
             newColour = Counter.COLOUR.WHITE;
         }
 
-        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(colour);
+        ImmutableList<ImmutablePosition> validMoves = ImmutableList.copyOf(board.getValidMoves(colour));
         if (validMoves.size() == 0) {
-            validMoves = board.getValidMoves(newColour);
+            validMoves = ImmutableList.copyOf(board.getValidMoves(newColour));
             if (validMoves.size() == 0) {
 
                 Counter.COLOUR winner = board.getWinner(false);
@@ -133,7 +138,7 @@ public class TreeNode {
 
         }
         Counter counter = new Counter(colour);
-        ImmutablePosition nextMove = pickNextMove(board, validMoves);
+        ImmutablePosition nextMove = pickNextMove(board.clone(), validMoves, colour);
 
         board.addCounter(counter, nextMove);
 
@@ -142,11 +147,30 @@ public class TreeNode {
 
     }
 
-    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves) {
-        //todo change to uct
-        //todo change so that children nodes have simulation number and wins and are not recalculated every turn
+    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves, Counter.COLOUR colour) {
         Random random = new Random();
+
+        int bestIndex = 0;
+        double bestValue = 0;
+        int i = 0;
+        for (ImmutablePosition pos : validMoves) {
+            Board newBoard = board.clone();
+            Counter counter = new Counter(colour);
+            newBoard.addCounter(counter, pos);
+            //double heursticValue = newBoard.getBoardHeurstic(this.rootColour);
+            double heursticValue = 10 * validMoves.size();
+            double randomValue = random.nextDouble();
+
+            double combinedValue = (heursticValue * heursticWeighting) + (randomValue * randomWeighting);
+
+            if (combinedValue > bestValue) {
+                bestValue = combinedValue;
+                bestIndex = i;
+            }
+            i++;
+        }
         return validMoves.get(random.nextInt(validMoves.size()));
+
 
     }
 
@@ -159,4 +183,7 @@ public class TreeNode {
 
     }
 
+    public Board getCurrentBoard() {
+        return currentBoard;
+    }
 }

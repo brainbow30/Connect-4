@@ -26,7 +26,7 @@ class Game {
 
     @Autowired
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson,
-                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime) {
+                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${mcts.heurstic}") double mctsHuersticWeighting, @Value("${mcts.random}") double mctsRandomWeighting) {
 
         this.board = board;
         this.messageProducer = messageProducer;
@@ -34,13 +34,13 @@ class Game {
         if (humanPlayer1) {
             this.player1 = new HumanPlayer(Counter.COLOUR.WHITE, messageProducer);
         } else {
-            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
+            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime, mctsHuersticWeighting, mctsRandomWeighting);
         }
         if (humanPlayer2) {
             this.player2 = new HumanPlayer(Counter.COLOUR.BLACK, messageProducer);
         } else {
 
-            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
+            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime, mctsHuersticWeighting, mctsRandomWeighting);
         }
         currentTurnsPlayer = player1;
     }

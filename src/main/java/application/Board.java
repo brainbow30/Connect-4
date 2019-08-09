@@ -26,8 +26,6 @@ public class Board implements Serializable {
     @Value("${evaluationValue.stableNum}")
     private Double evaluationStableDiscValue;
 
-    @Value("${board.evaluationFunction}")
-    private Integer evaluationFunction;
 
 
     @Autowired
@@ -310,7 +308,7 @@ public class Board implements Serializable {
         return true;
     }
 
-    public Double getBoardHeurstic(Counter.COLOUR colour) {
+    public Double getBoardHeurstic(Counter.COLOUR colour, int evaluationFunction) {
         Double huersticValue = 0.0;
         if (evaluationFunction == 1) {
             huersticValue = numberOfValidMoves(colour) * evaluationMobilityValue

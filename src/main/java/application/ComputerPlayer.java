@@ -10,15 +10,20 @@ public class ComputerPlayer implements Player {
     private final Counter.COLOUR counterColour;
     private final MessageProducer producer;
     private final Integer waitTime;
+    private final double heursticWeighting;
+    private final double randomWeighting;
 
     private Integer moveFunction;
 
 
-    public ComputerPlayer(Counter.COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
+    public ComputerPlayer(Counter.COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime,
+                          double heursticWeighting, double randomWeighting) {
         this.counterColour = counterColour;
         this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
+        this.heursticWeighting = heursticWeighting;
+        this.randomWeighting = randomWeighting;
 
     }
 
@@ -74,7 +79,7 @@ public class ComputerPlayer implements Player {
         for (ImmutablePosition position : validMoves) {
             Board futureBoard = board.clone();
             futureBoard.addCounter(counter, position);
-            Double boardHeurstic = futureBoard.getBoardHeurstic(this.counterColour);
+            Double boardHeurstic = futureBoard.getBoardHeurstic(this.counterColour, 1);
             if (boardHeurstic > bestBoardHeurstic) {
                 bestBoardHeurstic = boardHeurstic;
                 bestMove = position;
@@ -88,7 +93,7 @@ public class ComputerPlayer implements Player {
     private ImmutablePosition getNextPositionMCTS(Board board) {
         System.out.println(counterColour + "'s Turn");
         System.out.println("counterColour = " + counterColour);
-        MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime);
+        MonteCarloTreeSearch monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
         return monteCarloTreeSearch.run();
 
     }
