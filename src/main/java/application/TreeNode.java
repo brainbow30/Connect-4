@@ -28,7 +28,6 @@ public class TreeNode implements Serializable {
         this.children = ImmutableList.of();
 
 
-
     }
 
     private ImmutableList<TreeNode> generateChildren() {

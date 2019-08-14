@@ -24,6 +24,7 @@ public class ComputerPlayer implements Player {
     }
 
     public Board playTurn(Board board) {
+        System.out.println(counterColour + "'s Turn");
         ImmutablePosition position;
         if (this.moveFunction.equals(1)) {
             position = getNextPositionHuerstic(board);
@@ -67,7 +68,6 @@ public class ComputerPlayer implements Player {
     }
 
     private ImmutablePosition getNextPositionHuerstic(Board board) {
-        System.out.println(counterColour + "'s Turn");
         ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(this.counterColour);
         Counter counter = new Counter(this.counterColour);
         Double bestBoardHeurstic = Double.MIN_VALUE;
