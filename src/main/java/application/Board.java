@@ -19,9 +19,9 @@ public class Board implements Serializable {
 
 
     //heuristic values
-    private Double evaluationDiscValue;
-    private Double evaluationMobilityValue;
-    private Double evaluationStableDiscValue;
+    private final Double evaluationDiscValue;
+    private final Double evaluationMobilityValue;
+    private final Double evaluationStableDiscValue;
 
 
 
@@ -200,6 +200,12 @@ public class Board implements Serializable {
         return boardString.toString();
     }
 
+
+    @Override
+    public String toString() {
+        return printBoard();
+    }
+
     private void flipCounters(Counter.COLOUR colour, Position position, Integer xDirection, Integer yDirection) {
 
         ImmutablePosition.Builder tempPosition = ImmutablePosition.builder();
@@ -266,7 +272,7 @@ public class Board implements Serializable {
         return count;
     }
 
-    public Integer numberOfStableDiscs(Counter.COLOUR colour) {
+    private Integer numberOfStableDiscs(Counter.COLOUR colour) {
         int stableCounters = 0;
 
         for (int y = 0; y < boardSize; y++) {
@@ -311,7 +317,7 @@ public class Board implements Serializable {
     }
 
     public Double getBoardHeurstic(Counter.COLOUR colour, int evaluationFunction) {
-        Double huersticValue = 0.0;
+        double huersticValue;
         if (evaluationFunction == 1) {
             huersticValue = numberOfValidMoves(colour) * evaluationMobilityValue
                     + numberOfStableDiscs(colour) * evaluationStableDiscValue;
@@ -346,9 +352,10 @@ public class Board implements Serializable {
         if (printScore) {
             System.out.println("Score: " + whiteCounters + ":" + (int) (Math.pow(boardSize, 2) - whiteCounters));
         }
-        if (whiteCounters > Math.ceil(Math.pow(boardSize, 2) / 2.0)) {
+        double halfTotalCounters = Math.ceil(Math.pow(boardSize, 2) / 2.0);
+        if (whiteCounters > halfTotalCounters) {
             return Counter.COLOUR.WHITE;
-        } else if (whiteCounters < Math.ceil(Math.pow(boardSize, 2) / 2.0)) {
+        } else if (whiteCounters < halfTotalCounters) {
             return Counter.COLOUR.BLACK;
         } else {
             return null;
@@ -370,13 +377,10 @@ public class Board implements Serializable {
             ois = new ObjectInputStream(bis);
             newBoard = (Board) ois.readObject();
             return newBoard;
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 

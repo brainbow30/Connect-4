@@ -11,22 +11,21 @@ import java.io.ObjectInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 @Component
 class Game {
     private Board board;
-    private Player player1;
-    private Player player2;
+    private final Player player1;
+    private final Player player2;
     private Player currentTurnsPlayer;
     private final Gson gson;
     private final MessageProducer messageProducer;
-    private List<Board> previousBoards = new LinkedList<>();
-
-
+    private final List<Board> previousBoards = new LinkedList<>();
 
 
     @Autowired
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson,
-                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${mcts.heurstic}") double mctsHuersticWeighting, @Value("${mcts.random}") double mctsRandomWeighting) {
+                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime) {
 
         this.board = board;
         this.messageProducer = messageProducer;
@@ -34,13 +33,13 @@ class Game {
         if (humanPlayer1) {
             this.player1 = new HumanPlayer(Counter.COLOUR.WHITE, messageProducer);
         } else {
-            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime, mctsHuersticWeighting, mctsRandomWeighting);
+            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
         }
         if (humanPlayer2) {
             this.player2 = new HumanPlayer(Counter.COLOUR.BLACK, messageProducer);
         } else {
 
-            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime, mctsHuersticWeighting, mctsRandomWeighting);
+            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
         }
         currentTurnsPlayer = player1;
     }
@@ -78,6 +77,7 @@ class Game {
 
 
     //@KafkaListener(topics = "${player1.topic}", groupId = "foo")
+    @SuppressWarnings("unused")
     public void player1Turn(String data) {
         try {
             //System.out.println("player1 received board");
@@ -186,13 +186,6 @@ class Game {
 
     }
 
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    public Player getPlayer2() {
-        return player2;
-    }
 
     public void reset() {
         board.reset();

@@ -10,21 +10,16 @@ public class ComputerPlayer implements Player {
     private final Counter.COLOUR counterColour;
     private final MessageProducer producer;
     private final Integer waitTime;
-    private final double heursticWeighting;
-    private final double randomWeighting;
     private TreeNode previousNode;
 
-    private Integer moveFunction;
+    private final Integer moveFunction;
 
 
-    public ComputerPlayer(Counter.COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime,
-                          double heursticWeighting, double randomWeighting) {
+    public ComputerPlayer(Counter.COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
         this.counterColour = counterColour;
         this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
-        this.heursticWeighting = heursticWeighting;
-        this.randomWeighting = randomWeighting;
         this.previousNode = null;
     }
 
@@ -98,11 +93,10 @@ public class ComputerPlayer implements Player {
         if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
-            //todo check values are propagating correctly
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), this.counterColour, waitTime, heursticWeighting, randomWeighting);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime, heursticWeighting, randomWeighting);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime);
         }
         currentNode = monteCarloTreeSearch.run();
         this.previousNode = currentNode;

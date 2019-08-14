@@ -1,95 +1,51 @@
 package application;
 
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Stopwatch;
 
-import java.util.Random;
-
-
-public class MonteCarloTreeSearch {
-
-    private TreeNode root;
-    private Integer waitTime;
-    private static double epsilon = 1e-6;
-    private Counter.COLOUR colour;
-    private final double heursticWeighting;
-    private final double randomWeighting;
+import java.util.concurrent.TimeUnit;
 
 
-    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime,
-                                double heursticWeighting, double randomWeighting) {
-        this.root = new TreeNode(null, board, colour, colour, null, heursticWeighting, randomWeighting);
+class MonteCarloTreeSearch {
+
+    private final TreeNode root;
+    private final Integer waitTime;
+
+
+    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime) {
+        this.root = new TreeNode(null, board, colour, colour, null);
         root.visited();
-        this.colour = colour;
         this.waitTime = waitTime;
-        this.heursticWeighting = heursticWeighting;
-        this.randomWeighting = randomWeighting;
+
 
 
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Counter.COLOUR colour, Integer waitTime,
-                                double heursticWeighting, double randomWeighting) {
+    public MonteCarloTreeSearch(TreeNode node, Integer waitTime) {
         this.root = node;
         root.visited();
         root.setRoot();
-        this.colour = colour;
         this.waitTime = waitTime;
-        this.heursticWeighting = heursticWeighting;
-        this.randomWeighting = randomWeighting;
 
 
     }
 
     public TreeNode run() {
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + waitTime;
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
 
-        while (System.currentTimeMillis() < endTime) {
-
-            TreeNode selectedNode = selectNode(root);
+            TreeNode selectedNode = root.selectMove();
             while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
-                    selectedNode = selectNode(selectedNode);
+                selectedNode = selectedNode.selectMove();
             }
 
             Integer result = selectedNode.simulateGame();
-            selectedNode.addResult(result);
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
 
-        TreeNode newNode = root.selectMove();
-        return newNode;
+        return root.selectMove();
     }
-
-    private TreeNode selectNode(TreeNode node) {
-        Random random = new Random();
-        ImmutableList<TreeNode> children = node.getChildren();
-        if (node.getChildren().size() == 0) {
-            node.setTerminalNode();
-            return node;
-        }
-        int bestIndex = 0;
-        double bestValue = 0;
-        int i = 0;
-        for (TreeNode child : children) {
-            double heursticValue = child.getCurrentBoard().getBoardHeurstic(colour, 1);
-
-            double randomValue = random.nextDouble();
-
-            double combinedValue = (heursticValue * heursticWeighting) + (randomValue * randomWeighting);
-
-            if (combinedValue > bestValue) {
-                bestValue = combinedValue;
-                bestIndex = i;
-            }
-            i++;
-        }
-
-        return children.get(bestIndex);
-
-    }
-
 
     private void propagateResult(TreeNode node, Integer result) {
 

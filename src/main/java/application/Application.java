@@ -1,6 +1,5 @@
 package application;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,14 +12,16 @@ import java.util.UUID;
 
 @SpringBootApplication
 class Application {
-    @Autowired
-    private Game game;
+    private final Game game;
     @Value("${localGame}")
     Boolean localGame;
 
     @Value("${numberOfGames}")
     Integer numberOfGames;
 
+    public Application(Game game) {
+        this.game = game;
+    }
 
 
     public static void main(String[] args) {

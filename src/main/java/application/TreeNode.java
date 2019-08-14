@@ -11,25 +11,22 @@ public class TreeNode implements Serializable {
     private Integer numberOfWins = 0;
     private Integer numberOfSimulations = 0;
     private Boolean visited = false;
-    private Board currentBoard;
-    private Counter.COLOUR colour;
+    private final Board currentBoard;
+    private final Counter.COLOUR colour;
     private final Counter.COLOUR rootColour;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
     private ImmutablePosition positionToCreateBoard;
-    private double heursticWeighting;
-    private double randomWeighting;
-    private static double epsilon = 1e-6;
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position, double heursticWeighting, double randomWeighting) {
+
+    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
         this.rootColour = rootColour;
         this.positionToCreateBoard = position;
         this.children = ImmutableList.of();
-        this.heursticWeighting = heursticWeighting;
-        this.randomWeighting = randomWeighting;
+
 
 
     }
@@ -63,7 +60,7 @@ public class TreeNode implements Serializable {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move, heursticWeighting, randomWeighting);
+            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
             builder.add(childNode);
         }
         return builder.build();
@@ -81,11 +78,11 @@ public class TreeNode implements Serializable {
         return parent;
     }
 
-    public Integer getNumberOfWins() {
+    private Integer getNumberOfWins() {
         return numberOfWins;
     }
 
-    public Integer getNumberOfSimulations() {
+    private Integer getNumberOfSimulations() {
         return numberOfSimulations;
     }
 
@@ -93,7 +90,7 @@ public class TreeNode implements Serializable {
         return visited;
     }
 
-    public ImmutableList<TreeNode> getChildren() {
+    private ImmutableList<TreeNode> getChildren() {
         if (children.isEmpty()) {
             children = ImmutableList.copyOf(generateChildren());
         }
@@ -101,7 +98,7 @@ public class TreeNode implements Serializable {
 
     }
 
-    public void setTerminalNode() {
+    private void setTerminalNode() {
         terminalNode = true;
     }
 
@@ -110,7 +107,6 @@ public class TreeNode implements Serializable {
     }
 
     public Integer simulateGame() {
-        //todo simulate game through treenodes not through board
         if (this.isTerminalNode()) {
             Counter.COLOUR winner = this.getCurrentBoard().getWinner(false);
 
@@ -135,9 +131,10 @@ public class TreeNode implements Serializable {
     public TreeNode selectMove() {
         Random random = new Random();
         ImmutableList<TreeNode> children = this.getChildren();
-        Double bestValue = Double.MIN_VALUE;
+        double bestValue = Double.MIN_VALUE;
         TreeNode selected = null;
         for (TreeNode child : children) {
+            double epsilon = 1e-6;
             double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
                     Math.sqrt(Math.log(this.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
                     random.nextDouble() * epsilon;
@@ -163,16 +160,14 @@ public class TreeNode implements Serializable {
         numberOfWins += result;
     }
 
-    public Board getCurrentBoard() {
+    private Board getCurrentBoard() {
         return currentBoard;
     }
 
     public TreeNode findChildBoardMatch(Board board) {
-        System.out.println("board = " + board.getCountersPlayed());
-        System.out.println("this.getCurrentBoard().getCountersPlayed() = " + this.getCurrentBoard().getCountersPlayed());
         if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
             for (TreeNode child : this.getChildren()) {
-                System.out.println("child = " + child.getCurrentBoard().printBoard());
+
                 //todo override equals method in board
                 if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
                     return child.clone();
@@ -186,15 +181,9 @@ public class TreeNode implements Serializable {
                 }
             }
         }
-        Counter.COLOUR newColour;
-        if (this.colour.equals(Counter.COLOUR.WHITE)) {
-            newColour = Counter.COLOUR.BLACK;
-        } else {
-            newColour = Counter.COLOUR.WHITE;
-        }
         //todo issue with generate children such that children arent correct and it cant find board after invalid move
         System.out.println("created new root node");
-        return new TreeNode(null, board, rootColour, rootColour, null, heursticWeighting, randomWeighting);
+        return new TreeNode(null, board, rootColour, rootColour, null);
     }
 
 
@@ -205,6 +194,7 @@ public class TreeNode implements Serializable {
 
     @Override
     public TreeNode clone() {
+        //noinspection DuplicatedCode
         try {
             TreeNode newTreeNode;
             ByteArrayInputStream bis;
@@ -218,13 +208,10 @@ public class TreeNode implements Serializable {
             ois = new ObjectInputStream(bis);
             newTreeNode = (TreeNode) ois.readObject();
             return newTreeNode;
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }

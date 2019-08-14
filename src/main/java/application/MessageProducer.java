@@ -23,12 +23,12 @@ class MessageProducer {
     private String topicName1;
 
 
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Autowired
-    public MessageProducer(Gson gson) {
+    public MessageProducer(Gson gson, KafkaTemplate<String, String> kafkaTemplate) {
         this.gson = gson;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     private void sendMessage(String topicName, Integer partition, String key, Object value) {
