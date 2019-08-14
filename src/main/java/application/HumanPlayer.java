@@ -77,4 +77,9 @@ public class HumanPlayer implements Player {
     public Counter.COLOUR getCounterColour() {
         return counterColour;
     }
+
+
+    public void reset() {
+
+    }
 }

@@ -8,5 +8,7 @@ interface Player {
 
     Counter.COLOUR getCounterColour();
 
+    void reset();
+
 
 }

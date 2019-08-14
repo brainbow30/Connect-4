@@ -19,6 +19,7 @@ public class TreeNode implements Serializable {
     private ImmutablePosition positionToCreateBoard;
     private double heursticWeighting;
     private double randomWeighting;
+    private static double epsilon = 1e-6;
 
     public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position, double heursticWeighting, double randomWeighting) {
         this.parent = parent;
@@ -50,6 +51,14 @@ public class TreeNode implements Serializable {
             if (currentBoard.getValidMoves(newColour).size() == 0) {
                 terminalNode = true;
             }
+            if (newColour.equals(Counter.COLOUR.WHITE)) {
+                newColour = Counter.COLOUR.BLACK;
+            } else {
+                newColour = Counter.COLOUR.WHITE;
+            }
+            validMoves = currentBoard.getValidMoves(newColour);
+            counter.flip();
+
         }
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
@@ -101,87 +110,57 @@ public class TreeNode implements Serializable {
     }
 
     public Integer simulateGame() {
-        return simulateGame(this.currentBoard.clone(), this.colour);
-    }
-
-    public Integer simulateGame(Board board, Counter.COLOUR colour) {
         //todo simulate game through treenodes not through board
-        Counter.COLOUR newColour;
-        if (colour.equals(Counter.COLOUR.WHITE)) {
-            newColour = Counter.COLOUR.BLACK;
-        } else {
-            newColour = Counter.COLOUR.WHITE;
-        }
+        if (this.isTerminalNode()) {
+            Counter.COLOUR winner = this.getCurrentBoard().getWinner(false);
 
-        ImmutableList<ImmutablePosition> validMoves = ImmutableList.copyOf(board.getValidMoves(colour));
-        if (validMoves.size() == 0) {
-            validMoves = ImmutableList.copyOf(board.getValidMoves(newColour));
-            if (validMoves.size() == 0) {
+            if (winner == null) {
+                return 0;
+            } else if (winner.equals(rootColour)) {
 
-                Counter.COLOUR winner = board.getWinner(false);
-
-                if (winner == null) {
-                    return 0;
-                } else if (winner.equals(rootColour)) {
-
-                    return 1;
-
-                } else {
-                    return 0;
-                }
+                return 1;
 
             } else {
-                Counter.COLOUR temp = colour;
-                //this.colour=newColour;
-                colour = newColour;
-                newColour = temp;
+                return 0;
             }
-
+        } else {
+            Integer result = this.selectMove().simulateGame();
+            addResult(result);
+            return result;
         }
-        Counter counter = new Counter(colour);
-        ImmutablePosition nextMove = pickNextMove(board.clone(), validMoves, colour);
-
-        board.addCounter(counter, nextMove);
-
-        return simulateGame(board.clone(), newColour);
 
 
     }
 
-    private ImmutablePosition pickNextMove(Board board, ImmutableList<ImmutablePosition> validMoves, Counter.COLOUR colour) {
+    public TreeNode selectMove() {
         Random random = new Random();
-
-        int bestIndex = 0;
-        double bestValue = 0;
-        int i = 0;
-        for (ImmutablePosition pos : validMoves) {
-            Board newBoard = board.clone();
-            Counter counter = new Counter(colour);
-            newBoard.addCounter(counter, pos);
-            //double heursticValue = newBoard.getBoardHeurstic(this.rootColour);
-            double heursticValue = 10 * validMoves.size();
-            double randomValue = random.nextDouble();
-
-            double combinedValue = (heursticValue * heursticWeighting) + (randomValue * randomWeighting);
-
-            if (combinedValue > bestValue) {
-                bestValue = combinedValue;
-                bestIndex = i;
+        ImmutableList<TreeNode> children = this.getChildren();
+        Double bestValue = Double.MIN_VALUE;
+        TreeNode selected = null;
+        for (TreeNode child : children) {
+            double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
+                    Math.sqrt(Math.log(this.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
+                    random.nextDouble() * epsilon;
+            //System.out.println("uctValue = " + uctValue);
+            if (uctValue > bestValue) {
+                selected = child;
+                bestValue = uctValue;
             }
-            i++;
+
         }
-        return validMoves.get(bestIndex);
+        if (selected == null) {
+            this.setTerminalNode();
+            return this;
+        }
+
+        return selected;
 
 
     }
 
     public void addResult(Integer result) {
         this.numberOfSimulations++;
-        if (result.equals(1)) {
-            this.numberOfWins++;
-        }
-
-
+        numberOfWins += result;
     }
 
     public Board getCurrentBoard() {
@@ -189,16 +168,35 @@ public class TreeNode implements Serializable {
     }
 
     public TreeNode findChildBoardMatch(Board board) {
-        for (TreeNode child : this.getChildren()) {
-            //todo override equals method in board
-            if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
-                System.out.println("childSims = " + child.getNumberOfSimulations());
-                return child.clone();
+        System.out.println("board = " + board.getCountersPlayed());
+        System.out.println("this.getCurrentBoard().getCountersPlayed() = " + this.getCurrentBoard().getCountersPlayed());
+        if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
+            for (TreeNode child : this.getChildren()) {
+                System.out.println("child = " + child.getCurrentBoard().printBoard());
+                //todo override equals method in board
+                if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
+                    return child.clone();
+                }
+            }
+        } else if (this.getCurrentBoard().getCountersPlayed() < board.getCountersPlayed()) {
+            for (TreeNode child : this.getChildren()) {
+                TreeNode childBoardMatch = child.clone().findChildBoardMatch(board);
+                if (childBoardMatch != null) {
+                    return childBoardMatch;
+                }
             }
         }
-        //todo replace null
-        return null;
+        Counter.COLOUR newColour;
+        if (this.colour.equals(Counter.COLOUR.WHITE)) {
+            newColour = Counter.COLOUR.BLACK;
+        } else {
+            newColour = Counter.COLOUR.WHITE;
+        }
+        //todo issue with generate children such that children arent correct and it cant find board after invalid move
+        System.out.println("created new root node");
+        return new TreeNode(null, board, rootColour, rootColour, null, heursticWeighting, randomWeighting);
     }
+
 
     public void setRoot() {
         this.parent = null;

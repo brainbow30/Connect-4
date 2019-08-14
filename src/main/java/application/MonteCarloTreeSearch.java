@@ -16,7 +16,8 @@ public class MonteCarloTreeSearch {
     private final double randomWeighting;
 
 
-    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime, double heursticWeighting, double randomWeighting) {
+    public MonteCarloTreeSearch(Board board, Counter.COLOUR colour, Integer waitTime,
+                                double heursticWeighting, double randomWeighting) {
         this.root = new TreeNode(null, board, colour, colour, null, heursticWeighting, randomWeighting);
         root.visited();
         this.colour = colour;
@@ -27,7 +28,8 @@ public class MonteCarloTreeSearch {
 
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Counter.COLOUR colour, Integer waitTime, double heursticWeighting, double randomWeighting) {
+    public MonteCarloTreeSearch(TreeNode node, Counter.COLOUR colour, Integer waitTime,
+                                double heursticWeighting, double randomWeighting) {
         this.root = node;
         root.visited();
         root.setRoot();
@@ -43,12 +45,6 @@ public class MonteCarloTreeSearch {
         long startTime = System.currentTimeMillis();
         long endTime = startTime + waitTime;
 
-        System.out.println("\nbefore");
-        for (TreeNode node : root.getChildren()) {
-            System.out.println();
-            System.out.println("wins = " + node.getNumberOfWins());
-            System.out.println("played = " + node.getNumberOfSimulations());
-        }
         while (System.currentTimeMillis() < endTime) {
 
             TreeNode selectedNode = selectNode(root);
@@ -57,21 +53,12 @@ public class MonteCarloTreeSearch {
             }
 
             Integer result = selectedNode.simulateGame();
+            selectedNode.addResult(result);
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
-        System.out.println("\nafter");
-        for (TreeNode node : root.getChildren()) {
-            System.out.println();
-            System.out.println("wins = " + node.getNumberOfWins());
-            System.out.println("played = " + node.getNumberOfSimulations());
-        }
 
-        TreeNode newNode = selectMove(root);
-        System.out.println("\nselected");
-        System.out.println("wins = " + newNode.getNumberOfWins());
-        System.out.println("played = " + newNode.getNumberOfSimulations());
-
+        TreeNode newNode = root.selectMove();
         return newNode;
     }
 
@@ -103,37 +90,15 @@ public class MonteCarloTreeSearch {
 
     }
 
-    private TreeNode selectMove(TreeNode node) {
-        Random random = new Random();
-        ImmutableList<TreeNode> children = node.getChildren();
-        Double bestValue = Double.MIN_VALUE;
-        TreeNode selected = null;
-        for (TreeNode child : children) {
-            double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
-                    Math.sqrt(Math.log(node.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
-                    random.nextDouble() * epsilon;
-            //System.out.println("uctValue = " + uctValue);
-            if (uctValue > bestValue) {
-                selected = child;
-                bestValue = uctValue;
-            }
-
-        }
-        if (selected == null) {
-            node.setTerminalNode();
-            return node;
-        }
-
-        return selected;
-
-
-    }
 
     private void propagateResult(TreeNode node, Integer result) {
+
         while (node.getParent() != null) {
             node.addResult(result);
             node = node.getParent();
         }
+        node.addResult(result);
+
     }
 
 }

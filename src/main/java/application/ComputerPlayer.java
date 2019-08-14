@@ -94,11 +94,11 @@ public class ComputerPlayer implements Player {
     private ImmutablePosition getNextPositionMCTS(Board board) {
         MonteCarloTreeSearch monteCarloTreeSearch;
         TreeNode currentNode;
-        if (previousNode != null) {
+        //todo find replacement for previous node
+        if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
             //todo check values are propagating correctly
-
             monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), this.counterColour, waitTime, heursticWeighting, randomWeighting);
 
         } else {
@@ -108,6 +108,10 @@ public class ComputerPlayer implements Player {
         this.previousNode = currentNode;
         return currentNode.getPositionToCreateBoard();
 
+    }
+
+    public void reset() {
+        previousNode = null;
     }
 
 }

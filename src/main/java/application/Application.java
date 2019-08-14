@@ -38,6 +38,7 @@ class Application {
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
+
             if (localGame) {
                 Integer player1Wins = 0;
 
@@ -45,6 +46,7 @@ class Application {
                 for (int i = 0; i < numberOfGames; i++) {
                     System.out.println("Local Game");
                     game.reset();
+
                     Player winner = game.play();
                     if (winner.getCounterColour().equals(Counter.COLOUR.WHITE)) {
                         player1Wins++;

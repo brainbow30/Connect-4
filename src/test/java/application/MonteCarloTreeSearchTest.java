@@ -3,7 +3,7 @@ package application;
 import org.junit.Test;
 
 public class MonteCarloTreeSearchTest {
-    private Board board = new Board(8, new Verifier());
+    private Board board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
     private MonteCarloTreeSearch monteCarloTreeSearch;
 
 

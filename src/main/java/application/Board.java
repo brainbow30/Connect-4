@@ -19,20 +19,23 @@ public class Board implements Serializable {
 
 
     //heuristic values
-    @Value("${evaluationValue.discNum}")
     private Double evaluationDiscValue;
-    @Value("${evaluationValue.mobility}")
     private Double evaluationMobilityValue;
-    @Value("${evaluationValue.stableNum}")
     private Double evaluationStableDiscValue;
 
 
 
     @Autowired
-    public Board(@Value("${board.size}") Integer boardSize, Verifier verifier) {
+    public Board(@Value("${board.size}") Integer boardSize, Verifier verifier,
+                 @Value("${evaluationValue.discNum}") Double evaluationDiscValue,
+                 @Value("${evaluationValue.mobility}") Double evaluationMobilityValue,
+                 @Value("${evaluationValue.stableNum}") Double evaluationStableDiscValue) {
         this.boardSize = boardSize;
         this.board = setupBoard();
         this.verifier = verifier;
+        this.evaluationStableDiscValue = evaluationStableDiscValue;
+        this.evaluationMobilityValue = evaluationMobilityValue;
+        this.evaluationDiscValue = evaluationDiscValue;
     }
 
     public void reset() {
@@ -71,7 +74,6 @@ public class Board implements Serializable {
         }
         countersPlayed = 4;
         numberOfWhiteCounters = 2;
-
         return boardBuilder.build();
 
 
@@ -313,7 +315,6 @@ public class Board implements Serializable {
         if (evaluationFunction == 1) {
             huersticValue = numberOfValidMoves(colour) * evaluationMobilityValue
                     + numberOfStableDiscs(colour) * evaluationStableDiscValue;
-
             if (colour.equals(Counter.COLOUR.WHITE)) {
                 huersticValue += numberOfWhiteCounters * evaluationDiscValue;
             } else {
