@@ -1,5 +1,8 @@
 package application;
 
+import application.game.COLOUR;
+import application.game.Game;
+import application.players.Player;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

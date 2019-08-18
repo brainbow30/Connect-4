@@ -1,5 +1,9 @@
-package application;
+package application.game;
 
+import application.players.ComputerPlayer;
+import application.players.HumanPlayer;
+import application.players.Player;
+import application.utils.MessageProducer;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +17,7 @@ import java.util.List;
 
 @SuppressWarnings("unused")
 @Component
+public
 class Game {
     private final Player player1;
     private final Player player2;

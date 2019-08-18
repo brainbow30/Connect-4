@@ -1,5 +1,6 @@
-package application;
+package application.utils;
 
+import application.game.Board;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +16,7 @@ import java.io.ObjectOutputStream;
 
 
 @Component
-class MessageProducer {
+public class MessageProducer {
     private final Gson gson;
     @Value("${player2.topic}")
     private String topicName2;

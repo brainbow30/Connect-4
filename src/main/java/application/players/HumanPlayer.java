@@ -1,4 +1,10 @@
-package application;
+package application.players;
+
+import application.ImmutablePosition;
+import application.game.Board;
+import application.game.COLOUR;
+import application.game.Counter;
+import application.utils.MessageProducer;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

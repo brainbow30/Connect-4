@@ -1,4 +1,4 @@
-package application;
+package application.game;
 
 
 import org.springframework.beans.factory.annotation.Autowired;

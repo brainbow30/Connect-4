@@ -1,11 +1,13 @@
-package application;
+package application.game;
 
+import application.ImmutablePosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
 @Component
+public
 class Verifier implements Serializable {
     @Autowired
     public Verifier() {

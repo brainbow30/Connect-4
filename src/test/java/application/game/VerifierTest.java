@@ -1,5 +1,6 @@
-package application;
+package application.game;
 
+import application.ImmutablePosition;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +11,7 @@ public class VerifierTest {
 
     private Board board;
     private Counter counter;
-    private ImmutablePosition position;
+    private application.ImmutablePosition position;
 
 
     @Test
@@ -19,7 +20,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
         verifier = new Verifier();
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(5);
         builder.y(3);
         position = builder.build();
@@ -34,7 +35,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
         verifier = new Verifier();
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(2);
         builder.y(4);
         position = builder.build();
@@ -50,7 +51,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
 
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(5);
         builder.y(3);
         position = builder.build();
@@ -71,7 +72,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
         verifier = new Verifier();
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
         builder.x(2);
         position = builder.build();
@@ -85,7 +86,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
         verifier = new Verifier();
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
         builder.x(1);
         position = builder.build();
@@ -99,7 +100,7 @@ public class VerifierTest {
         counter = new Counter(COLOUR.WHITE);
         verifier = new Verifier();
 
-        ImmutablePosition.Builder builder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder builder = ImmutablePosition.builder();
         builder.y(3);
         builder.x(3);
         position = builder.build();

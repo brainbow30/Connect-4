@@ -1,4 +1,4 @@
-package utils;
+package application.utils;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;

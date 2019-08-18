@@ -1,4 +1,4 @@
-package utils;
+package application.utils;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;

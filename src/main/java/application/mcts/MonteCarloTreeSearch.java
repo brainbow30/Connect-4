@@ -1,12 +1,14 @@
-package application;
+package application.mcts;
 
 
+import application.game.Board;
+import application.game.COLOUR;
 import com.google.common.base.Stopwatch;
 
 import java.util.concurrent.TimeUnit;
 
 
-class MonteCarloTreeSearch {
+public class MonteCarloTreeSearch {
 
     private final TreeNode root;
     private final Integer waitTime;

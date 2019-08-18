@@ -1,5 +1,9 @@
-package application;
+package application.mcts;
 
+import application.ImmutablePosition;
+import application.game.Board;
+import application.game.COLOUR;
+import application.game.Verifier;
 import org.junit.Test;
 
 public class MonteCarloTreeSearchTest {

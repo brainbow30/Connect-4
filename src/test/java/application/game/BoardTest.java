@@ -1,5 +1,6 @@
-package application;
+package application.game;
 
+import application.ImmutablePosition;
 import com.google.common.base.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +22,7 @@ public class BoardTest {
     @Test
     public void setupTest() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(3).y(3);
         //noinspection OptionalGetWithoutIsPresent
         assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.WHITE);
@@ -42,7 +43,7 @@ public class BoardTest {
 
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
         board.addCounter(counter1, positionBuilder.build());
 
@@ -55,7 +56,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(-1).y(-1);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
 
@@ -65,7 +66,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest1() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
 
         positionBuilder.x(0).y(-1);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
@@ -76,7 +77,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest2() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
 
         positionBuilder.x(-1).y(0);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
@@ -87,7 +88,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest3() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
 
         positionBuilder.x(8).y(8);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
@@ -98,7 +99,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest4() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
 
         positionBuilder.x(7).y(8);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
@@ -109,7 +110,7 @@ public class BoardTest {
     @Test
     public void addCounterOutOfBoundsTest5() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
 
         positionBuilder.x(8).y(7);
         assertEquals(false, board.addCounter(counter, positionBuilder.build()));
@@ -121,7 +122,7 @@ public class BoardTest {
     @Test
     public void getCounterOutOfBounds() {
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(-1).y(-1);
 
         assertEquals(Optional.absent(), board.getCounter(positionBuilder.build()));
@@ -137,7 +138,7 @@ public class BoardTest {
     public void flipLeftCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -152,7 +153,7 @@ public class BoardTest {
     public void flipRightCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(2).y(4);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -167,7 +168,7 @@ public class BoardTest {
     public void flipUpCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(3).y(5);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -182,7 +183,7 @@ public class BoardTest {
     public void flipDownCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(4).y(2);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -197,7 +198,7 @@ public class BoardTest {
     public void flipLeftDownCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -217,7 +218,7 @@ public class BoardTest {
     public void flipRightUpCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter();
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -237,7 +238,7 @@ public class BoardTest {
     public void flipRightDownCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter(COLOUR.BLACK);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(2).y(3);
 
         board.addCounter(counter1, positionBuilder.build());
@@ -257,7 +258,7 @@ public class BoardTest {
     public void flipLeftUpCounterTest() {
         board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
         Counter counter1 = new Counter(COLOUR.BLACK);
-        ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
+        application.ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
         positionBuilder.x(5).y(4);
 
         board.addCounter(counter1, positionBuilder.build());

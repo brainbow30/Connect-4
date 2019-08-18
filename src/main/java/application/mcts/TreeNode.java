@@ -1,5 +1,9 @@
-package application;
+package application.mcts;
 
+import application.ImmutablePosition;
+import application.game.Board;
+import application.game.COLOUR;
+import application.game.Counter;
 import com.google.common.collect.ImmutableList;
 
 import java.io.*;

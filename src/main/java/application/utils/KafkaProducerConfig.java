@@ -1,4 +1,4 @@
-package utils;
+package application.utils;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
