@@ -148,7 +148,7 @@ public class TreeNode implements Serializable {
 
     public void addResult(Counter.COLOUR result) {
         this.numberOfSimulations++;
-        if (result.equals(rootColour)) {
+        if (result != null && result.equals(rootColour)) {
             numberOfWins++;
         }
     }
@@ -158,13 +158,11 @@ public class TreeNode implements Serializable {
     }
 
     public TreeNode findChildBoardMatch(Board board) {
-        if (this.getCurrentBoard().printBoard().equals(board.printBoard())) {
+        if (this.getCurrentBoard().equals(board)) {
             return this;
         } else if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
             for (TreeNode child : this.getChildren()) {
-
-                //todo override equals method in board
-                if (child.getCurrentBoard().printBoard().equals(board.printBoard())) {
+                if (child.getCurrentBoard().equals(board)) {
                     return child.clone();
                 }
             }
@@ -177,10 +175,7 @@ public class TreeNode implements Serializable {
                 }
             }
         }
-        //todo issue with generate children such that children arent correct and it cant find board after invalid move
         return null;
-//        System.out.println("created new root node");
-//        return new TreeNode(null, board, rootColour, rootColour, null);
     }
 
 
@@ -209,6 +204,20 @@ public class TreeNode implements Serializable {
             e.printStackTrace();
             return null;
 
+        }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        try {
+            TreeNode node = (TreeNode) object;
+            return node.getCurrentBoard().equals(this.getCurrentBoard())
+                    && this.positionToCreateBoard.equals(node.positionToCreateBoard)
+                    && this.colour.equals(node.colour)
+                    && this.rootColour.equals(node.rootColour);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

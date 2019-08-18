@@ -384,4 +384,16 @@ public class Board implements Serializable {
         }
     }
 
+    @Override
+    public boolean equals(Object object) {
+        try {
+            Board board = (Board) object;
+            return board.printBoard().equals(this.printBoard());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
 }

@@ -45,15 +45,15 @@ class Game {
     }
 
     public Player play() {
-        int numberOfConcecutivePasses = 0;
-        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConcecutivePasses < 2) {
+        int numberOfConsecutivePasses = 0;
+        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
             System.out.println("board = " + board.printBoard());
             if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
                 board = currentTurnsPlayer.playTurn(board);
-                numberOfConcecutivePasses = 0;
+                numberOfConsecutivePasses = 0;
             } else {
                 System.out.println("No valid moves, turn passes");
-                numberOfConcecutivePasses += 1;
+                numberOfConsecutivePasses += 1;
 
 
             }
