@@ -1,6 +1,7 @@
 package application.game;
 
 import application.ImmutablePosition;
+import application.Position;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;

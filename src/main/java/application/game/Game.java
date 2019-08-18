@@ -15,7 +15,6 @@ import java.io.ObjectInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @Component
 public
 class Game {

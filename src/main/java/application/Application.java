@@ -3,6 +3,7 @@ package application;
 import application.game.COLOUR;
 import application.game.Game;
 import application.players.Player;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,15 +16,16 @@ import java.util.UUID;
 
 @SpringBootApplication
 class Application {
-    private final Game game;
-    @Value("${localGame}")
-    Boolean localGame;
 
-    @Value("${numberOfGames}")
+    private final Game game;
+    Boolean localGame;
     Integer numberOfGames;
 
-    public Application(Game game) {
+    @Autowired
+    public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames) {
         this.game = game;
+        this.localGame = localGame;
+        this.numberOfGames = numberOfGames;
     }
 
 

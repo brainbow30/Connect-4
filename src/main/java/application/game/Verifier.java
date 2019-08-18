@@ -1,6 +1,7 @@
 package application.game;
 
 import application.ImmutablePosition;
+import application.Position;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
