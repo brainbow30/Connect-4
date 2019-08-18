@@ -44,16 +44,18 @@ public class TreeNode implements Serializable {
 
         if (validMoves.size() == 0) {
 
-            if (currentBoard.getValidMoves(newColour).size() == 0) {
+
+            validMoves = currentBoard.getValidMoves(newColour);
+            if (validMoves.size() == 0) {
                 terminalNode = true;
             }
+            counter.flip();
             if (newColour.equals(Counter.COLOUR.WHITE)) {
                 newColour = Counter.COLOUR.BLACK;
             } else {
                 newColour = Counter.COLOUR.WHITE;
             }
-            validMoves = currentBoard.getValidMoves(newColour);
-            counter.flip();
+
 
         }
         for (ImmutablePosition move : validMoves) {
@@ -164,7 +166,9 @@ public class TreeNode implements Serializable {
     }
 
     public TreeNode findChildBoardMatch(Board board) {
-        if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
+        if (this.getCurrentBoard().printBoard().equals(board.printBoard())) {
+            return this;
+        } else if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
             for (TreeNode child : this.getChildren()) {
 
                 //todo override equals method in board
@@ -173,6 +177,7 @@ public class TreeNode implements Serializable {
                 }
             }
         } else if (this.getCurrentBoard().getCountersPlayed() < board.getCountersPlayed()) {
+            System.out.println("recursive board search");
             for (TreeNode child : this.getChildren()) {
                 TreeNode childBoardMatch = child.clone().findChildBoardMatch(board);
                 if (childBoardMatch != null) {
@@ -181,8 +186,9 @@ public class TreeNode implements Serializable {
             }
         }
         //todo issue with generate children such that children arent correct and it cant find board after invalid move
-        System.out.println("created new root node");
-        return new TreeNode(null, board, rootColour, rootColour, null);
+        return null;
+//        System.out.println("created new root node");
+//        return new TreeNode(null, board, rootColour, rootColour, null);
     }
 
 
