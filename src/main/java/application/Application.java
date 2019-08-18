@@ -18,8 +18,8 @@ import java.util.UUID;
 class Application {
 
     private final Game game;
-    Boolean localGame;
-    Integer numberOfGames;
+    private final Boolean localGame;
+    private final Integer numberOfGames;
 
     @Autowired
     public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames) {
