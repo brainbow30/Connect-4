@@ -5,7 +5,7 @@ import org.immutables.value.Value;
 import java.io.Serializable;
 
 @Value.Immutable
-interface Position extends Serializable {
+public interface Position extends Serializable {
     Integer x();
 
     Integer y();
