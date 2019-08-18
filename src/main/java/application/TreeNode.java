@@ -107,21 +107,11 @@ public class TreeNode implements Serializable {
         return terminalNode;
     }
 
-    public Integer simulateGame() {
+    public Counter.COLOUR simulateGame() {
         if (this.isTerminalNode()) {
-            Counter.COLOUR winner = this.getCurrentBoard().getWinner(false);
-
-            if (winner == null) {
-                return 0;
-            } else if (winner.equals(rootColour)) {
-
-                return 1;
-
-            } else {
-                return 0;
-            }
+            return this.getCurrentBoard().getWinner(false);
         } else {
-            Integer result = this.selectMove().simulateGame();
+            Counter.COLOUR result = this.selectMove().simulateGame();
             addResult(result);
             return result;
         }
@@ -156,9 +146,11 @@ public class TreeNode implements Serializable {
 
     }
 
-    public void addResult(Integer result) {
+    public void addResult(Counter.COLOUR result) {
         this.numberOfSimulations++;
-        numberOfWins += result;
+        if (result.equals(rootColour)) {
+            numberOfWins++;
+        }
     }
 
     private Board getCurrentBoard() {
