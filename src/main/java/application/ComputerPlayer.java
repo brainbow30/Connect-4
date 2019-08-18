@@ -75,7 +75,7 @@ public class ComputerPlayer implements Player {
         for (ImmutablePosition position : validMoves) {
             Board futureBoard = board.clone();
             futureBoard.addCounter(counter, position);
-            Double boardHeurstic = futureBoard.getBoardHeurstic(this.counterColour, 1);
+            Double boardHeurstic = futureBoard.getBoardHeuristic(this.counterColour, 1);
             if (boardHeurstic > bestBoardHeurstic) {
                 bestBoardHeurstic = boardHeurstic;
                 bestMove = position;

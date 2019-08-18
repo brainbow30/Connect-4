@@ -35,12 +35,8 @@ public class TreeNode implements Serializable {
         Counter counter = new Counter(colour);
         ImmutableList.Builder<TreeNode> builder = ImmutableList.builder();
         ImmutableList<ImmutablePosition> validMoves = currentBoard.getValidMoves(colour);
-        COLOUR newColour;
-        if (counter.getColour().equals(COLOUR.WHITE)) {
-            newColour = COLOUR.BLACK;
-        } else {
-            newColour = COLOUR.WHITE;
-        }
+        COLOUR newColour = COLOUR.opposite(colour);
+
 
         if (validMoves.size() == 0) {
 
@@ -50,11 +46,7 @@ public class TreeNode implements Serializable {
                 terminalNode = true;
             }
             counter.flip();
-            if (newColour.equals(COLOUR.WHITE)) {
-                newColour = COLOUR.BLACK;
-            } else {
-                newColour = COLOUR.WHITE;
-            }
+            newColour = COLOUR.opposite(newColour);
 
 
         }
@@ -134,7 +126,6 @@ public class TreeNode implements Serializable {
                 selected = child;
                 bestValue = uctValue;
             }
-
         }
         if (selected == null) {
             this.setTerminalNode();

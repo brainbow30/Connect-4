@@ -316,26 +316,26 @@ public class Board implements Serializable {
         return true;
     }
 
-    public Double getBoardHeurstic(COLOUR colour, int evaluationFunction) {
-        double huersticValue;
+    public Double getBoardHeuristic(COLOUR colour, int evaluationFunction) {
+        double heuristicValue;
         if (evaluationFunction == 1) {
-            huersticValue = numberOfValidMoves(colour) * evaluationMobilityValue
+            heuristicValue = numberOfValidMoves(colour) * evaluationMobilityValue
                     + numberOfStableDiscs(colour) * evaluationStableDiscValue;
             if (colour.equals(COLOUR.WHITE)) {
-                huersticValue += numberOfWhiteCounters * evaluationDiscValue;
+                heuristicValue += numberOfWhiteCounters * evaluationDiscValue;
             } else {
-                huersticValue += (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
+                heuristicValue += (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
             }
 
         } else {
-            System.out.println("Using basic huerstic function");
+            System.out.println("Using basic heuristic function");
             if (colour.equals(COLOUR.WHITE)) {
-                huersticValue = numberOfWhiteCounters * evaluationDiscValue;
+                heuristicValue = numberOfWhiteCounters * evaluationDiscValue;
             } else {
-                huersticValue = (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
+                heuristicValue = (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
             }
         }
-        return huersticValue;
+        return heuristicValue;
     }
 
 

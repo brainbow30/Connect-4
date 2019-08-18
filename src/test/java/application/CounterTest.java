@@ -8,11 +8,11 @@ public class CounterTest {
 
     @Test
     public void FlipTest() {
-        Counter counter = new Counter(Counter.COLOUR.BLACK);
+        Counter counter = new Counter(COLOUR.BLACK);
         counter.flip();
-        assertEquals(counter.getColour(), Counter.COLOUR.WHITE);
+        assertEquals(counter.getColour(), COLOUR.WHITE);
         counter.flip();
-        assertEquals(counter.getColour(), Counter.COLOUR.BLACK);
+        assertEquals(counter.getColour(), COLOUR.BLACK);
 
 
     }
