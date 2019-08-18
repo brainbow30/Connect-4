@@ -39,7 +39,7 @@ class MonteCarloTreeSearch {
                 selectedNode = selectedNode.selectMove();
             }
 
-            Integer result = selectedNode.simulateGame();
+            Counter.COLOUR result = selectedNode.simulateGame();
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
@@ -47,7 +47,7 @@ class MonteCarloTreeSearch {
         return root.selectMove();
     }
 
-    private void propagateResult(TreeNode node, Integer result) {
+    private void propagateResult(TreeNode node, Counter.COLOUR result) {
 
         while (node.getParent() != null) {
             node.addResult(result);
