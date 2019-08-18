@@ -6,7 +6,7 @@ interface Player {
 
     void playTurnKafka(Board board);
 
-    Counter.COLOUR getCounterColour();
+    COLOUR getCounterColour();
 
     void reset();
 

@@ -7,19 +7,19 @@ import java.util.Random;
 
 
 public class TreeNode implements Serializable {
+    private final Board currentBoard;
+    private final COLOUR colour;
+    private final COLOUR rootColour;
     private TreeNode parent;
     private Integer numberOfWins = 0;
     private Integer numberOfSimulations = 0;
     private Boolean visited = false;
-    private final Board currentBoard;
-    private final Counter.COLOUR colour;
-    private final Counter.COLOUR rootColour;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
     private ImmutablePosition positionToCreateBoard;
 
 
-    public TreeNode(TreeNode parent, Board currentBoard, Counter.COLOUR colour, Counter.COLOUR rootColour, ImmutablePosition position) {
+    public TreeNode(TreeNode parent, Board currentBoard, COLOUR colour, COLOUR rootColour, ImmutablePosition position) {
         this.parent = parent;
         this.currentBoard = currentBoard;
         this.colour = colour;
@@ -35,11 +35,11 @@ public class TreeNode implements Serializable {
         Counter counter = new Counter(colour);
         ImmutableList.Builder<TreeNode> builder = ImmutableList.builder();
         ImmutableList<ImmutablePosition> validMoves = currentBoard.getValidMoves(colour);
-        Counter.COLOUR newColour;
-        if (counter.getColour().equals(Counter.COLOUR.WHITE)) {
-            newColour = Counter.COLOUR.BLACK;
+        COLOUR newColour;
+        if (counter.getColour().equals(COLOUR.WHITE)) {
+            newColour = COLOUR.BLACK;
         } else {
-            newColour = Counter.COLOUR.WHITE;
+            newColour = COLOUR.WHITE;
         }
 
         if (validMoves.size() == 0) {
@@ -50,10 +50,10 @@ public class TreeNode implements Serializable {
                 terminalNode = true;
             }
             counter.flip();
-            if (newColour.equals(Counter.COLOUR.WHITE)) {
-                newColour = Counter.COLOUR.BLACK;
+            if (newColour.equals(COLOUR.WHITE)) {
+                newColour = COLOUR.BLACK;
             } else {
-                newColour = Counter.COLOUR.WHITE;
+                newColour = COLOUR.WHITE;
             }
 
 
@@ -107,11 +107,11 @@ public class TreeNode implements Serializable {
         return terminalNode;
     }
 
-    public Counter.COLOUR simulateGame() {
+    public COLOUR simulateGame() {
         if (this.isTerminalNode()) {
             return this.getCurrentBoard().getWinner(false);
         } else {
-            Counter.COLOUR result = this.selectMove().simulateGame();
+            COLOUR result = this.selectMove().simulateGame();
             addResult(result);
             return result;
         }
@@ -146,7 +146,7 @@ public class TreeNode implements Serializable {
 
     }
 
-    public void addResult(Counter.COLOUR result) {
+    public void addResult(COLOUR result) {
         this.numberOfSimulations++;
         if (result != null && result.equals(rootColour)) {
             numberOfWins++;

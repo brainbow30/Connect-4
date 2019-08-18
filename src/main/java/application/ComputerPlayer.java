@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class ComputerPlayer implements Player {
 
-    private final Counter.COLOUR counterColour;
+    private final COLOUR counterColour;
     private final MessageProducer producer;
     private final Integer waitTime;
     private TreeNode previousNode;
@@ -15,7 +15,7 @@ public class ComputerPlayer implements Player {
     private final Integer moveFunction;
 
 
-    public ComputerPlayer(Counter.COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
+    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
         this.counterColour = counterColour;
         this.producer = producer;
         this.moveFunction = moveFunction;
@@ -54,7 +54,7 @@ public class ComputerPlayer implements Player {
             }
 
         }
-        if (counterColour.equals(Counter.COLOUR.WHITE)) {
+        if (counterColour.equals(COLOUR.WHITE)) {
             producer.sendMessage2(0, java.time.LocalDateTime.now().toString(), board);
         } else {
             producer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
@@ -63,7 +63,7 @@ public class ComputerPlayer implements Player {
     }
 
     @Override
-    public Counter.COLOUR getCounterColour() {
+    public COLOUR getCounterColour() {
         return counterColour;
     }
 

@@ -49,7 +49,7 @@ class Application {
                     game.reset();
 
                     Player winner = game.play();
-                    if (winner.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+                    if (winner.getCounterColour().equals(COLOUR.WHITE)) {
                         player1Wins++;
                     }
                 }

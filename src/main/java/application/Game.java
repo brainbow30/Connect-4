@@ -14,13 +14,13 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Component
 class Game {
-    private Board board;
     private final Player player1;
     private final Player player2;
-    private Player currentTurnsPlayer;
     private final Gson gson;
     private final MessageProducer messageProducer;
     private final List<Board> previousBoards = new LinkedList<>();
+    private Board board;
+    private Player currentTurnsPlayer;
 
 
     @Autowired
@@ -31,15 +31,15 @@ class Game {
         this.messageProducer = messageProducer;
         this.gson = gson;
         if (humanPlayer1) {
-            this.player1 = new HumanPlayer(Counter.COLOUR.WHITE, messageProducer);
+            this.player1 = new HumanPlayer(COLOUR.WHITE, messageProducer);
         } else {
-            this.player1 = new ComputerPlayer(Counter.COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
+            this.player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
         }
         if (humanPlayer2) {
-            this.player2 = new HumanPlayer(Counter.COLOUR.BLACK, messageProducer);
+            this.player2 = new HumanPlayer(COLOUR.BLACK, messageProducer);
         } else {
 
-            this.player2 = new ComputerPlayer(Counter.COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
+            this.player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
         }
         currentTurnsPlayer = player1;
     }
@@ -164,17 +164,17 @@ class Game {
 
     private Player endGame(Board board) {
         System.out.println("final board = " + board.printBoard());
-        Counter.COLOUR winner = board.getWinner(true);
-        if (winner.equals(Counter.COLOUR.WHITE)) {
+        COLOUR winner = board.getWinner(true);
+        if (winner.equals(COLOUR.WHITE)) {
             System.out.println("White wins");
-            if (player1.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+            if (player1.getCounterColour().equals(COLOUR.WHITE)) {
                 return player1;
             } else {
                 return player2;
             }
-        } else if (winner.equals(Counter.COLOUR.BLACK)) {
+        } else if (winner.equals(COLOUR.BLACK)) {
             System.out.println("Black wins");
-            if (player1.getCounterColour().equals(Counter.COLOUR.BLACK)) {
+            if (player1.getCounterColour().equals(COLOUR.BLACK)) {
                 return player1;
             } else {
                 return player2;
