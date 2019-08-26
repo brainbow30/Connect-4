@@ -30,30 +30,23 @@ public class TreeNode implements Serializable {
         this.rootColour = rootColour;
         this.positionToCreateBoard = position;
         this.children = ImmutableList.of();
-
-
     }
 
     private ImmutableList<TreeNode> generateChildren() {
-
         Counter counter = new Counter(colour);
         ImmutableList.Builder<TreeNode> builder = ImmutableList.builder();
         ImmutableList<ImmutablePosition> validMoves = currentBoard.getValidMoves(colour);
         COLOUR newColour = COLOUR.opposite(colour);
 
-
         if (validMoves.size() == 0) {
-
-
             validMoves = currentBoard.getValidMoves(newColour);
             if (validMoves.size() == 0) {
-                terminalNode = true;
+                this.setTerminalNode();
             }
             counter.flip();
             newColour = COLOUR.opposite(newColour);
-
-
         }
+
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
@@ -75,11 +68,11 @@ public class TreeNode implements Serializable {
         return parent;
     }
 
-    private Integer getNumberOfWins() {
+    Integer getNumberOfWins() {
         return numberOfWins;
     }
 
-    private Integer getNumberOfSimulations() {
+    Integer getNumberOfSimulations() {
         return numberOfSimulations;
     }
 
@@ -92,7 +85,6 @@ public class TreeNode implements Serializable {
             children = ImmutableList.copyOf(generateChildren());
         }
         return children;
-
     }
 
     private void setTerminalNode() {
@@ -104,18 +96,17 @@ public class TreeNode implements Serializable {
     }
 
     public COLOUR simulateGame() {
+        COLOUR result;
         if (this.isTerminalNode()) {
-            return this.getCurrentBoard().getWinner(false);
+            result = this.getCurrentBoard().getWinner(false);
         } else {
-            COLOUR result = this.selectMove().simulateGame();
-            addResult(result);
-            return result;
+            result = this.selectRandomMove().simulateGame();
         }
-
-
+        addResult(result);
+        return result;
     }
 
-    public TreeNode selectMove() {
+    public TreeNode selectUCTMove() {
         Random random = new Random();
         ImmutableList<TreeNode> children = this.getChildren();
         double bestValue = Double.MIN_VALUE;
@@ -132,13 +123,19 @@ public class TreeNode implements Serializable {
             }
         }
         if (selected == null) {
-            this.setTerminalNode();
             return this;
         }
-
         return selected;
+    }
 
-
+    public TreeNode selectRandomMove() {
+        ImmutableList<TreeNode> children = this.getChildren();
+        if (children.size() > 0) {
+            Random random = new Random();
+            return this.children.get(random.nextInt(children.size()));
+        } else {
+            return this;
+        }
     }
 
     public void addResult(COLOUR result) {
@@ -173,7 +170,6 @@ public class TreeNode implements Serializable {
         return null;
     }
 
-
     public void setRoot() {
         this.parent = null;
         this.positionToCreateBoard = null;
@@ -198,7 +194,6 @@ public class TreeNode implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
-
         }
     }
 

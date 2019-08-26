@@ -36,9 +36,9 @@ public class MonteCarloTreeSearch {
         Stopwatch stopwatch = Stopwatch.createStarted();
         while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
 
-            TreeNode selectedNode = root.selectMove();
+            TreeNode selectedNode = root.selectRandomMove();
             while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
-                selectedNode = selectedNode.selectMove();
+                selectedNode = selectedNode.selectRandomMove();
             }
 
             COLOUR result = selectedNode.simulateGame();
@@ -46,7 +46,10 @@ public class MonteCarloTreeSearch {
             selectedNode.visited();
         }
 
-        return root.selectMove();
+        TreeNode selectMove = root.selectUCTMove();
+        System.out.println("selectMove = " + selectMove.getNumberOfWins());
+        System.out.println("selectMove sims = " + selectMove.getNumberOfSimulations());
+        return selectMove;
     }
 
     private void propagateResult(TreeNode node, COLOUR result) {

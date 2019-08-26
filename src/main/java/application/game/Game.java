@@ -51,7 +51,7 @@ class Game {
     public Player play() {
         int numberOfConsecutivePasses = 0;
         while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
-            System.out.println("board = " + board.printBoard());
+            System.out.println(board);
             if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
                 board = currentTurnsPlayer.playTurn(board);
                 numberOfConsecutivePasses = 0;
@@ -100,7 +100,7 @@ class Game {
                 endGame(board);
             } else {
                 this.currentTurnsPlayer = player1;
-                System.out.println("board = " + board.printBoard());
+                System.out.println(board);
 
                 if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
                     if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
@@ -144,7 +144,7 @@ class Game {
                 endGame(board);
             } else {
                 this.currentTurnsPlayer = player2;
-                System.out.println("board = " + board.printBoard());
+                System.out.println(board);
 
                 if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
                     if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
