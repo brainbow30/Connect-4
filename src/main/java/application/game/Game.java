@@ -58,25 +58,18 @@ class Game {
             } else {
                 System.out.println("No valid moves, turn passes");
                 numberOfConsecutivePasses += 1;
-
-
             }
             if (currentTurnsPlayer.equals(player1)) {
                 currentTurnsPlayer = player2;
             } else {
                 currentTurnsPlayer = player1;
             }
-
         }
         return endGame(board);
-
-
     }
 
     public void playKafka() {
-
         messageProducer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
-
     }
 
 
@@ -84,7 +77,6 @@ class Game {
     @SuppressWarnings("unused")
     public void player1Turn(String data) {
         try {
-            //System.out.println("player1 received board");
 
             Board newBoard;
             ByteArrayInputStream bis;
@@ -109,19 +101,13 @@ class Game {
                         System.out.println("No valid moves, turn passes");
                         messageProducer.sendMessage2(0, java.time.LocalDateTime.now().toString(), board);
                     }
-
                 } else {
                     endGame(board);
                 }
             }
-
-
-            //System.out.println("obj = " + obj.printBoard());
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     //@KafkaListener(topics = "${player2.topic}", groupId = "bar")
@@ -157,8 +143,6 @@ class Game {
                     endGame(board);
                 }
             }
-
-
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }

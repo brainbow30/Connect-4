@@ -15,7 +15,13 @@ public class MonteCarloTreeSearch {
 
 
     public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime) {
-        this.root = new TreeNode(null, board, colour, colour, null);
+        this.root = TreeNode.builder()
+                .parent(null)
+                .currentBoard(board)
+                .colour(colour)
+                .rootColour(colour)
+                .positionToCreateBoard(null)
+                .build();
         root.visited();
         this.waitTime = waitTime;
 

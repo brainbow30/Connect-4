@@ -23,13 +23,17 @@ public class TreeNode implements Serializable {
     private ImmutablePosition positionToCreateBoard;
 
 
-    public TreeNode(TreeNode parent, Board currentBoard, COLOUR colour, COLOUR rootColour, ImmutablePosition position) {
-        this.parent = parent;
-        this.currentBoard = currentBoard;
-        this.colour = colour;
-        this.rootColour = rootColour;
-        this.positionToCreateBoard = position;
+    private TreeNode(Builder builder) {
+        this.parent = builder.parent;
+        this.currentBoard = builder.currentBoard;
+        this.colour = builder.colour;
+        this.rootColour = builder.rootColour;
+        this.positionToCreateBoard = builder.positionToCreateBoard;
         this.children = ImmutableList.of();
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     private ImmutableList<TreeNode> generateChildren() {
@@ -50,10 +54,54 @@ public class TreeNode implements Serializable {
         for (ImmutablePosition move : validMoves) {
             Board clone = currentBoard.clone();
             clone.addCounter(counter, move);
-            TreeNode childNode = new TreeNode(this, clone, newColour, this.rootColour, move);
+            TreeNode childNode = TreeNode.builder()
+                    .parent(this)
+                    .currentBoard(clone)
+                    .colour(newColour)
+                    .rootColour(this.rootColour)
+                    .positionToCreateBoard(move)
+                    .build();
             builder.add(childNode);
         }
         return builder.build();
+    }
+
+    public static class Builder {
+        private Board currentBoard;
+        private COLOUR colour;
+        private COLOUR rootColour;
+        private TreeNode parent;
+        private ImmutablePosition positionToCreateBoard;
+
+
+        public Builder currentBoard(Board currentBoard) {
+            this.currentBoard = currentBoard;
+            return this;
+        }
+
+        public Builder colour(COLOUR colour) {
+            this.colour = colour;
+            return this;
+        }
+
+        public Builder rootColour(COLOUR rootColour) {
+            this.rootColour = rootColour;
+            return this;
+        }
+
+        public Builder parent(TreeNode parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder positionToCreateBoard(ImmutablePosition positionToCreateBoard) {
+            this.positionToCreateBoard = positionToCreateBoard;
+            return this;
+        }
+
+        public TreeNode build() {
+            return new TreeNode(this);
+        }
     }
 
     public ImmutablePosition getPositionToCreateBoard() {

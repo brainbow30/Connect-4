@@ -19,13 +19,10 @@ public class Board implements Serializable {
     private Integer numberOfWhiteCounters;
     private final Integer boardSize;
 
-
     //heuristic values
     private final Double evaluationDiscValue;
     private final Double evaluationMobilityValue;
     private final Double evaluationStableDiscValue;
-
-
 
     @Autowired
     public Board(@Value("${board.size}") Integer boardSize, Verifier verifier,
@@ -43,6 +40,7 @@ public class Board implements Serializable {
     public void reset() {
         this.board = setupBoard();
     }
+
     private ImmutableList<ImmutableList<Optional<Counter>>> setupBoard() {
         ImmutableList.Builder<ImmutableList<Optional<Counter>>> boardBuilder = ImmutableList.builder();
 
@@ -72,15 +70,11 @@ public class Board implements Serializable {
                 }
             }
             boardBuilder.add(rowBuilder.build());
-
         }
         countersPlayed = 4;
         numberOfWhiteCounters = 2;
         return boardBuilder.build();
-
-
     }
-
 
 
     public Integer getBoardSize() {
@@ -197,8 +191,6 @@ public class Board implements Serializable {
             boardString.append("\n");
             y++;
         }
-
-
         return boardString.toString();
     }
 
@@ -209,12 +201,9 @@ public class Board implements Serializable {
     }
 
     private void flipCounters(COLOUR colour, Position position, Integer xDirection, Integer yDirection) {
-
         ImmutablePosition.Builder tempPosition = ImmutablePosition.builder();
         tempPosition.from(position);
         int numberOfCounters = 0;
-
-
         tempPosition.x(position.x() + xDirection);
         tempPosition.y(position.y() + yDirection);
 
@@ -222,7 +211,6 @@ public class Board implements Serializable {
             numberOfCounters++;
             tempPosition.x(tempPosition.build().x() + xDirection);
             tempPosition.y(tempPosition.build().y() + yDirection);
-
         }
 
 
@@ -230,7 +218,6 @@ public class Board implements Serializable {
             while (numberOfCounters > 0) {
                 tempPosition.x(tempPosition.build().x() - xDirection);
                 tempPosition.y(tempPosition.build().y() - yDirection);
-
 
                 getCounter(tempPosition.build()).get().flip();
                 if (colour.equals(COLOUR.WHITE)) {
@@ -241,8 +228,6 @@ public class Board implements Serializable {
                 numberOfCounters--;
             }
         }
-
-
     }
 
     public ImmutableList<ImmutablePosition> getValidMoves(COLOUR colour) {
@@ -259,8 +244,6 @@ public class Board implements Serializable {
     }
 
     public Integer numberOfValidMoves(COLOUR colour) {
-
-
         Integer count = 0;
         for (int y = 0; y < boardSize; y++) {
             for (int x = 0; x < boardSize; x++) {
@@ -296,12 +279,8 @@ public class Board implements Serializable {
                     }
                 }
             }
-
         }
-
-
         return stableCounters;
-
     }
 
     private Boolean areaSameColour(COLOUR colour, ImmutablePosition startPosition, ImmutablePosition endPosition) {
