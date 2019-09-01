@@ -1,5 +1,8 @@
 package application;
 
+import application.game.COLOUR;
+import application.game.Game;
+import application.players.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -13,23 +16,23 @@ import java.util.UUID;
 
 @SpringBootApplication
 class Application {
+
+    private final Game game;
+    private final Boolean localGame;
+    private final Integer numberOfGames;
+
     @Autowired
-    private Game game;
-    @Value("${localGame}")
-    Boolean localGame;
-
-    @Value("${numberOfGames}")
-    Integer numberOfGames;
-
+    public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames) {
+        this.game = game;
+        this.localGame = localGame;
+        this.numberOfGames = numberOfGames;
+    }
 
 
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(Application.class);
 
         Properties properties = new Properties();
-        properties.put("board.size", 4);
-        properties.put("player1.human", true);
-        properties.put("player2.human", true);
         properties.put("player1.topic", UUID.randomUUID());
         properties.put("player2.topic", UUID.randomUUID());
         application.setDefaultProperties(properties);
@@ -41,6 +44,7 @@ class Application {
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
+
             if (localGame) {
                 Integer player1Wins = 0;
 
@@ -48,8 +52,9 @@ class Application {
                 for (int i = 0; i < numberOfGames; i++) {
                     System.out.println("Local Game");
                     game.reset();
+
                     Player winner = game.play();
-                    if (winner.getCounterColour().equals(Counter.COLOUR.WHITE)) {
+                    if (winner.getCounterColour().equals(COLOUR.WHITE)) {
                         player1Wins++;
                     }
                 }

@@ -1,5 +1,7 @@
-package application;
+package application.game;
 
+import application.ImmutablePosition;
+import application.Position;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,29 +19,28 @@ public class Board implements Serializable {
     private Integer numberOfWhiteCounters;
     private final Integer boardSize;
 
-
     //heuristic values
-    @Value("${evaluationValue.discNum}")
-    private Double evaluationDiscValue;
-    @Value("${evaluationValue.mobility}")
-    private Double evaluationMobilityValue;
-    @Value("${evaluationValue.stableNum}")
-    private Double evaluationStableDiscValue;
-
-    @Value("${board.evaluationFunction}")
-    private Integer evaluationFunction;
-
+    private final Double evaluationDiscValue;
+    private final Double evaluationMobilityValue;
+    private final Double evaluationStableDiscValue;
 
     @Autowired
-    public Board(@Value("${board.size}") Integer boardSize, Verifier verifier) {
+    public Board(@Value("${board.size}") Integer boardSize, Verifier verifier,
+                 @Value("${evaluationValue.discNum}") Double evaluationDiscValue,
+                 @Value("${evaluationValue.mobility}") Double evaluationMobilityValue,
+                 @Value("${evaluationValue.stableNum}") Double evaluationStableDiscValue) {
         this.boardSize = boardSize;
         this.board = setupBoard();
         this.verifier = verifier;
+        this.evaluationStableDiscValue = evaluationStableDiscValue;
+        this.evaluationMobilityValue = evaluationMobilityValue;
+        this.evaluationDiscValue = evaluationDiscValue;
     }
 
     public void reset() {
         this.board = setupBoard();
     }
+
     private ImmutableList<ImmutableList<Optional<Counter>>> setupBoard() {
         ImmutableList.Builder<ImmutableList<Optional<Counter>>> boardBuilder = ImmutableList.builder();
 
@@ -50,17 +51,17 @@ public class Board implements Serializable {
 
                 if (y == (boardSize / 2) - 1) {
                     if (x == (boardSize / 2) - 1) {
-                        rowBuilder.add(Optional.of(new Counter(Counter.COLOUR.WHITE)));
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.WHITE)));
                     } else if (x == (boardSize / 2)) {
-                        rowBuilder.add(Optional.of(new Counter(Counter.COLOUR.BLACK)));
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.BLACK)));
                     } else {
                         rowBuilder.add(Optional.absent());
                     }
                 } else if (y == (boardSize / 2)) {
                     if (x == (boardSize / 2) - 1) {
-                        rowBuilder.add(Optional.of(new Counter(Counter.COLOUR.BLACK)));
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.BLACK)));
                     } else if (x == (boardSize / 2)) {
-                        rowBuilder.add(Optional.of(new Counter(Counter.COLOUR.WHITE)));
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.WHITE)));
                     } else {
                         rowBuilder.add(Optional.absent());
                     }
@@ -69,16 +70,11 @@ public class Board implements Serializable {
                 }
             }
             boardBuilder.add(rowBuilder.build());
-
         }
         countersPlayed = 4;
         numberOfWhiteCounters = 2;
-
         return boardBuilder.build();
-
-
     }
-
 
 
     public Integer getBoardSize() {
@@ -146,7 +142,7 @@ public class Board implements Serializable {
                 }
                 board = boardBuilder.build();
                 countersPlayed++;
-                if (newCounter.getColour().equals(Counter.COLOUR.WHITE)) {
+                if (newCounter.getColour().equals(COLOUR.WHITE)) {
                     numberOfWhiteCounters++;
                 }
 
@@ -179,7 +175,7 @@ public class Board implements Serializable {
             boardString.append(y).append(" |");
             for (Optional<Counter> counterOptional : row) {
                 if (counterOptional.isPresent()) {
-                    if (counterOptional.get().getColour().equals(Counter.COLOUR.WHITE)) {
+                    if (counterOptional.get().getColour().equals(COLOUR.WHITE)) {
                         boardString.append("O|");
                     } else {
                         boardString.append("X|");
@@ -195,18 +191,19 @@ public class Board implements Serializable {
             boardString.append("\n");
             y++;
         }
-
-
         return boardString.toString();
     }
 
-    private void flipCounters(Counter.COLOUR colour, Position position, Integer xDirection, Integer yDirection) {
 
+    @Override
+    public String toString() {
+        return printBoard();
+    }
+
+    private void flipCounters(COLOUR colour, Position position, Integer xDirection, Integer yDirection) {
         ImmutablePosition.Builder tempPosition = ImmutablePosition.builder();
         tempPosition.from(position);
         int numberOfCounters = 0;
-
-
         tempPosition.x(position.x() + xDirection);
         tempPosition.y(position.y() + yDirection);
 
@@ -214,7 +211,6 @@ public class Board implements Serializable {
             numberOfCounters++;
             tempPosition.x(tempPosition.build().x() + xDirection);
             tempPosition.y(tempPosition.build().y() + yDirection);
-
         }
 
 
@@ -223,9 +219,8 @@ public class Board implements Serializable {
                 tempPosition.x(tempPosition.build().x() - xDirection);
                 tempPosition.y(tempPosition.build().y() - yDirection);
 
-
                 getCounter(tempPosition.build()).get().flip();
-                if (colour.equals(Counter.COLOUR.WHITE)) {
+                if (colour.equals(COLOUR.WHITE)) {
                     numberOfWhiteCounters++;
                 } else {
                     numberOfWhiteCounters--;
@@ -233,11 +228,9 @@ public class Board implements Serializable {
                 numberOfCounters--;
             }
         }
-
-
     }
 
-    public ImmutableList<ImmutablePosition> getValidMoves(Counter.COLOUR colour) {
+    public ImmutableList<ImmutablePosition> getValidMoves(COLOUR colour) {
         ImmutableList.Builder<ImmutablePosition> validMoves = ImmutableList.builder();
         for (int y = 0; y < boardSize; y++) {
             for (int x = 0; x < boardSize; x++) {
@@ -250,9 +243,7 @@ public class Board implements Serializable {
         return validMoves.build();
     }
 
-    public Integer numberOfValidMoves(Counter.COLOUR colour) {
-
-
+    public Integer numberOfValidMoves(COLOUR colour) {
         Integer count = 0;
         for (int y = 0; y < boardSize; y++) {
             for (int x = 0; x < boardSize; x++) {
@@ -266,7 +257,7 @@ public class Board implements Serializable {
         return count;
     }
 
-    public Integer numberOfStableDiscs(Counter.COLOUR colour) {
+    private Integer numberOfStableDiscs(COLOUR colour) {
         int stableCounters = 0;
 
         for (int y = 0; y < boardSize; y++) {
@@ -288,15 +279,11 @@ public class Board implements Serializable {
                     }
                 }
             }
-
         }
-
-
         return stableCounters;
-
     }
 
-    private Boolean areaSameColour(Counter.COLOUR colour, ImmutablePosition startPosition, ImmutablePosition endPosition) {
+    private Boolean areaSameColour(COLOUR colour, ImmutablePosition startPosition, ImmutablePosition endPosition) {
 
         for (int y = startPosition.y(); y <= endPosition.y(); y++) {
             for (int x = startPosition.x(); x <= endPosition.x(); x++) {
@@ -310,36 +297,35 @@ public class Board implements Serializable {
         return true;
     }
 
-    public Double getBoardHeurstic(Counter.COLOUR colour) {
-        Double huersticValue = 0.0;
+    public Double getBoardHeuristic(COLOUR colour, int evaluationFunction) {
+        double heuristicValue;
         if (evaluationFunction == 1) {
-            huersticValue = numberOfValidMoves(colour) * evaluationMobilityValue
+            heuristicValue = numberOfValidMoves(colour) * evaluationMobilityValue
                     + numberOfStableDiscs(colour) * evaluationStableDiscValue;
-
-            if (colour.equals(Counter.COLOUR.WHITE)) {
-                huersticValue += numberOfWhiteCounters * evaluationDiscValue;
+            if (colour.equals(COLOUR.WHITE)) {
+                heuristicValue += numberOfWhiteCounters * evaluationDiscValue;
             } else {
-                huersticValue += (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
+                heuristicValue += (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
             }
 
         } else {
-            System.out.println("Using basic huerstic function");
-            if (colour.equals(Counter.COLOUR.WHITE)) {
-                huersticValue = numberOfWhiteCounters * evaluationDiscValue;
+            System.out.println("Using basic heuristic function");
+            if (colour.equals(COLOUR.WHITE)) {
+                heuristicValue = numberOfWhiteCounters * evaluationDiscValue;
             } else {
-                huersticValue = (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
+                heuristicValue = (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
             }
         }
-        return huersticValue;
+        return heuristicValue;
     }
 
 
-    public Counter.COLOUR getWinner(Boolean printScore) {
+    public COLOUR getWinner(Boolean printScore) {
         int whiteCounters = 0;
         for (ImmutableList<Optional<Counter>> row : board) {
             for (Optional<Counter> counter : row) {
 
-                if (counter.isPresent() && counter.get().getColour().equals(Counter.COLOUR.WHITE)) {
+                if (counter.isPresent() && counter.get().getColour().equals(COLOUR.WHITE)) {
                     whiteCounters++;
                 }
             }
@@ -347,10 +333,11 @@ public class Board implements Serializable {
         if (printScore) {
             System.out.println("Score: " + whiteCounters + ":" + (int) (Math.pow(boardSize, 2) - whiteCounters));
         }
-        if (whiteCounters > Math.ceil(Math.pow(boardSize, 2) / 2.0)) {
-            return Counter.COLOUR.WHITE;
-        } else if (whiteCounters < Math.ceil(Math.pow(boardSize, 2) / 2.0)) {
-            return Counter.COLOUR.BLACK;
+        double halfTotalCounters = Math.ceil(Math.pow(boardSize, 2) / 2.0);
+        if (whiteCounters > halfTotalCounters) {
+            return COLOUR.WHITE;
+        } else if (whiteCounters < halfTotalCounters) {
+            return COLOUR.BLACK;
         } else {
             return null;
         }
@@ -371,14 +358,23 @@ public class Board implements Serializable {
             ois = new ObjectInputStream(bis);
             newBoard = (Board) ois.readObject();
             return newBoard;
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
         }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        try {
+            Board board = (Board) object;
+            return board.printBoard().equals(this.printBoard());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
     }
 
 }

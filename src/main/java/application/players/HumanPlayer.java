@@ -1,15 +1,21 @@
-package application;
+package application.players;
+
+import application.ImmutablePosition;
+import application.game.Board;
+import application.game.COLOUR;
+import application.game.Counter;
+import application.utils.MessageProducer;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 
 public class HumanPlayer implements Player {
-    private final Counter.COLOUR counterColour;
+    private final COLOUR counterColour;
     private final MessageProducer producer;
 
 
-    public HumanPlayer(Counter.COLOUR counterColour, MessageProducer producer) {
+    public HumanPlayer(COLOUR counterColour, MessageProducer producer) {
         this.counterColour = counterColour;
         this.producer = producer;
     }
@@ -38,7 +44,7 @@ public class HumanPlayer implements Player {
             }
 
         }
-        if (counterColour.equals(Counter.COLOUR.WHITE)) {
+        if (counterColour.equals(COLOUR.WHITE)) {
             producer.sendMessage2(0, java.time.LocalDateTime.now().toString(), board);
         } else {
             producer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
@@ -74,7 +80,12 @@ public class HumanPlayer implements Player {
 
     }
 
-    public Counter.COLOUR getCounterColour() {
+    public COLOUR getCounterColour() {
         return counterColour;
+    }
+
+
+    public void reset() {
+
     }
 }
