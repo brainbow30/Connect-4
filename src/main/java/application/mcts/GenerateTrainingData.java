@@ -9,7 +9,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class GenerateTrainingData {
-    public static void save(TreeNode terminalNode) {
+    private BufferedWriter outputWriter;
+
+    public GenerateTrainingData(String filename) {
+        try {
+            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, true));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void save(TreeNode terminalNode) {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = forNeuralNet(terminalNode.getCurrentBoard(), terminalNode.getColour());
             COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
@@ -26,9 +36,7 @@ public class GenerateTrainingData {
         }
     }
 
-    static void write(String filename, ImmutableList<Integer> intBoard, Integer result) throws IOException {
-        BufferedWriter outputWriter = null;
-        outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, true));
+    void write(String filename, ImmutableList<Integer> intBoard, Integer result) throws IOException {
         outputWriter.write("[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             outputWriter.write(intBoard.get(pos).toString());
@@ -41,10 +49,10 @@ public class GenerateTrainingData {
         outputWriter.write(":" + result);
         outputWriter.newLine();
         outputWriter.flush();
-        outputWriter.close();
+
     }
 
-    static ImmutableList<Integer> forNeuralNet(Board board, COLOUR colour) {
+    ImmutableList<Integer> forNeuralNet(Board board, COLOUR colour) {
         ImmutableList<Integer> intBoard = board.asIntArray();
         if (colour.equals(COLOUR.BLACK)) {
             ImmutableList.Builder<Integer> builder = ImmutableList.builder();

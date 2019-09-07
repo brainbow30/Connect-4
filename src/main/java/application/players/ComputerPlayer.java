@@ -21,6 +21,7 @@ public class ComputerPlayer implements Player {
     private TreeNode previousNode;
 
     private final Integer moveFunction;
+    private final GenerateTrainingData generateTrainingData;
 
 
     public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
@@ -29,6 +30,7 @@ public class ComputerPlayer implements Player {
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
         previousNode = null;
+        generateTrainingData = new GenerateTrainingData("training.txt");
     }
 
     public Board playTurn(Board board) {
@@ -112,7 +114,7 @@ public class ComputerPlayer implements Player {
         if (currentNode.isTerminalNode()) {
             Thread t1 = new Thread(new Runnable() {
                 public void run() {
-                    GenerateTrainingData.save(trainingNode);
+                    generateTrainingData.save(trainingNode);
                 }
             });
             t1.start();

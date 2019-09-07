@@ -14,16 +14,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import static application.mcts.GenerateTrainingData.forNeuralNet;
-import static application.mcts.GenerateTrainingData.write;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GenerateTrainingDataTest {
     private Board board;
 
+    private GenerateTrainingData generateTrainingData;
     @Before
     public void setup() {
+        generateTrainingData = new GenerateTrainingData("testWrite.txt");
         board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
     }
 
@@ -32,7 +32,7 @@ public class GenerateTrainingDataTest {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            write("testWrite.txt", board.asIntArray(), null);
+            generateTrainingData.write("testWrite.txt", board.asIntArray(), null);
             String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
             assertEquals(expected, readFile("testWrite.txt").get(0));
         } catch (IOException e) {
@@ -53,7 +53,7 @@ public class GenerateTrainingDataTest {
 
     @Test
     public void convertForNNTest() {
-        ImmutableList<Integer> whiteNNBoard = forNeuralNet(board, COLOUR.WHITE);
+        ImmutableList<Integer> whiteNNBoard = generateTrainingData.forNeuralNet(board, COLOUR.WHITE);
         ImmutableList<Integer> whiteExpected = ImmutableList.of(
                 0, 0, 0, 0,
                 0, 1, -1, 0,
@@ -65,7 +65,7 @@ public class GenerateTrainingDataTest {
                 0, -1, 1, 0,
                 0, 1, -1, 0,
                 0, 0, 0, 0);
-        ImmutableList<Integer> blackNNBoard = forNeuralNet(board, COLOUR.BLACK);
+        ImmutableList<Integer> blackNNBoard = generateTrainingData.forNeuralNet(board, COLOUR.BLACK);
         assertEquals(blackExpected, blackNNBoard);
     }
 }
