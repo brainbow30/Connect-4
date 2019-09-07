@@ -24,12 +24,12 @@ public class TreeNode implements Serializable {
 
 
     private TreeNode(Builder builder) {
-        this.parent = builder.parent;
-        this.currentBoard = builder.currentBoard;
-        this.colour = builder.colour;
-        this.rootColour = builder.rootColour;
-        this.positionToCreateBoard = builder.positionToCreateBoard;
-        this.children = ImmutableList.of();
+        parent = builder.parent;
+        currentBoard = builder.currentBoard;
+        colour = builder.colour;
+        rootColour = builder.rootColour;
+        positionToCreateBoard = builder.positionToCreateBoard;
+        children = ImmutableList.of();
     }
 
     public static Builder builder() {
@@ -45,7 +45,7 @@ public class TreeNode implements Serializable {
         if (validMoves.size() == 0) {
             validMoves = currentBoard.getValidMoves(newColour);
             if (validMoves.size() == 0) {
-                this.setTerminalNode();
+                setTerminalNode();
             }
             counter.flip();
             newColour = COLOUR.opposite(newColour);
@@ -58,7 +58,7 @@ public class TreeNode implements Serializable {
                     .parent(this)
                     .currentBoard(clone)
                     .colour(newColour)
-                    .rootColour(this.rootColour)
+                    .rootColour(rootColour)
                     .positionToCreateBoard(move)
                     .build();
             builder.add(childNode);
@@ -104,6 +104,10 @@ public class TreeNode implements Serializable {
         }
     }
 
+    public COLOUR getColour() {
+        return colour;
+    }
+
     public ImmutablePosition getPositionToCreateBoard() {
         return positionToCreateBoard;
     }
@@ -145,10 +149,10 @@ public class TreeNode implements Serializable {
 
     public COLOUR simulateGame() {
         COLOUR result;
-        if (this.isTerminalNode()) {
-            result = this.getCurrentBoard().getWinner(false);
+        if (isTerminalNode()) {
+            result = getCurrentBoard().getWinner(false);
         } else {
-            result = this.selectRandomMove().simulateGame();
+            result = selectRandomMove().simulateGame();
         }
         addResult(result);
         return result;
@@ -156,13 +160,13 @@ public class TreeNode implements Serializable {
 
     public TreeNode selectUCTMove() {
         Random random = new Random();
-        ImmutableList<TreeNode> children = this.getChildren();
+        ImmutableList<TreeNode> children = getChildren();
         double bestValue = Double.MIN_VALUE;
         TreeNode selected = null;
         for (TreeNode child : children) {
             double epsilon = 1e-6;
             double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
-                    Math.sqrt(Math.log(this.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
+                    Math.sqrt(Math.log(getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
                     random.nextDouble() * epsilon;
             //System.out.println("uctValue = " + uctValue);
             if (uctValue > bestValue) {
@@ -177,7 +181,7 @@ public class TreeNode implements Serializable {
     }
 
     public TreeNode selectRandomMove() {
-        ImmutableList<TreeNode> children = this.getChildren();
+        ImmutableList<TreeNode> children = getChildren();
         if (children.size() > 0) {
             Random random = new Random();
             return this.children.get(random.nextInt(children.size()));
@@ -187,28 +191,28 @@ public class TreeNode implements Serializable {
     }
 
     public void addResult(COLOUR result) {
-        this.numberOfSimulations++;
+        numberOfSimulations++;
         if (result != null && result.equals(rootColour)) {
             numberOfWins++;
         }
     }
 
-    private Board getCurrentBoard() {
+    Board getCurrentBoard() {
         return currentBoard;
     }
 
     public TreeNode findChildBoardMatch(Board board) {
-        if (this.getCurrentBoard().equals(board)) {
+        if (getCurrentBoard().equals(board)) {
             return this;
-        } else if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
-            for (TreeNode child : this.getChildren()) {
+        } else if (getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
+            for (TreeNode child : getChildren()) {
                 if (child.getCurrentBoard().equals(board)) {
                     return child.clone();
                 }
             }
-        } else if (this.getCurrentBoard().getCountersPlayed() < board.getCountersPlayed()) {
+        } else if (getCurrentBoard().getCountersPlayed() < board.getCountersPlayed()) {
             System.out.println("recursive board search");
-            for (TreeNode child : this.getChildren()) {
+            for (TreeNode child : getChildren()) {
                 TreeNode childBoardMatch = child.clone().findChildBoardMatch(board);
                 if (childBoardMatch != null) {
                     return childBoardMatch;
@@ -219,8 +223,7 @@ public class TreeNode implements Serializable {
     }
 
     public void setRoot() {
-        this.parent = null;
-        this.positionToCreateBoard = null;
+        positionToCreateBoard = null;
     }
 
     @Override
@@ -249,10 +252,10 @@ public class TreeNode implements Serializable {
     public boolean equals(Object object) {
         try {
             TreeNode node = (TreeNode) object;
-            return node.getCurrentBoard().equals(this.getCurrentBoard())
-                    && this.positionToCreateBoard.equals(node.positionToCreateBoard)
-                    && this.colour.equals(node.colour)
-                    && this.rootColour.equals(node.rootColour);
+            return node.getCurrentBoard().equals(getCurrentBoard())
+                    && positionToCreateBoard.equals(node.positionToCreateBoard)
+                    && colour.equals(node.colour)
+                    && rootColour.equals(node.rootColour);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

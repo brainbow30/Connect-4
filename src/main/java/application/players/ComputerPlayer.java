@@ -4,6 +4,7 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
+import application.mcts.GenerateTrainingData;
 import application.mcts.MonteCarloTreeSearch;
 import application.mcts.TreeNode;
 import application.utils.MessageProducer;
@@ -27,20 +28,20 @@ public class ComputerPlayer implements Player {
         this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
-        this.previousNode = null;
+        previousNode = null;
     }
 
     public Board playTurn(Board board) {
         System.out.println(counterColour + "'s Turn");
         ImmutablePosition position;
-        if (this.moveFunction.equals(1)) {
+        if (moveFunction.equals(1)) {
             position = getNextPositionHeuristic(board);
-        } else if (this.moveFunction.equals(2)) {
+        } else if (moveFunction.equals(2)) {
             position = getNextPositionMCTS(board);
         } else {
             System.out.println("random move");
             Random random = new Random();
-            ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(this.counterColour);
+            ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(counterColour);
             position = validMoves.get(random.nextInt(validMoves.size()));
         }
         Counter counter = new Counter(counterColour);
@@ -75,14 +76,14 @@ public class ComputerPlayer implements Player {
     }
 
     private ImmutablePosition getNextPositionHeuristic(Board board) {
-        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(this.counterColour);
-        Counter counter = new Counter(this.counterColour);
+        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(counterColour);
+        Counter counter = new Counter(counterColour);
         Double bestBoardHeuristic = Double.MIN_VALUE;
         ImmutablePosition bestMove = null;
         for (ImmutablePosition position : validMoves) {
             Board futureBoard = board.clone();
             futureBoard.addCounter(counter, position);
-            Double boardHeuristic = futureBoard.getBoardHeuristic(this.counterColour, 1);
+            Double boardHeuristic = futureBoard.getBoardHeuristic(counterColour, 1);
             if (boardHeuristic > bestBoardHeuristic) {
                 bestBoardHeuristic = boardHeuristic;
                 bestMove = position;
@@ -103,10 +104,20 @@ public class ComputerPlayer implements Player {
             monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, this.counterColour, waitTime);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime);
         }
         currentNode = monteCarloTreeSearch.run();
-        this.previousNode = currentNode;
+        previousNode = currentNode;
+        final TreeNode trainingNode = currentNode;
+        if (currentNode.isTerminalNode()) {
+            Thread t1 = new Thread(new Runnable() {
+                public void run() {
+                    GenerateTrainingData.save(trainingNode);
+                }
+            });
+            t1.start();
+
+        }
         return currentNode.getPositionToCreateBoard();
 
     }

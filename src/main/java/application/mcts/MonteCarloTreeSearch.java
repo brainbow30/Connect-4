@@ -15,7 +15,7 @@ public class MonteCarloTreeSearch {
 
 
     public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime) {
-        this.root = TreeNode.builder()
+        root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
                 .colour(colour)
@@ -24,18 +24,13 @@ public class MonteCarloTreeSearch {
                 .build();
         root.visited();
         this.waitTime = waitTime;
-
-
-
     }
 
     public MonteCarloTreeSearch(TreeNode node, Integer waitTime) {
-        this.root = node;
+        root = node;
         root.visited();
         root.setRoot();
         this.waitTime = waitTime;
-
-
     }
 
     public TreeNode run() {
@@ -60,7 +55,7 @@ public class MonteCarloTreeSearch {
 
     private void propagateResult(TreeNode node, COLOUR result) {
 
-        while (node.getParent() != null) {
+        while (node.getPositionToCreateBoard() != null) {
             node.addResult(result);
             node = node.getParent();
         }

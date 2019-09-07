@@ -4,6 +4,7 @@ import application.players.ComputerPlayer;
 import application.players.HumanPlayer;
 import application.players.Player;
 import application.utils.MessageProducer;
+import com.google.common.base.Optional;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,20 +36,20 @@ class Game {
         this.messageProducer = messageProducer;
         this.gson = gson;
         if (humanPlayer1) {
-            this.player1 = new HumanPlayer(COLOUR.WHITE, messageProducer);
+            player1 = new HumanPlayer(COLOUR.WHITE, messageProducer);
         } else {
-            this.player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
+            player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
         }
         if (humanPlayer2) {
-            this.player2 = new HumanPlayer(COLOUR.BLACK, messageProducer);
+            player2 = new HumanPlayer(COLOUR.BLACK, messageProducer);
         } else {
 
-            this.player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
+            player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
         }
         currentTurnsPlayer = player1;
     }
 
-    public Player play() {
+    public Optional<Player> play() {
         int numberOfConsecutivePasses = 0;
         while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
             System.out.println(board);
@@ -86,12 +87,12 @@ class Game {
             ois = new ObjectInputStream(bis);
             newBoard = (Board) ois.readObject();
 
-            this.board = newBoard;
+            board = newBoard;
             previousBoards.add(newBoard);
             if (previousBoards.size() > 3 && previousBoards.get(previousBoards.size() - 3).equals(newBoard)) {
                 endGame(board);
             } else {
-                this.currentTurnsPlayer = player1;
+                currentTurnsPlayer = player1;
                 System.out.println(board);
 
                 if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
@@ -124,12 +125,12 @@ class Game {
             ois = new ObjectInputStream(bis);
             newBoard = (Board) ois.readObject();
 
-            this.board = newBoard;
+            board = newBoard;
             previousBoards.add(newBoard);
             if (previousBoards.size() > 3 && previousBoards.get(previousBoards.size() - 3).equals(newBoard)) {
                 endGame(board);
             } else {
-                this.currentTurnsPlayer = player2;
+                currentTurnsPlayer = player2;
                 System.out.println(board);
 
                 if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
@@ -150,28 +151,28 @@ class Game {
 
     }
 
-    private Player endGame(Board board) {
+    private Optional<Player> endGame(Board board) {
         System.out.println("final board = " + board.printBoard());
         COLOUR winner = board.getWinner(true);
-        if (winner.equals(COLOUR.WHITE)) {
+        if (winner == null) {
+            System.out.println("Draw");
+            Optional.absent();
+        } else if (winner.equals(COLOUR.WHITE)) {
             System.out.println("White wins");
             if (player1.getCounterColour().equals(COLOUR.WHITE)) {
-                return player1;
+                return Optional.of(player1);
             } else {
-                return player2;
+                return Optional.of(player2);
             }
         } else if (winner.equals(COLOUR.BLACK)) {
             System.out.println("Black wins");
             if (player1.getCounterColour().equals(COLOUR.BLACK)) {
-                return player1;
+                return Optional.of(player1);
             } else {
-                return player2;
+                return Optional.of(player2);
             }
-        } else {
-            System.out.println("Draw");
-            return null;
         }
-
+        return Optional.absent();
     }
 
 

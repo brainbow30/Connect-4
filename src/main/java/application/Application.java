@@ -3,6 +3,7 @@ package application;
 import application.game.COLOUR;
 import application.game.Game;
 import application.players.Player;
+import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -47,18 +48,23 @@ class Application {
 
             if (localGame) {
                 Integer player1Wins = 0;
-
+                Integer draws = 0;
                 //play locally
                 for (int i = 0; i < numberOfGames; i++) {
                     System.out.println("Local Game");
                     game.reset();
 
-                    Player winner = game.play();
-                    if (winner.getCounterColour().equals(COLOUR.WHITE)) {
-                        player1Wins++;
+                    Optional<Player> winner = game.play();
+                    if (winner.isPresent()) {
+                        if (winner.get().getCounterColour().equals(COLOUR.WHITE)) {
+                            player1Wins++;
+                        }
+                    } else {
+                        draws++;
                     }
+
                 }
-                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + (numberOfGames - player1Wins));
+                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
 
 
                 //play over kafka

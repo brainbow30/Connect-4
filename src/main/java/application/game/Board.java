@@ -30,7 +30,7 @@ public class Board implements Serializable {
                  @Value("${evaluationValue.mobility}") Double evaluationMobilityValue,
                  @Value("${evaluationValue.stableNum}") Double evaluationStableDiscValue) {
         this.boardSize = boardSize;
-        this.board = setupBoard();
+        board = setupBoard();
         this.verifier = verifier;
         this.evaluationStableDiscValue = evaluationStableDiscValue;
         this.evaluationMobilityValue = evaluationMobilityValue;
@@ -38,7 +38,7 @@ public class Board implements Serializable {
     }
 
     public void reset() {
-        this.board = setupBoard();
+        board = setupBoard();
     }
 
     private ImmutableList<ImmutableList<Optional<Counter>>> setupBoard() {
@@ -369,12 +369,31 @@ public class Board implements Serializable {
     public boolean equals(Object object) {
         try {
             Board board = (Board) object;
-            return board.printBoard().equals(this.printBoard());
+            return board.printBoard().equals(printBoard());
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
 
+    }
+
+    public ImmutableList<Integer> asIntArray() {
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        for (ImmutableList<Optional<Counter>> row : board) {
+            for (Optional<Counter> counterOptional : row) {
+                if (counterOptional.isPresent()) {
+                    Counter counter = counterOptional.get();
+                    if (counter.getColour().equals(COLOUR.WHITE)) {
+                        builder.add(1);
+                    } else {
+                        builder.add(-1);
+                    }
+                } else {
+                    builder.add(0);
+                }
+            }
+        }
+        return builder.build();
     }
 
 }
