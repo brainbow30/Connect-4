@@ -32,7 +32,7 @@ public class GenerateTrainingDataTest {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            generateTrainingData.write("testWrite.txt", board.asIntArray(), null);
+            generateTrainingData.write("testWrite.txt", board.asIntArray(), 0.0, null);
             String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
             assertEquals(expected, readFile("testWrite.txt").get(0));
         } catch (IOException e) {

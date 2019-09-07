@@ -17,6 +17,7 @@ public class TreeNode implements Serializable {
     private TreeNode parent;
     private Integer numberOfWins = 0;
     private Integer numberOfSimulations = 0;
+    private Double policyValue = 0.0;
     private Boolean visited = false;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
@@ -126,6 +127,10 @@ public class TreeNode implements Serializable {
 
     Integer getNumberOfSimulations() {
         return numberOfSimulations;
+    }
+
+    public Double getPolicyValue() {
+        return policyValue;
     }
 
     public Boolean isVisited() {

@@ -23,12 +23,13 @@ public class GenerateTrainingData {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = forNeuralNet(terminalNode.getCurrentBoard(), terminalNode.getColour());
             COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
+            Double policy = terminalNode.getPolicyValue();
             Integer result = -1;
             if (winner != null && winner.equals(terminalNode.getColour())) {
                 result = 1;
             }
             try {
-                write("training.txt", intBoard, result);
+                write("training.txt", intBoard, policy, result);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -36,7 +37,7 @@ public class GenerateTrainingData {
         }
     }
 
-    void write(String filename, ImmutableList<Integer> intBoard, Integer result) throws IOException {
+    void write(String filename, ImmutableList<Integer> intBoard, Double policy, Integer result) throws IOException {
         outputWriter.write("[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             outputWriter.write(intBoard.get(pos).toString());
@@ -46,7 +47,7 @@ public class GenerateTrainingData {
                 outputWriter.write("]");
             }
         }
-        outputWriter.write(":" + result);
+        outputWriter.write(":" + policy + ":" + result);
         outputWriter.newLine();
         outputWriter.flush();
 
