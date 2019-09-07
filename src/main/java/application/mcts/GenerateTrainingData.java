@@ -38,13 +38,10 @@ public class GenerateTrainingData {
     }
 
     void write(String filename, ImmutableList<Integer> intBoard, Double policy, Integer result) throws IOException {
-        outputWriter.write("[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             outputWriter.write(intBoard.get(pos).toString());
             if (pos + 1 != intBoard.size()) {
                 outputWriter.write(",");
-            } else {
-                outputWriter.write("]");
             }
         }
         outputWriter.write(":" + policy + ":" + result);
