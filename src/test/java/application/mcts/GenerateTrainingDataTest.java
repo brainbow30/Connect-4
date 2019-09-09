@@ -1,7 +1,6 @@
 package application.mcts;
 
 import application.game.Board;
-import application.game.COLOUR;
 import application.game.Verifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -32,7 +31,7 @@ public class GenerateTrainingDataTest {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            generateTrainingData.write("testWrite.txt", board.asIntArray(), 0.0, null);
+            generateTrainingData.write(board.asIntArray(), ImmutableList.of(), null);
             String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
             assertEquals(expected, readFile("testWrite.txt").get(0));
         } catch (IOException e) {
@@ -51,23 +50,7 @@ public class GenerateTrainingDataTest {
         return builder.build();
     }
 
-    @Test
-    public void convertForNNTest() {
-        ImmutableList<Integer> whiteNNBoard = generateTrainingData.forNeuralNet(board, COLOUR.WHITE);
-        ImmutableList<Integer> whiteExpected = ImmutableList.of(
-                0, 0, 0, 0,
-                0, 1, -1, 0,
-                0, -1, 1, 0,
-                0, 0, 0, 0);
-        assertEquals(whiteExpected, whiteNNBoard);
-        ImmutableList<Integer> blackExpected = ImmutableList.of(
-                0, 0, 0, 0,
-                0, -1, 1, 0,
-                0, 1, -1, 0,
-                0, 0, 0, 0);
-        ImmutableList<Integer> blackNNBoard = generateTrainingData.forNeuralNet(board, COLOUR.BLACK);
-        assertEquals(blackExpected, blackNNBoard);
-    }
+
 }
 
 

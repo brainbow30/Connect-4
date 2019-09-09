@@ -4,8 +4,15 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import org.glassfish.jersey.client.ClientConfig;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.util.Random;
 
@@ -17,11 +24,11 @@ public class TreeNode implements Serializable {
     private TreeNode parent;
     private Integer numberOfWins = 0;
     private Integer numberOfSimulations = 0;
-    private Double policyValue = 0.0;
     private Boolean visited = false;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
     private ImmutablePosition positionToCreateBoard;
+    private Boolean isRoot = false;
 
 
     private TreeNode(Builder builder) {
@@ -29,6 +36,9 @@ public class TreeNode implements Serializable {
         currentBoard = builder.currentBoard;
         colour = builder.colour;
         rootColour = builder.rootColour;
+        if (builder.positionToCreateBoard == null) {
+            isRoot = true;
+        }
         positionToCreateBoard = builder.positionToCreateBoard;
         children = ImmutableList.of();
     }
@@ -129,15 +139,51 @@ public class TreeNode implements Serializable {
         return numberOfSimulations;
     }
 
-    public Double getPolicyValue() {
-        return policyValue;
+    public ImmutableList<Double> getPolicyVector() {
+        ImmutableList<Integer> canonicalBoard = canonicalBoard();
+        ImmutableList.Builder<Double> builder = ImmutableList.builder();
+        Double total = 0.0;
+        ImmutableList<TreeNode> children = getChildren();
+        for (int i = 0; i < canonicalBoard.size(); i++) {
+            Optional<TreeNode> posValidChild = isBoardPositionAValidChild(i);
+            if (posValidChild.isPresent()) {
+                Double value = posValidChild.get().numberOfSimulations.doubleValue();
+                total += value;
+                builder.add(value);
+            } else {
+                builder.add(0.0);
+            }
+        }
+        ImmutableList<Double> boardOfChildSimulations = builder.build();
+        ImmutableList.Builder<Double> boardOfMoveProbabilities = ImmutableList.builder();
+        if (total > 0) {
+            for (Double value : boardOfChildSimulations) {
+                boardOfMoveProbabilities.add(value / total);
+            }
+        } else {
+            boardOfMoveProbabilities.addAll(boardOfChildSimulations.asList());
+        }
+        return boardOfMoveProbabilities.build();
+    }
+
+    private Optional<TreeNode> isBoardPositionAValidChild(Integer i) {
+        for (TreeNode child : getChildren()) {
+            ImmutablePosition positionToCreateBoard = child.getPositionToCreateBoard();
+            if (positionToCreateBoard != null) {
+                Integer pos = positionToCreateBoard.x() * currentBoard.getBoardSize() + positionToCreateBoard.y();
+                if (pos.equals(i)) {
+                    return Optional.of(child);
+                }
+            }
+        }
+        return Optional.absent();
     }
 
     public Boolean isVisited() {
         return visited;
     }
 
-    private ImmutableList<TreeNode> getChildren() {
+    ImmutableList<TreeNode> getChildren() {
         if (children.isEmpty()) {
             children = ImmutableList.copyOf(generateChildren());
         }
@@ -161,6 +207,31 @@ public class TreeNode implements Serializable {
         }
         addResult(result);
         return result;
+    }
+
+    double getNNPrediction() {
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(UriBuilder.fromUri(
+                "http://127.0.0.1:5000").build());
+
+        StringBuilder stringBoard = new StringBuilder();
+        ImmutableList<Integer> intBoard = canonicalBoard();
+        for (int pos = 0; pos < intBoard.size(); pos++) {
+            stringBoard.append(intBoard.get(pos));
+            if (pos + 1 != intBoard.size()) {
+                stringBoard.append(",");
+            }
+        }
+        // Get JSON for application
+        String jsonResponse = target.path("predict")
+                .path(currentBoard.getBoardSize().toString())
+                .path(stringBoard.toString()).request()
+                .accept(MediaType.APPLICATION_JSON).get(String.class);
+
+
+        return Double.parseDouble(jsonResponse);
     }
 
     public TreeNode selectUCTMove() {
@@ -228,7 +299,11 @@ public class TreeNode implements Serializable {
     }
 
     public void setRoot() {
-        positionToCreateBoard = null;
+        isRoot = true;
+    }
+
+    public Boolean getRoot() {
+        return isRoot;
     }
 
     @Override
@@ -265,5 +340,23 @@ public class TreeNode implements Serializable {
             e.printStackTrace();
             return false;
         }
+    }
+
+    ImmutableList<Integer> canonicalBoard() {
+        ImmutableList<Integer> intBoard = currentBoard.asIntArray();
+        if (colour.equals(COLOUR.BLACK)) {
+            ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+            for (Integer pos : intBoard) {
+                if (pos == 1) {
+                    builder.add(-1);
+                } else if (pos == -1) {
+                    builder.add(1);
+                } else {
+                    builder.add(0);
+                }
+            }
+            intBoard = ImmutableList.copyOf(builder.build());
+        }
+        return intBoard;
     }
 }

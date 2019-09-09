@@ -1,6 +1,5 @@
 package application.mcts;
 
-import application.game.Board;
 import application.game.COLOUR;
 import com.google.common.collect.ImmutableList;
 
@@ -21,15 +20,15 @@ public class GenerateTrainingData {
 
     public void save(TreeNode terminalNode) {
         while (terminalNode.getParent() != null) {
-            ImmutableList<Integer> intBoard = forNeuralNet(terminalNode.getCurrentBoard(), terminalNode.getColour());
+            ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
-            Double policy = terminalNode.getPolicyValue();
+            ImmutableList<Double> policyVector = terminalNode.getPolicyVector();
             Integer result = -1;
             if (winner != null && winner.equals(terminalNode.getColour())) {
                 result = 1;
             }
             try {
-                write("training.txt", intBoard, policy, result);
+                write(intBoard, policyVector, result);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -37,34 +36,24 @@ public class GenerateTrainingData {
         }
     }
 
-    void write(String filename, ImmutableList<Integer> intBoard, Double policy, Integer result) throws IOException {
+    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policy, Integer result) throws IOException {
         for (int pos = 0; pos < intBoard.size(); pos++) {
             outputWriter.write(intBoard.get(pos).toString());
             if (pos + 1 != intBoard.size()) {
                 outputWriter.write(",");
             }
         }
-        outputWriter.write(":" + policy + ":" + result);
+        outputWriter.write(":");
+        StringBuilder policyVector = new StringBuilder();
+        for (Double value : policy) {
+            policyVector.append(value).append(",");
+        }
+        outputWriter.write(policyVector.substring(0, policyVector.length() - 1));
+        outputWriter.write(":" + result);
         outputWriter.newLine();
         outputWriter.flush();
 
     }
 
-    ImmutableList<Integer> forNeuralNet(Board board, COLOUR colour) {
-        ImmutableList<Integer> intBoard = board.asIntArray();
-        if (colour.equals(COLOUR.BLACK)) {
-            ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-            for (Integer pos : intBoard) {
-                if (pos == 1) {
-                    builder.add(-1);
-                } else if (pos == -1) {
-                    builder.add(1);
-                } else {
-                    builder.add(0);
-                }
-            }
-            intBoard = ImmutableList.copyOf(builder.build());
-        }
-        return intBoard;
-    }
+
 }

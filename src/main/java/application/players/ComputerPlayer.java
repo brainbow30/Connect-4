@@ -24,13 +24,13 @@ public class ComputerPlayer implements Player {
     private final GenerateTrainingData generateTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime) {
+    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime, Integer boardSize) {
         this.counterColour = counterColour;
         this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
         previousNode = null;
-        generateTrainingData = new GenerateTrainingData("training.txt");
+        generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
     }
 
     public Board playTurn(Board board) {

@@ -55,7 +55,7 @@ public class MonteCarloTreeSearch {
 
     private void propagateResult(TreeNode node, COLOUR result) {
 
-        while (node.getPositionToCreateBoard() != null) {
+        while (!node.getRoot()) {
             node.addResult(result);
             node = node.getParent();
         }
