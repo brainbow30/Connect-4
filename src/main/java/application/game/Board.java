@@ -370,7 +370,7 @@ public class Board implements Serializable {
         try {
             Board board = (Board) object;
             return board.printBoard().equals(printBoard());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
             return false;
         }

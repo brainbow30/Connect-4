@@ -17,12 +17,11 @@ public class TreeNodeTest {
     private TreeNode blackNode;
     private TreeNode nnNode;
     private Board board;
-    private Board nnboard;
 
     @Before
     public void setup() {
         board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
-        nnboard = new Board(6, new Verifier(), 0.0, 0.0, 0.0);
+        Board nnboard = new Board(6, new Verifier(), 0.0, 0.0, 0.0);
 
         TreeNode.Builder builder = TreeNode.builder();
         builder.colour(COLOUR.WHITE);

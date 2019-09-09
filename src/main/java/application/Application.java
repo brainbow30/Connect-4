@@ -27,15 +27,13 @@ class Application {
     private final Game game;
     private final Boolean localGame;
     private final Integer numberOfGames;
-    private final String nnPath;
     private final Integer boardSize;
 
     @Autowired
-    public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames, @Value("${nn.path}") String nnPath, @Value("${board.size}") Integer boardSize) {
+    public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize) {
         this.game = game;
         this.localGame = localGame;
         this.numberOfGames = numberOfGames;
-        this.nnPath = nnPath;
         this.boardSize = boardSize;
     }
 
@@ -58,7 +56,7 @@ class Application {
 
             if (localGame) {
                 Integer player1Wins = 0;
-                Integer draws = 0;
+                int draws = 0;
                 //play locally
                 for (int i = 0; i < numberOfGames; i++) {
                     System.out.println("Local Game");
@@ -90,20 +88,20 @@ class Application {
         System.out.println("Training Neural Network...");
         try {
             Thread.sleep(1000);
+            ClientConfig config = new ClientConfig();
+            Client client = ClientBuilder.newClient(config);
+
+            WebTarget target = client.target(UriBuilder.fromUri(
+                    "http://127.0.0.1:5000").build());
+
+            // Get JSON for application
+            String jsonResponse = target.path("train").path(boardSize.toString()).request()
+                    .accept(MediaType.APPLICATION_JSON).get(String.class);
+
+            System.out.println(jsonResponse);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
-
-        WebTarget target = client.target(UriBuilder.fromUri(
-                "http://127.0.0.1:5000").build());
-
-        // Get JSON for application
-        String jsonResponse = target.path("train").path(boardSize.toString()).request()
-                .accept(MediaType.APPLICATION_JSON).get(String.class);
-
-        System.out.println(jsonResponse);
     }
 
 }

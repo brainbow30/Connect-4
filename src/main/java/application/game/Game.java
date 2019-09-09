@@ -156,7 +156,7 @@ class Game {
         COLOUR winner = board.getWinner(true);
         if (winner == null) {
             System.out.println("Draw");
-            Optional.absent();
+            return Optional.absent();
         } else if (winner.equals(COLOUR.WHITE)) {
             System.out.println("White wins");
             if (player1.getCounterColour().equals(COLOUR.WHITE)) {

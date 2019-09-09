@@ -8,10 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,15 +30,17 @@ public class GenerateTrainingDataTest {
         try {
             generateTrainingData.write(board.asIntArray(), ImmutableList.of(), null);
             String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
-            assertEquals(expected, readFile("testWrite.txt").get(0));
+            assertEquals(expected, readFile().get(0));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private ImmutableList<String> readFile(String filename) throws IOException {
+    private ImmutableList<String> readFile() throws IOException {
         ImmutableList.Builder<String> builder = ImmutableList.builder();
-        File file = new File("intBoards/" + filename);
+        File file = new File("intBoards/" + "testWrite.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
         while ((line = br.readLine()) != null) {

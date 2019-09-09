@@ -23,7 +23,7 @@ public class GenerateTrainingData {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
             ImmutableList<Double> policyVector = terminalNode.getPolicyVector();
-            Integer result = -1;
+            int result = -1;
             if (winner != null && winner.equals(terminalNode.getColour())) {
                 result = 1;
             }
