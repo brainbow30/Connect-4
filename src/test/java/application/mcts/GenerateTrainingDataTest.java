@@ -28,7 +28,7 @@ public class GenerateTrainingDataTest {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            generateTrainingData.write(board.asIntArray(), ImmutableList.of(), null);
+            generateTrainingData.write(board.asIntArray(), ImmutableList.of(0.0), null);
             String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
             assertEquals(expected, readFile().get(0));
         } catch (FileNotFoundException e) {

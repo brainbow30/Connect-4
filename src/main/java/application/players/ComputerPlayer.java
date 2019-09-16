@@ -18,19 +18,22 @@ public class ComputerPlayer implements Player {
     private final COLOUR counterColour;
     private final MessageProducer producer;
     private final Integer waitTime;
+    private final Boolean useNN;
     private TreeNode previousNode;
 
     private final Integer moveFunction;
     private final GenerateTrainingData generateTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime, Integer boardSize) {
+    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime, Integer boardSize, Boolean useNN) {
         this.counterColour = counterColour;
         this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
+        this.useNN = useNN;
         previousNode = null;
         generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
+
     }
 
     public Board playTurn(Board board) {
@@ -103,10 +106,10 @@ public class ComputerPlayer implements Player {
         if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, useNN);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, useNN);
         }
         currentNode = monteCarloTreeSearch.run();
         previousNode = currentNode;

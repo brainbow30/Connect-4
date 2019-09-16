@@ -12,9 +12,10 @@ public class MonteCarloTreeSearch {
 
     private final TreeNode root;
     private final Integer waitTime;
+    private final Boolean useNN;
 
 
-    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime) {
+    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN) {
         root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
@@ -24,13 +25,15 @@ public class MonteCarloTreeSearch {
                 .build();
         root.visited();
         this.waitTime = waitTime;
+        this.useNN = useNN;
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Integer waitTime) {
+    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Boolean useNN) {
         root = node;
         root.visited();
         root.setRoot();
         this.waitTime = waitTime;
+        this.useNN = useNN;
     }
 
     public TreeNode run() {
@@ -42,18 +45,18 @@ public class MonteCarloTreeSearch {
                 selectedNode = selectedNode.selectRandomMove();
             }
 
-            COLOUR result = selectedNode.simulateGame();
+            Double result = selectedNode.simulateGame(useNN);
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
 
         TreeNode selectMove = root.selectUCTMove();
-        System.out.println("selectMove = " + selectMove.getNumberOfWins());
+        System.out.println("selectMove value= " + selectMove.getNumberOfWins());
         System.out.println("selectMove sims = " + selectMove.getNumberOfSimulations());
         return selectMove;
     }
 
-    private void propagateResult(TreeNode node, COLOUR result) {
+    private void propagateResult(TreeNode node, Double result) {
 
         while (!node.getRoot()) {
             node.addResult(result);

@@ -30,7 +30,7 @@ class Game {
 
     @Autowired
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson,
-                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime) {
+                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${useNN}") Boolean useNN) {
 
         this.board = board;
         this.messageProducer = messageProducer;
@@ -38,13 +38,13 @@ class Game {
         if (humanPlayer1) {
             player1 = new HumanPlayer(COLOUR.WHITE, messageProducer);
         } else {
-            player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime, board.getBoardSize());
+            player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime, board.getBoardSize(), useNN);
         }
         if (humanPlayer2) {
             player2 = new HumanPlayer(COLOUR.BLACK, messageProducer);
         } else {
 
-            player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime, board.getBoardSize());
+            player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime, board.getBoardSize(), useNN);
         }
         currentTurnsPlayer = player1;
     }

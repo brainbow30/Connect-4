@@ -69,7 +69,7 @@ public class TreeNodeTest {
 
     }
 
-    @Test
+    //@Test
     public void getNNPrediction() {
         System.out.println(nnNode.getNNPrediction());
     }

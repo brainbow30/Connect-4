@@ -22,7 +22,7 @@ public final class TreeNode implements Serializable {
     private final COLOUR colour;
     private final COLOUR rootColour;
     private final TreeNode parent;
-    private Integer numberOfWins = 0;
+    private Double numberOfWins = 0.0;
     private Integer numberOfSimulations = 0;
     private Boolean visited = false;
     private ImmutableList<TreeNode> children;
@@ -106,8 +106,18 @@ public final class TreeNode implements Serializable {
         return parent;
     }
 
-    Integer getNumberOfWins() {
-        return numberOfWins;
+    public static Double getWinnerValue(COLOUR rootColour, COLOUR actualColour) {
+        if (actualColour != null) {
+            if (rootColour.equals(actualColour)) {
+                return 1.0;
+            } else if (!rootColour.equals(actualColour)) {
+                return -1.0;
+            } else {
+                return 0.0;
+            }
+        } else {
+            return 0.0;
+        }
     }
 
     Integer getNumberOfSimulations() {
@@ -140,15 +150,8 @@ public final class TreeNode implements Serializable {
         return boardOfMoveProbabilities.build();
     }
 
-    public COLOUR simulateGame() {
-        COLOUR result;
-        if (isTerminalNode()) {
-            result = currentBoard.getWinner(false);
-        } else {
-            result = selectRandomMove().simulateGame();
-        }
-        addResult(result);
-        return result;
+    Double getNumberOfWins() {
+        return numberOfWins;
     }
 
     public Boolean isVisited() {
@@ -248,10 +251,24 @@ public final class TreeNode implements Serializable {
         }
     }
 
-    public void addResult(COLOUR result) {
-        numberOfSimulations++;
-        if (result != null && result.equals(rootColour)) {
-            numberOfWins++;
+    Double simulateGame(Boolean useNN) {
+        if (useNN) {
+            double nnPrediction = getNNPrediction();
+            addResult(nnPrediction);
+            return nnPrediction;
+        } else {
+            Double result;
+            if (isTerminalNode()) {
+                result = getWinnerValue(rootColour, currentBoard.getWinner(false));
+            } else {
+                result = selectRandomMove().simulateGame(false);
+            }
+            addResult(result);
+            if (result != null && result.equals(rootColour)) {
+                return 1.0;
+            } else {
+                return -1.0;
+            }
         }
     }
 
@@ -358,5 +375,10 @@ public final class TreeNode implements Serializable {
             intBoard = ImmutableList.copyOf(builder.build());
         }
         return intBoard;
+    }
+
+    public void addResult(Double result) {
+        numberOfSimulations++;
+        numberOfWins += result;
     }
 }
