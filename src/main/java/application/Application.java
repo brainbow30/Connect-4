@@ -25,14 +25,12 @@ import java.util.UUID;
 class Application {
 
     private final Game game;
-    private final Boolean localGame;
     private final Integer numberOfGames;
     private final Integer boardSize;
 
     @Autowired
-    public Application(Game game, @Value("${localGame}") Boolean localGame, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize) {
+    public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize) {
         this.game = game;
-        this.localGame = localGame;
         this.numberOfGames = numberOfGames;
         this.boardSize = boardSize;
     }
@@ -54,32 +52,26 @@ class Application {
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
 
-            if (localGame) {
-                Integer player1Wins = 0;
-                int draws = 0;
-                //play locally
-                for (int i = 0; i < numberOfGames; i++) {
-                    System.out.println("Local Game");
-                    game.reset();
 
-                    Optional<Player> winner = game.play();
-                    if (winner.isPresent()) {
-                        if (winner.get().getCounterColour().equals(COLOUR.WHITE)) {
-                            player1Wins++;
-                        }
-                    } else {
-                        draws++;
+            Integer player1Wins = 0;
+            int draws = 0;
+            //play locally
+            for (int i = 0; i < numberOfGames; i++) {
+                System.out.println("Local Game");
+                game.reset();
+
+                Optional<Player> winner = game.play();
+                if (winner.isPresent()) {
+                    if (winner.get().getCounterColour().equals(COLOUR.WHITE)) {
+                        player1Wins++;
                     }
-                    trainNN();
+                } else {
+                    draws++;
                 }
-                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
-
-
-                //play over kafka
-            } else {
-                System.out.println("Kafka Game");
-                game.playKafka();
+                trainNN();
             }
+            System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
+
 
         };
     }

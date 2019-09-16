@@ -29,6 +29,7 @@ public final class TreeNode implements Serializable {
     private Boolean terminalNode = false;
     private final ImmutablePosition positionToCreateBoard;
     private Boolean isRoot = false;
+    private final String hostname;
 
 
     private TreeNode(Builder builder) {
@@ -41,6 +42,7 @@ public final class TreeNode implements Serializable {
         }
         positionToCreateBoard = builder.positionToCreateBoard;
         children = ImmutableList.of();
+        hostname = builder.hostname;
     }
 
     public static Builder builder() {
@@ -198,7 +200,7 @@ public final class TreeNode implements Serializable {
         Client client = ClientBuilder.newClient(config);
 
         WebTarget target = client.target(UriBuilder.fromUri(
-                "http://127.0.0.1:5000").build());
+                hostname).build());
 
         StringBuilder stringBoard = new StringBuilder();
         ImmutableList<Integer> intBoard = canonicalBoard();
@@ -321,6 +323,7 @@ public final class TreeNode implements Serializable {
         private COLOUR rootColour;
         private TreeNode parent;
         private ImmutablePosition positionToCreateBoard;
+        private String hostname;
 
 
         public Builder currentBoard(Board currentBoard) {
@@ -345,6 +348,11 @@ public final class TreeNode implements Serializable {
 
         public Builder positionToCreateBoard(ImmutablePosition positionToCreateBoard) {
             this.positionToCreateBoard = positionToCreateBoard;
+            return this;
+        }
+
+        public Builder hostname(String hostname) {
+            this.hostname = hostname;
             return this;
         }
 

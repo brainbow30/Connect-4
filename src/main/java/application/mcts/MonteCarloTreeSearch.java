@@ -15,13 +15,14 @@ public class MonteCarloTreeSearch {
     private final Boolean useNN;
 
 
-    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN) {
+    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN, String hostname) {
         root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
                 .colour(colour)
                 .rootColour(colour)
                 .positionToCreateBoard(null)
+                .hostname(hostname)
                 .build();
         root.visited();
         this.waitTime = waitTime;

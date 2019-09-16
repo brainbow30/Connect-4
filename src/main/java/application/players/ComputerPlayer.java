@@ -7,7 +7,6 @@ import application.game.Counter;
 import application.mcts.GenerateTrainingData;
 import application.mcts.MonteCarloTreeSearch;
 import application.mcts.TreeNode;
-import application.utils.MessageProducer;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Random;
@@ -16,21 +15,21 @@ import java.util.Random;
 public class ComputerPlayer implements Player {
 
     private final COLOUR counterColour;
-    private final MessageProducer producer;
     private final Integer waitTime;
     private final Boolean useNN;
+    private final String hostname;
     private TreeNode previousNode;
 
     private final Integer moveFunction;
     private final GenerateTrainingData generateTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, MessageProducer producer, Integer moveFunction, Integer waitTime, Integer boardSize, Boolean useNN) {
+    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, Boolean useNN, String hostname) {
         this.counterColour = counterColour;
-        this.producer = producer;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
         this.useNN = useNN;
+        this.hostname = hostname;
         previousNode = null;
         generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
 
@@ -57,23 +56,6 @@ public class ComputerPlayer implements Player {
 
     }
 
-    public void playTurnKafka(Board board) {
-        boolean invalidMove = true;
-        while (invalidMove) {
-            ImmutablePosition position = getNextPositionHeuristic(board);
-            Counter counter = new Counter(counterColour);
-            if (board.addCounter(counter, position)) {
-                invalidMove = false;
-            }
-
-        }
-        if (counterColour.equals(COLOUR.WHITE)) {
-            producer.sendMessage2(0, java.time.LocalDateTime.now().toString(), board);
-        } else {
-            producer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
-        }
-
-    }
 
     @Override
     public COLOUR getCounterColour() {
@@ -109,7 +91,7 @@ public class ComputerPlayer implements Player {
             monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, useNN);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, useNN);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, useNN, hostname);
         }
         currentNode = monteCarloTreeSearch.run();
         previousNode = currentNode;
