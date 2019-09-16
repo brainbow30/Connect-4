@@ -110,8 +110,6 @@ public final class TreeNode implements Serializable {
         if (actualColour != null) {
             if (rootColour.equals(actualColour)) {
                 return 1.0;
-            } else if (!rootColour.equals(actualColour)) {
-                return -1.0;
             } else {
                 return 0.0;
             }
@@ -264,11 +262,7 @@ public final class TreeNode implements Serializable {
                 result = selectRandomMove().simulateGame(false);
             }
             addResult(result);
-            if (result != null && result.equals(rootColour)) {
-                return 1.0;
-            } else {
-                return -1.0;
-            }
+            return result;
         }
     }
 
