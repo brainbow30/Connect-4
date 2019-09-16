@@ -178,15 +178,13 @@ public final class TreeNode implements Serializable {
         Random random = new Random();
         ImmutableList<TreeNode> children = getChildren();
         double bestValue = Double.MIN_VALUE;
-        TreeNode selected = null;
+        TreeNode selected = children.get(random.nextInt(children.size()));
         for (TreeNode child : children) {
-            System.out.println();
             double epsilon = 1e-6;
-            double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
-                    Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+            double uctValue = (child.numberOfWins) + child.numberOfSimulations / (numberOfSimulations + epsilon) +
                     random.nextDouble() * epsilon;
             //System.out.println("uctValue = " + uctValue);
-            if (uctValue > bestValue) {
+            if (uctValue > bestValue && child.numberOfSimulations > 0) {
                 selected = child;
                 bestValue = uctValue;
             }
@@ -219,7 +217,7 @@ public final class TreeNode implements Serializable {
                 .accept(MediaType.APPLICATION_JSON).get(String.class);
 
 
-        return (Double.parseDouble(jsonResponse) + 1.0) / 2.0;
+        return Double.parseDouble(jsonResponse);
     }
 
     public TreeNode findChildBoardMatch(Board board) {
@@ -255,7 +253,7 @@ public final class TreeNode implements Serializable {
 
     Double simulateGame(Boolean useNN) {
         if (useNN) {
-            double nnPrediction = getNNPrediction();
+            double nnPrediction = getNNPrediction() * adjustForRootColour();
             addResult(nnPrediction);
             return nnPrediction;
         } else {
@@ -381,8 +379,18 @@ public final class TreeNode implements Serializable {
         return intBoard;
     }
 
+    private Double adjustForRootColour() {
+        if (!colour.equals(rootColour)) {
+            return -1.0;
+        } else {
+            return 1.0;
+        }
+    }
+
     public void addResult(Double result) {
         numberOfSimulations++;
         numberOfWins += result;
     }
+
+
 }
