@@ -23,7 +23,7 @@ public final class TreeNode implements Serializable {
     private final COLOUR rootColour;
     private final TreeNode parent;
     private Double numberOfWins = 0.0;
-    private Integer numberOfSimulations = 0;
+    private Double numberOfSimulations = 0.0;
     private Boolean visited = false;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
@@ -73,6 +73,7 @@ public final class TreeNode implements Serializable {
                     .colour(newColour)
                     .rootColour(rootColour)
                     .positionToCreateBoard(move)
+                    .hostname(hostname)
                     .build();
             builder.add(childNode);
         }
@@ -120,7 +121,7 @@ public final class TreeNode implements Serializable {
         }
     }
 
-    Integer getNumberOfSimulations() {
+    Double getNumberOfSimulations() {
         return numberOfSimulations;
     }
 
@@ -131,7 +132,7 @@ public final class TreeNode implements Serializable {
         for (int i = 0; i < canonicalBoard.size(); i++) {
             Optional<TreeNode> posValidChild = isBoardPositionAValidChild(i);
             if (posValidChild.isPresent()) {
-                Double value = posValidChild.get().numberOfSimulations.doubleValue();
+                Double value = posValidChild.get().numberOfWins.doubleValue();
                 total += value;
                 builder.add(value);
             } else {
@@ -179,6 +180,7 @@ public final class TreeNode implements Serializable {
         double bestValue = Double.MIN_VALUE;
         TreeNode selected = null;
         for (TreeNode child : children) {
+            System.out.println();
             double epsilon = 1e-6;
             double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
                     Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
@@ -217,7 +219,7 @@ public final class TreeNode implements Serializable {
                 .accept(MediaType.APPLICATION_JSON).get(String.class);
 
 
-        return Double.parseDouble(jsonResponse);
+        return (Double.parseDouble(jsonResponse) + 1.0) / 2.0;
     }
 
     public TreeNode findChildBoardMatch(Board board) {

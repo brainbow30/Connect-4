@@ -12,7 +12,7 @@ public class GenerateTrainingData {
 
     public GenerateTrainingData(String filename) {
         try {
-            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, true));
+            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename));
         } catch (IOException e) {
             e.printStackTrace();
         }

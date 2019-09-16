@@ -57,7 +57,6 @@ class Application {
             int draws = 0;
             //play locally
             for (int i = 0; i < numberOfGames; i++) {
-                System.out.println("Local Game");
                 game.reset();
 
                 Optional<Player> winner = game.play();

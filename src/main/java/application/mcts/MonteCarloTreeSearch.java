@@ -58,7 +58,6 @@ public class MonteCarloTreeSearch {
     }
 
     private void propagateResult(TreeNode node, Double result) {
-
         while (!node.getRoot()) {
             node.addResult(result);
             node = node.getParent();
