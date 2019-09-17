@@ -132,7 +132,8 @@ public final class TreeNode implements Serializable {
         for (int i = 0; i < canonicalBoard.size(); i++) {
             Optional<TreeNode> posValidChild = isBoardPositionAValidChild(i);
             if (posValidChild.isPresent()) {
-                Double value = posValidChild.get().numberOfWins.doubleValue();
+                //todo replace with uct value
+                Double value = posValidChild.get().numberOfWins / (posValidChild.get().getNumberOfSimulations() + 1);
                 total += value;
                 builder.add(value);
             } else {
@@ -216,8 +217,14 @@ public final class TreeNode implements Serializable {
                 .path(stringBoard.toString()).request()
                 .accept(MediaType.APPLICATION_JSON).get(String.class);
 
-
-        return Double.parseDouble(jsonResponse);
+        try {
+            return Double.parseDouble(jsonResponse);
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+            System.out.println("jsonResponse = " + jsonResponse);
+            e.printStackTrace();
+            return 0.0;
+        }
     }
 
     public TreeNode findChildBoardMatch(Board board) {

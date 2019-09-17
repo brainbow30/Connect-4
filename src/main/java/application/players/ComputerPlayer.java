@@ -97,8 +97,9 @@ public class ComputerPlayer implements Player {
         previousNode = currentNode;
         final TreeNode trainingNode = currentNode;
         if (currentNode.isTerminalNode()) {
-            Thread t1 = new Thread(() -> generateTrainingData.save(trainingNode));
-            t1.start();
+            generateTrainingData.open();
+            generateTrainingData.save(trainingNode);
+            generateTrainingData.close();
 
         }
         return currentNode.getPositionToCreateBoard();

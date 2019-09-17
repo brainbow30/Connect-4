@@ -9,10 +9,16 @@ import java.io.IOException;
 
 public class GenerateTrainingData {
     private BufferedWriter outputWriter;
+    private String filename;
 
     public GenerateTrainingData(String filename) {
+        this.filename = filename;
+        open();
+    }
+
+    public void open() {
         try {
-            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename));
+            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, false));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,7 +64,15 @@ public class GenerateTrainingData {
         outputWriter.newLine();
         outputWriter.flush();
 
+
     }
 
+    public void close() {
+        try {
+            outputWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
