@@ -25,13 +25,13 @@ class Game {
         if (humanPlayer1) {
             player1 = new HumanPlayer(COLOUR.WHITE);
         } else {
-            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime, board.getBoardSize(), useNN, hostname);
+            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime, board.getBoardSize(), hostname);
         }
         if (humanPlayer2) {
             player2 = new HumanPlayer(COLOUR.BLACK);
         } else {
 
-            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime, board.getBoardSize(), useNN, hostname);
+            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime, board.getBoardSize(), hostname);
         }
         currentTurnsPlayer = player1;
     }

@@ -16,7 +16,6 @@ public class ComputerPlayer implements Player {
 
     private final COLOUR counterColour;
     private final Integer waitTime;
-    private final Boolean useNN;
     private final String hostname;
     private TreeNode previousNode;
 
@@ -24,11 +23,10 @@ public class ComputerPlayer implements Player {
     private final GenerateTrainingData generateTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, Boolean useNN, String hostname) {
+    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, String hostname) {
         this.counterColour = counterColour;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
-        this.useNN = useNN;
         this.hostname = hostname;
         previousNode = null;
         generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
@@ -41,7 +39,9 @@ public class ComputerPlayer implements Player {
         if (moveFunction.equals(1)) {
             position = getNextPositionHeuristic(board);
         } else if (moveFunction.equals(2)) {
-            position = getNextPositionMCTS(board);
+            position = getNextPositionMCTS(board, false);
+        } else if (moveFunction.equals(3)) {
+            position = getNextPositionMCTS(board, true);
         } else {
             System.out.println("random move");
             Random random = new Random();
@@ -81,7 +81,7 @@ public class ComputerPlayer implements Player {
 
     }
 
-    private ImmutablePosition getNextPositionMCTS(Board board) {
+    private ImmutablePosition getNextPositionMCTS(Board board, Boolean useNN) {
         MonteCarloTreeSearch monteCarloTreeSearch;
         TreeNode currentNode;
         //todo find replacement for previous node
