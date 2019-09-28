@@ -27,12 +27,14 @@ class Application {
     private final Game game;
     private final Integer numberOfGames;
     private final Integer boardSize;
+    private final Boolean train;
 
     @Autowired
-    public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize) {
+    public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize, @Value("${nn.train}") Boolean train) {
         this.game = game;
         this.numberOfGames = numberOfGames;
         this.boardSize = boardSize;
+        this.train = train;
     }
 
 
@@ -67,7 +69,9 @@ class Application {
                 } else {
                     draws++;
                 }
-                trainNN();
+                if (train) {
+                    trainNN();
+                }
             }
             System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
 
