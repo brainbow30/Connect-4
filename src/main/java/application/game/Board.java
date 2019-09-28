@@ -333,7 +333,7 @@ public class Board implements Serializable {
         if (printScore) {
             System.out.println("Score: " + whiteCounters + ":" + (countersPlayed - whiteCounters));
         }
-        double halfTotalCounters = Math.ceil(countersPlayed / 2.0);
+        double halfTotalCounters = countersPlayed / 2.0;
         if (whiteCounters > halfTotalCounters) {
             return COLOUR.WHITE;
         } else if (whiteCounters < halfTotalCounters) {
