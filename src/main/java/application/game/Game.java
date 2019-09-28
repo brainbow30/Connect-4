@@ -20,7 +20,7 @@ class Game {
     @Autowired
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2,
                 @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction,
-                @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${mcts.useNN}") Boolean useNN, @Value("${hostname}") String hostname) {
+                @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${hostname}") String hostname) {
         this.board = board;
         if (humanPlayer1) {
             player1 = new HumanPlayer(COLOUR.WHITE);
