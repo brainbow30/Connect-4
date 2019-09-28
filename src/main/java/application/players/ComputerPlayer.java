@@ -21,15 +21,17 @@ public class ComputerPlayer implements Player {
 
     private final Integer moveFunction;
     private final GenerateTrainingData generateTrainingData;
+    private final Boolean writeTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, String hostname) {
+    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, String hostname, Boolean writeTrainingData) {
         this.counterColour = counterColour;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
         this.hostname = hostname;
         previousNode = null;
         generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
+        this.writeTrainingData = writeTrainingData;
 
     }
 
@@ -96,7 +98,7 @@ public class ComputerPlayer implements Player {
         currentNode = monteCarloTreeSearch.run();
         previousNode = currentNode;
         final TreeNode trainingNode = currentNode;
-        if (currentNode.isTerminalNode()) {
+        if (currentNode.isTerminalNode() && writeTrainingData) {
             generateTrainingData.open();
             generateTrainingData.save(trainingNode);
             generateTrainingData.close();
