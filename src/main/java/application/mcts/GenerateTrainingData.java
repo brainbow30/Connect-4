@@ -18,7 +18,7 @@ public class GenerateTrainingData {
 
     public void open() {
         try {
-            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, true));
+            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, false));
         } catch (IOException e) {
             e.printStackTrace();
         }

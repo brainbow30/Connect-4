@@ -20,18 +20,19 @@ class Game {
     @Autowired
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2,
                 @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction,
-                @Value("${mcts.waitTime}") Integer mctsWaitTime, @Value("${hostname}") String hostname, @Value("${write.training.data}") Boolean writeTrainingData) {
+                @Value("${mcts.waitTime1}") Integer mctsWaitTime1, @Value("${mcts.waitTime2}") Integer mctsWaitTime2,
+                @Value("${hostname}") String hostname, @Value("${write.training.data}") Boolean writeTrainingData) {
         this.board = board;
         if (humanPlayer1) {
             player1 = new HumanPlayer(COLOUR.WHITE);
         } else {
-            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime, board.getBoardSize(), hostname, writeTrainingData);
+            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData);
         }
         if (humanPlayer2) {
             player2 = new HumanPlayer(COLOUR.BLACK);
         } else {
 
-            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime, board.getBoardSize(), hostname, writeTrainingData);
+            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData);
         }
         currentTurnsPlayer = player1;
     }
