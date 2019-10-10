@@ -28,7 +28,6 @@ public class GenerateTrainingData {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
-            ImmutableList<Double> policyVector = terminalNode.getPolicyVector();
             int result = 0;
             if (winner != null && winner.equals(terminalNode.getColour())) {
                 result = 1;
@@ -36,7 +35,7 @@ public class GenerateTrainingData {
                 result = -1;
             }
             try {
-                write(intBoard, policyVector, result);
+                write(intBoard, result);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -44,19 +43,13 @@ public class GenerateTrainingData {
         }
     }
 
-    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policy, Integer result) throws IOException {
+    void write(ImmutableList<Integer> intBoard, Integer result) throws IOException {
         for (int pos = 0; pos < intBoard.size(); pos++) {
             outputWriter.write(intBoard.get(pos).toString());
             if (pos + 1 != intBoard.size()) {
                 outputWriter.write(",");
             }
         }
-        outputWriter.write(":");
-        StringBuilder policyVector = new StringBuilder();
-        for (Double value : policy) {
-            policyVector.append(value).append(",");
-        }
-        outputWriter.write(policyVector.substring(0, policyVector.length() - 1));
         if (result == 0) {
             result = -1;
         }

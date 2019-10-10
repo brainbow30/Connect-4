@@ -1,6 +1,7 @@
 package application.mcts;
 
 import application.game.Board;
+import application.game.COLOUR;
 import application.game.Verifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -15,12 +16,14 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class GenerateTrainingDataTest {
     private Board board;
+    private TreeNode treeNode;
 
     private GenerateTrainingData generateTrainingData;
     @Before
     public void setup() {
         generateTrainingData = new GenerateTrainingData("testWrite.txt");
         board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
+        treeNode = TreeNode.builder().colour(COLOUR.WHITE).currentBoard(board).positionToCreateBoard(null).parent(null).rootColour(COLOUR.WHITE).hostname("127.0.0.1:5000").build();
     }
 
     @Test
@@ -28,14 +31,21 @@ public class GenerateTrainingDataTest {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            generateTrainingData.write(board.asIntArray(), ImmutableList.of(0.0), null);
-            String expected = "[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0]";
+            generateTrainingData.write(board.asIntArray(), 1);
+            String expected = "0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0:1";
             assertEquals(expected, readFile().get(0));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void save() {
+        generateTrainingData.open();
+        generateTrainingData.save(treeNode);
+        generateTrainingData.close();
     }
 
     private ImmutableList<String> readFile() throws IOException {

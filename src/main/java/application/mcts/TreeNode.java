@@ -4,7 +4,6 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -80,18 +79,6 @@ public final class TreeNode implements Serializable {
         return builder.build();
     }
 
-    private Optional<TreeNode> isBoardPositionAValidChild(Integer i) {
-        for (TreeNode child : getChildren()) {
-            ImmutablePosition positionToCreateBoard = child.positionToCreateBoard;
-            if (positionToCreateBoard != null) {
-                Integer pos = positionToCreateBoard.x() * currentBoard.getBoardSize() + positionToCreateBoard.y();
-                if (pos.equals(i)) {
-                    return Optional.of(child);
-                }
-            }
-        }
-        return Optional.absent();
-    }
 
     public COLOUR getColour() {
         return colour;
@@ -125,32 +112,6 @@ public final class TreeNode implements Serializable {
         return numberOfSimulations;
     }
 
-    public ImmutableList<Double> getPolicyVector() {
-        ImmutableList<Integer> canonicalBoard = canonicalBoard();
-        ImmutableList.Builder<Double> builder = ImmutableList.builder();
-        Double total = 0.0;
-        for (int i = 0; i < canonicalBoard.size(); i++) {
-            Optional<TreeNode> posValidChild = isBoardPositionAValidChild(i);
-            if (posValidChild.isPresent()) {
-                //todo replace with uct value
-                Double value = posValidChild.get().numberOfWins / (posValidChild.get().getNumberOfSimulations() + 1);
-                total += value;
-                builder.add(value);
-            } else {
-                builder.add(0.0);
-            }
-        }
-        ImmutableList<Double> boardOfChildSimulations = builder.build();
-        ImmutableList.Builder<Double> boardOfMoveProbabilities = ImmutableList.builder();
-        if (total > 0) {
-            for (Double value : boardOfChildSimulations) {
-                boardOfMoveProbabilities.add(value / total);
-            }
-        } else {
-            boardOfMoveProbabilities.addAll(boardOfChildSimulations.asList());
-        }
-        return boardOfMoveProbabilities.build();
-    }
 
     Double getNumberOfWins() {
         return numberOfWins;
@@ -172,7 +133,11 @@ public final class TreeNode implements Serializable {
     }
 
     public Boolean isTerminalNode() {
-        return terminalNode;
+        if (currentBoard.getCountersPlayed() == currentBoard.getBoardSize() * currentBoard.getBoardSize()) {
+            return true;
+        } else {
+            return terminalNode;
+        }
     }
 
     public TreeNode selectUCTMove() {
