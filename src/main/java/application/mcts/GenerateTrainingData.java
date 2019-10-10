@@ -25,15 +25,16 @@ public class GenerateTrainingData {
     }
 
     public void save(TreeNode terminalNode) {
+        COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
+        int result = 0;
+        if (winner != null && winner.equals(terminalNode.getRootColour())) {
+            result = 1;
+        } else if (winner != null && !winner.equals(terminalNode.getRootColour())) {
+            result = -1;
+        }
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
-            COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
-            int result = 0;
-            if (winner != null && winner.equals(terminalNode.getColour())) {
-                result = 1;
-            } else if (winner != null && !winner.equals(terminalNode.getColour())) {
-                result = -1;
-            }
+
             try {
                 write(intBoard, result);
             } catch (IOException e) {

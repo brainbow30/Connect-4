@@ -84,6 +84,10 @@ public final class TreeNode implements Serializable {
         return colour;
     }
 
+    public COLOUR getRootColour() {
+        return rootColour;
+    }
+
     public ImmutablePosition getPositionToCreateBoard() {
         return positionToCreateBoard;
     }
@@ -225,7 +229,7 @@ public final class TreeNode implements Serializable {
 
     Double simulateGame(Boolean useNN) {
         if (useNN) {
-            double nnPrediction = getNNPrediction() * adjustForRootColour();
+            double nnPrediction = getNNPrediction();
             addResult(nnPrediction);
             return nnPrediction;
         } else {
@@ -335,7 +339,7 @@ public final class TreeNode implements Serializable {
 
     ImmutableList<Integer> canonicalBoard() {
         ImmutableList<Integer> intBoard = currentBoard.asIntArray();
-        if (colour.equals(COLOUR.BLACK)) {
+        if (rootColour.equals(COLOUR.BLACK)) {
             ImmutableList.Builder<Integer> builder = ImmutableList.builder();
             for (Integer pos : intBoard) {
                 if (pos == 1) {
@@ -351,13 +355,6 @@ public final class TreeNode implements Serializable {
         return intBoard;
     }
 
-    private Double adjustForRootColour() {
-        if (!colour.equals(rootColour)) {
-            return -1.0;
-        } else {
-            return 1.0;
-        }
-    }
 
     public void addResult(Double result) {
         numberOfSimulations++;
