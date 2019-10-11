@@ -49,8 +49,8 @@ public class TreeNodeTest {
         assertEquals(whiteExpected, whiteNNBoard);
         ImmutableList<Integer> blackExpected = ImmutableList.of(
                 0, 0, 0, 0,
-                0, -1, 1, 0,
                 0, 1, -1, 0,
+                0, -1, 1, 0,
                 0, 0, 0, 0);
         ImmutableList<Integer> blackNNBoard = blackNode.canonicalBoard();
         assertEquals(blackExpected, blackNNBoard);

@@ -340,19 +340,35 @@ public final class TreeNode implements Serializable {
     ImmutableList<Integer> canonicalBoard() {
         ImmutableList<Integer> intBoard = currentBoard.asIntArray();
         if (rootColour.equals(COLOUR.BLACK)) {
-            ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-            for (Integer pos : intBoard) {
-                if (pos == 1) {
-                    builder.add(-1);
-                } else if (pos == -1) {
-                    builder.add(1);
-                } else {
-                    builder.add(0);
-                }
-            }
-            intBoard = ImmutableList.copyOf(builder.build());
+            return changeBoardPerspective(intBoard);
         }
         return intBoard;
+    }
+
+    ImmutableList<Integer> changeBoardPerspective(ImmutableList<Integer> intBoard) {
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        for (Integer pos : intBoard) {
+            if (pos == 1) {
+                builder.add(-1);
+            } else if (pos == -1) {
+                builder.add(1);
+            } else {
+                builder.add(0);
+            }
+        }
+        ImmutableList<Integer> unrotatedBoard = ImmutableList.copyOf(builder.build());
+        return rotateBoard(unrotatedBoard);
+    }
+
+    ImmutableList<Integer> rotateBoard(ImmutableList<Integer> intArray) {
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        for (int y = 0; y < currentBoard.getBoardSize(); y++) {
+            for (int x = currentBoard.getBoardSize() - 1; x >= 0; x--) {
+                Integer value = intArray.get(x * currentBoard.getBoardSize() + y);
+                builder.add(value);
+            }
+        }
+        return builder.build();
     }
 
 
