@@ -151,7 +151,8 @@ public final class TreeNode implements Serializable {
         TreeNode selected = children.get(random.nextInt(children.size()));
         for (TreeNode child : children) {
             double epsilon = 1e-6;
-            double uctValue = (child.numberOfWins) + child.numberOfSimulations / (numberOfSimulations + epsilon) +
+            double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
+                    Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
                     random.nextDouble() * epsilon;
             if (uctValue > bestValue) {
                 selected = child;
