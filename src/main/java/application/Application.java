@@ -2,15 +2,17 @@ package application;
 
 import application.game.COLOUR;
 import application.game.Game;
+import application.gui.GUI;
 import application.players.Player;
 import com.google.common.base.Optional;
 import org.glassfish.jersey.client.ClientConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import javax.ws.rs.client.Client;
@@ -18,8 +20,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
-import java.util.Properties;
-import java.util.UUID;
+
 
 @SpringBootApplication
 class Application {
@@ -28,25 +29,23 @@ class Application {
     private final Integer numberOfGames;
     private final Integer boardSize;
     private final Boolean train;
+    private final Boolean useGUI;
 
     @Autowired
-    public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize, @Value("${nn.train}") Boolean train) {
+    public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize,
+                       @Value("${nn.train}") Boolean train, @Value("${useGUI}") Boolean useGUI) {
         this.game = game;
         this.numberOfGames = numberOfGames;
         this.boardSize = boardSize;
         this.train = train;
+        this.useGUI = useGUI;
     }
 
 
     public static void main(String[] args) {
-        SpringApplication application = new SpringApplication(Application.class);
+        ConfigurableApplicationContext context = new SpringApplicationBuilder(Application.class).headless(false).run(args);
+        GUI frame = context.getBean(GUI.class);
 
-        Properties properties = new Properties();
-        properties.put("player1.topic", UUID.randomUUID());
-        properties.put("player2.topic", UUID.randomUUID());
-        application.setDefaultProperties(properties);
-
-        application.run(args);
 
     }
 
@@ -61,7 +60,7 @@ class Application {
             for (int i = 0; i < numberOfGames; i++) {
                 game.reset();
 
-                Optional<Player> winner = game.play();
+                Optional<Player> winner = game.play(useGUI);
                 if (winner.isPresent()) {
                     if (winner.get().getCounterColour().equals(COLOUR.WHITE)) {
                         player1Wins++;

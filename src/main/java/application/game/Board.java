@@ -85,6 +85,10 @@ public class Board implements Serializable {
         return countersPlayed;
     }
 
+    public Integer getNumberOfWhiteCounters() {
+        return numberOfWhiteCounters;
+    }
+
     public Optional<Counter> getCounter(Position position) {
         int x = position.x();
         int y = position.y();
