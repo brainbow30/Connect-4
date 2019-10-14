@@ -1,6 +1,7 @@
 package application.mcts;
 
 import application.game.COLOUR;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import java.io.BufferedWriter;
@@ -25,16 +26,19 @@ public class GenerateTrainingData {
     }
 
     public void save(TreeNode terminalNode) {
-        COLOUR winner = terminalNode.getCurrentBoard().getWinner(false);
+        Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner(false);
         int result = 0;
         int oppResult = 0;
-        if (winner != null && winner.equals(terminalNode.getRootColour())) {
-            result = 1;
-            oppResult = -1;
-        } else if (winner != null && !winner.equals(terminalNode.getRootColour())) {
-            result = -1;
-            oppResult = 1;
+        if (winner.isPresent()) {
+            if (winner.get().equals(terminalNode.getRootColour())) {
+                result = 1;
+                oppResult = -1;
+            } else if (!winner.get().equals(terminalNode.getRootColour())) {
+                result = -1;
+                oppResult = 1;
+            }
         }
+
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             ImmutableList<Integer> oppIntBoard = terminalNode.changeBoardPerspective(intBoard);

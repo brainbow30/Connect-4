@@ -6,6 +6,8 @@ import application.game.COLOUR;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
 public class BoardGridPanel extends JPanel {
@@ -50,6 +52,16 @@ public class BoardGridPanel extends JPanel {
                 buttons[i][j] = new JButton();
                 buttons[i][j].setPreferredSize(BTN_PREF_SIZE);
                 buttons[i][j].setBackground(boardBG);
+                final int x = j;
+                final int y = i;
+                buttons[i][j].addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println(x);
+                        System.out.println(y);
+                    }
+                });
                 ImmutablePosition pos = ImmutablePosition.builder().x(j).y(i).build();
                 if (board.getCounter(pos).isPresent()) {
                     if (board.getCounter(pos).get().getColour().equals(COLOUR.WHITE)) {

@@ -74,25 +74,27 @@ class Game {
         } else {
             System.out.println(board);
         }
-        COLOUR winner = board.getWinner(true);
+        Optional<COLOUR> winner = board.getWinner(true);
         GUI.setWinnerText(winner);
-        if (winner == null) {
+        if (winner.isPresent()) {
+            if (winner.get().equals(COLOUR.WHITE)) {
+                System.out.println("White wins");
+                if (player1.getCounterColour().equals(COLOUR.WHITE)) {
+                    return Optional.of(player1);
+                } else {
+                    return Optional.of(player2);
+                }
+            } else if (winner.get().equals(COLOUR.BLACK)) {
+                System.out.println("Black wins");
+                if (player1.getCounterColour().equals(COLOUR.BLACK)) {
+                    return Optional.of(player1);
+                } else {
+                    return Optional.of(player2);
+                }
+            }
+        } else {
             System.out.println("Draw");
             return Optional.absent();
-        } else if (winner.equals(COLOUR.WHITE)) {
-            System.out.println("White wins");
-            if (player1.getCounterColour().equals(COLOUR.WHITE)) {
-                return Optional.of(player1);
-            } else {
-                return Optional.of(player2);
-            }
-        } else if (winner.equals(COLOUR.BLACK)) {
-            System.out.println("Black wins");
-            if (player1.getCounterColour().equals(COLOUR.BLACK)) {
-                return Optional.of(player1);
-            } else {
-                return Optional.of(player2);
-            }
         }
         return Optional.absent();
     }

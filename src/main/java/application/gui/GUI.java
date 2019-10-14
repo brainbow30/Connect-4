@@ -3,6 +3,7 @@ package application.gui;
 
 import application.game.Board;
 import application.game.COLOUR;
+import com.google.common.base.Optional;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -81,14 +82,15 @@ public class GUI {
         boardGridPanel.updateBoard(board);
     }
 
-    public void setWinnerText(COLOUR colour) {
-        currentPlayer.setText("");
-        if (colour.equals(COLOUR.WHITE)) {
-            currentScore.setText("White Wins");
-        } else if (colour.equals(COLOUR.BLACK)) {
-            currentScore.setText("Black Wins");
+    public void setWinnerText(Optional<COLOUR> colour) {
+        if (colour.isPresent()) {
+            if (colour.get().equals(COLOUR.WHITE)) {
+                currentPlayer.setText("White Wins");
+            } else if (colour.get().equals(COLOUR.BLACK)) {
+                currentPlayer.setText("Black Wins");
+            }
         } else {
-            currentScore.setText("Draw");
+            currentPlayer.setText("Draw");
         }
     }
 
