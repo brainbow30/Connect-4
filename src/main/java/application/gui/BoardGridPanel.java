@@ -4,8 +4,10 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,5 +91,11 @@ public class BoardGridPanel extends JPanel {
         Optional<ImmutablePosition> returnValue = clickedPos;
         clickedPos = Optional.absent();
         return returnValue;
+    }
+
+    void highlight(ImmutableList<ImmutablePosition> positions) {
+        for (ImmutablePosition pos : positions) {
+            buttons[pos.y()][pos.x()].setBorder(new LineBorder(Color.yellow));
+        }
     }
 }

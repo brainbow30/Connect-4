@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 @Component
 public class GUI {
@@ -17,10 +19,13 @@ public class GUI {
     private BoardGridPanel boardGridPanel;
     private JFrame frame;
     private JPanel mainPanel;
-    private JLabel currentPlayer;
-    private JLabel currentScore;
+    private JLabel currentPlayerLabel;
+    private JLabel currentScoreLabel;
+    private Board board;
+    private COLOUR colour = COLOUR.WHITE;
 
     public GUI(Board board) {
+        this.board = board;
         frame = new JFrame("Othello");
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
@@ -32,19 +37,19 @@ public class GUI {
         c.gridwidth = 1;
         c.gridx = 0;
         c.gridy = 0;
-        currentPlayer = new JLabel("White's Turn", JLabel.CENTER);
-        currentPlayer.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
-        currentPlayer.setFont(new Font(null, Font.PLAIN, 20));
-        mainPanel.add(currentPlayer, c);
+        currentPlayerLabel = new JLabel("White's Turn", JLabel.CENTER);
+        currentPlayerLabel.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
+        currentPlayerLabel.setFont(new Font(null, Font.PLAIN, 20));
+        mainPanel.add(currentPlayerLabel, c);
 
-        currentScore = new JLabel("Score: 0-0", JLabel.CENTER);
-        currentScore.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
-        currentScore.setFont(new Font(null, Font.PLAIN, 20));
+        currentScoreLabel = new JLabel("Score: 0-0", JLabel.CENTER);
+        currentScoreLabel.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
+        currentScoreLabel.setFont(new Font(null, Font.PLAIN, 20));
         c.gridx = 3;
         c.gridy = 0;
         c.gridwidth = 1;
         c.gridwidth = 1;
-        mainPanel.add(currentScore, c);
+        mainPanel.add(currentScoreLabel, c);
 
 
         boardGridPanel = new BoardGridPanel(board);
@@ -63,6 +68,27 @@ public class GUI {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(false);
+        mainPanel.requestFocusInWindow();
+        mainPanel.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyChar() == 'h') {
+                    help();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
+    }
+
+    private void help() {
+        boardGridPanel.highlight(board.getValidMoves(colour));
     }
 
     public void show() {
@@ -74,24 +100,27 @@ public class GUI {
     }
 
     public void updateBoard(Board board, COLOUR colour) {
+        mainPanel.requestFocusInWindow();
+        this.board = board;
+        this.colour = colour;
         if (colour.equals(COLOUR.WHITE)) {
-            currentPlayer.setText("White's Turn");
+            currentPlayerLabel.setText("White's Turn");
         } else if (colour.equals(COLOUR.BLACK)) {
-            currentPlayer.setText("Black's Turn");
+            currentPlayerLabel.setText("Black's Turn");
         }
-        currentScore.setText("Score: " + board.getNumberOfWhiteCounters() + "-" + (board.getCountersPlayed() - board.getNumberOfWhiteCounters()));
+        currentScoreLabel.setText("Score: " + board.getNumberOfWhiteCounters() + "-" + (board.getCountersPlayed() - board.getNumberOfWhiteCounters()));
         boardGridPanel.updateBoard(board);
     }
 
     public void setWinnerText(Optional<COLOUR> colour) {
         if (colour.isPresent()) {
             if (colour.get().equals(COLOUR.WHITE)) {
-                currentPlayer.setText("White Wins");
+                currentPlayerLabel.setText("White Wins");
             } else if (colour.get().equals(COLOUR.BLACK)) {
-                currentPlayer.setText("Black Wins");
+                currentPlayerLabel.setText("Black Wins");
             }
         } else {
-            currentPlayer.setText("Draw");
+            currentPlayerLabel.setText("Draw");
         }
     }
 
