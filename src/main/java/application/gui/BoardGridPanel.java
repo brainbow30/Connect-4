@@ -3,6 +3,7 @@ package application.gui;
 import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
+import com.google.common.base.Optional;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,7 @@ public class BoardGridPanel extends JPanel {
     private static final BufferedImage whiteCircle = createCircle(Color.WHITE);
     private static final BufferedImage blackCircle = createCircle(Color.BLACK);
     private JButton[][] buttons;
+    private Optional<ImmutablePosition> clickedPos;
 
     public BoardGridPanel(Board board) {
         setup(board);
@@ -58,8 +60,7 @@ public class BoardGridPanel extends JPanel {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        System.out.println(x);
-                        System.out.println(y);
+                        clickedPos = Optional.of(ImmutablePosition.builder().x(x).y(y).build());
                     }
                 });
                 ImmutablePosition pos = ImmutablePosition.builder().x(j).y(i).build();
@@ -77,11 +78,16 @@ public class BoardGridPanel extends JPanel {
     }
 
     public void updateBoard(Board board) {
+        clickedPos = Optional.absent();
         removeAll();
         buttons = createButtons(board);
         repaint();
         revalidate();
     }
 
-
+    Optional<ImmutablePosition> getClickedPos() {
+        Optional<ImmutablePosition> returnValue = clickedPos;
+        clickedPos = Optional.absent();
+        return returnValue;
+    }
 }

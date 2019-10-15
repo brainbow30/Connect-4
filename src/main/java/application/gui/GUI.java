@@ -1,6 +1,7 @@
 package application.gui;
 
 
+import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import com.google.common.base.Optional;
@@ -92,6 +93,10 @@ public class GUI {
         } else {
             currentPlayer.setText("Draw");
         }
+    }
+
+    public Optional<ImmutablePosition> getClickedPos() {
+        return boardGridPanel.getClickedPos();
     }
 
 }
