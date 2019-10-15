@@ -20,6 +20,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.util.concurrent.TimeUnit;
 
 
 @SpringBootApplication
@@ -67,6 +68,12 @@ class Application {
                     }
                 } else {
                     draws++;
+                }
+                //rest time before next game
+                try {
+                    TimeUnit.MILLISECONDS.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
                 if (train) {
                     trainNN();

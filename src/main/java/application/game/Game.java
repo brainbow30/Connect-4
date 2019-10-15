@@ -52,7 +52,7 @@ class Game {
         int numberOfConsecutivePasses = 0;
         while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
             if (useGUI) {
-                GUI.updateBoard(board, currentTurnsPlayer.getCounterColour());
+                GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
                 GUI.show();
             } else {
                 System.out.println(board);
@@ -77,7 +77,7 @@ class Game {
 
     private Optional<Player> endGame(Board board, Boolean useGUI) {
         if (useGUI) {
-            GUI.updateBoard(board, currentTurnsPlayer.getCounterColour());
+            GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
             GUI.show();
         } else {
             System.out.println(board);
