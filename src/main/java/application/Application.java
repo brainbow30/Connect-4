@@ -17,9 +17,12 @@ import org.springframework.context.annotation.Bean;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 
@@ -85,9 +88,17 @@ class Application {
         };
     }
 
-    private void trainNN() {
+    void trainNN() {
         System.out.println("Training Neural Network...");
         try {
+            Scanner in = new Scanner(new FileReader("intBoards/training" + boardSize + ".txt"));
+            StringBuilder sb = new StringBuilder();
+            while (in.hasNext()) {
+                sb.append(in.next());
+            }
+            in.close();
+            String trainingData = sb.toString();
+            String trainingDataJSON = "{\"data\":\"" + trainingData + "\"}";
             Thread.sleep(1000);
             ClientConfig config = new ClientConfig();
             Client client = ClientBuilder.newClient(config);
@@ -96,11 +107,11 @@ class Application {
                     "http://127.0.0.1:5000").build());
 
             // Get JSON for application
-            String jsonResponse = target.path("train").path(boardSize.toString()).request()
-                    .accept(MediaType.APPLICATION_JSON).get(String.class);
+            String jsonResponse = target.path("train").path(boardSize.toString()).request().put(Entity.json(trainingDataJSON)).toString();
+
 
             System.out.println(jsonResponse);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | FileNotFoundException e) {
             e.printStackTrace();
         }
     }

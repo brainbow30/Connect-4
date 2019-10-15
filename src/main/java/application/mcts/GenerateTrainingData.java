@@ -11,6 +11,7 @@ import java.io.IOException;
 public class GenerateTrainingData {
     private BufferedWriter outputWriter;
     private String filename;
+    private StringBuilder builder;
 
     public GenerateTrainingData(String filename) {
         this.filename = filename;
@@ -26,6 +27,8 @@ public class GenerateTrainingData {
     }
 
     public void save(TreeNode terminalNode) {
+        builder = new StringBuilder();
+        builder.append("[");
         Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner(false);
         int result = 0;
         int oppResult = 0;
@@ -42,31 +45,36 @@ public class GenerateTrainingData {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             ImmutableList<Integer> oppIntBoard = terminalNode.changeBoardPerspective(intBoard);
+            write(intBoard, result);
+            builder.append(",");
+            write(oppIntBoard, oppResult);
+            builder.append(",");
 
-            try {
-                //todo write opposite board with opposite result to generate more training data
-                write(intBoard, result);
-                write(oppIntBoard, oppResult);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             terminalNode = terminalNode.getParent();
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("]");
+        try {
+            outputWriter.write(builder.toString());
+            outputWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    void write(ImmutableList<Integer> intBoard, Integer result) throws IOException {
+    void write(ImmutableList<Integer> intBoard, Integer result) {
+        builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
-            outputWriter.write(intBoard.get(pos).toString());
+            builder.append(intBoard.get(pos));
             if (pos + 1 != intBoard.size()) {
-                outputWriter.write(",");
+                builder.append(",");
             }
         }
         if (result == 0) {
             result = -1;
         }
-        outputWriter.write(":" + result);
-        outputWriter.newLine();
-        outputWriter.flush();
+        builder.append("]," + result);
+        builder.append("]");
 
 
     }
