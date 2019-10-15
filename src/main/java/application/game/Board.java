@@ -85,6 +85,10 @@ public class Board implements Serializable {
         return countersPlayed;
     }
 
+    public Integer getNumberOfWhiteCounters() {
+        return numberOfWhiteCounters;
+    }
+
     public Optional<Counter> getCounter(Position position) {
         int x = position.x();
         int y = position.y();
@@ -159,7 +163,6 @@ public class Board implements Serializable {
 
 
     public String printBoard() {
-        //System.out.println("numberOfWhiteCounters = " + numberOfWhiteCounters);
         StringBuilder boardString = new StringBuilder("\n  ");
         for (int x = 0; x < boardSize; x++) {
             boardString.append(" ").append(x + 1);
@@ -320,7 +323,7 @@ public class Board implements Serializable {
     }
 
 
-    public COLOUR getWinner(Boolean printScore) {
+    public Optional<COLOUR> getWinner(Boolean printScore) {
         int whiteCounters = 0;
         for (ImmutableList<Optional<Counter>> row : board) {
             for (Optional<Counter> counter : row) {
@@ -335,11 +338,11 @@ public class Board implements Serializable {
         }
         double halfTotalCounters = countersPlayed / 2.0;
         if (whiteCounters > halfTotalCounters) {
-            return COLOUR.WHITE;
+            return Optional.of(COLOUR.WHITE);
         } else if (whiteCounters < halfTotalCounters) {
-            return COLOUR.BLACK;
+            return Optional.of(COLOUR.BLACK);
         } else {
-            return null;
+            return Optional.absent();
         }
     }
 

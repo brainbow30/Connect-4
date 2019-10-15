@@ -4,6 +4,7 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.glassfish.jersey.client.ClientConfig;
 
@@ -100,9 +101,9 @@ public final class TreeNode implements Serializable {
         return parent;
     }
 
-    public static Double getWinnerValue(COLOUR rootColour, COLOUR actualColour) {
-        if (actualColour != null) {
-            if (rootColour.equals(actualColour)) {
+    public static Double getWinnerValue(COLOUR rootColour, Optional<COLOUR> actualColour) {
+        if (actualColour.isPresent()) {
+            if (rootColour.equals(actualColour.get())) {
                 return 1.0;
             } else {
                 return 0.0;
