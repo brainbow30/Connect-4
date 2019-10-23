@@ -30,6 +30,7 @@ public final class TreeNode implements Serializable {
     private final ImmutablePosition positionToCreateBoard;
     private Boolean isRoot = false;
     private final String hostname;
+    //todo add nodes policy value from nn
 
 
     private TreeNode(Builder builder) {
@@ -166,6 +167,7 @@ public final class TreeNode implements Serializable {
         return selected;
     }
 
+    //todo get policy vector
     double getNNPrediction() {
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
@@ -229,20 +231,19 @@ public final class TreeNode implements Serializable {
     }
 
     Double simulateGame(Boolean useNN) {
-        if (useNN) {
-            double nnPrediction = getNNPrediction();
-            addResult(nnPrediction);
-            return nnPrediction;
+        Double result;
+        if (isTerminalNode()) {
+            result = getWinnerValue(rootColour, currentBoard.getWinner(false));
         } else {
-            Double result;
-            if (isTerminalNode()) {
-                result = getWinnerValue(rootColour, currentBoard.getWinner(false));
+            if (useNN) {
+                result = getNNPrediction();
             } else {
                 result = selectRandomMove().simulateGame(false);
             }
-            addResult(result);
-            return result;
+
         }
+        addResult(result);
+        return result;
     }
 
     Board getCurrentBoard() {

@@ -62,6 +62,7 @@ public class GenerateTrainingData {
         }
     }
 
+    //todo write policy vector for node
     void write(ImmutableList<Integer> intBoard, Integer result) {
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {

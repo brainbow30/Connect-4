@@ -39,6 +39,7 @@ public class MonteCarloTreeSearch {
 
     public TreeNode run() {
         Stopwatch stopwatch = Stopwatch.createStarted();
+        //todo if all nodes visited stop
         while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
 
             TreeNode selectedNode = root.selectRandomMove();

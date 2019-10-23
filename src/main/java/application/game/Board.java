@@ -108,7 +108,6 @@ public class Board implements Serializable {
     public Boolean addCounter(Counter newCounter, Position position) {
         try {
             if (verifier.validMove(this, newCounter.getColour(), position)) {
-                //System.out.println("valid move");
                 //flip counter
                 //horizontal flips
                 flipCounters(newCounter.getColour(), position, 1, 0);
