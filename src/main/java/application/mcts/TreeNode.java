@@ -124,7 +124,7 @@ public final class TreeNode implements Serializable {
                 ImmutablePosition position = ImmutablePosition.builder().x(x).y(y).build();
                 Boolean contains = false;
                 for (TreeNode child : getChildren()) {
-                    if (child.getPositionToCreateBoard().equals(position) && getNumberOfSimulations() > 0) {
+                    if (child.getPositionToCreateBoard().equals(position) && child.getNumberOfSimulations() > 0) {
                         //todo find good policy values
                         builder.add((child.getNumberOfWins() / child.getNumberOfSimulations()));
                         contains = true;
