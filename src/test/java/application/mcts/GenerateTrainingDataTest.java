@@ -26,13 +26,14 @@ public class GenerateTrainingDataTest {
         treeNode = TreeNode.builder().colour(COLOUR.WHITE).currentBoard(board).positionToCreateBoard(null).parent(null).rootColour(COLOUR.WHITE).hostname("127.0.0.1:5000").build();
     }
 
-    @Test
     public void writeSingleBoardTest() {
         File file = new File("intBoards/testWrite.txt");
         file.delete();
         try {
-            generateTrainingData.write(board.asIntArray(), 1);
-            String expected = "0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0:1";
+            ImmutableList.Builder<Double> builder = ImmutableList.builder();
+            builder.add(0.0);
+            generateTrainingData.write(board.asIntArray(), builder.build(), 1);
+            String expected = "[[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0],[0.0],1]";
             assertEquals(expected, readFile().get(0));
         } catch (FileNotFoundException e) {
             e.printStackTrace();

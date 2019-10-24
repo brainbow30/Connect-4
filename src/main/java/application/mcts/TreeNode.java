@@ -30,7 +30,7 @@ public final class TreeNode implements Serializable {
     private final ImmutablePosition positionToCreateBoard;
     private Boolean isRoot = false;
     private final String hostname;
-    //todo add nodes policy value from nn
+    private ImmutableList<Double> policy;
 
 
     private TreeNode(Builder builder) {
@@ -81,6 +81,21 @@ public final class TreeNode implements Serializable {
         return builder.build();
     }
 
+    private static Double getWinnerValue(COLOUR rootColour, Optional<COLOUR> actualColour) {
+        if (actualColour.isPresent()) {
+            //win
+            if (rootColour.equals(actualColour.get())) {
+                return 1.0;
+                //loss
+            } else {
+                return -1.0;
+            }
+            //draw
+        } else {
+            return -1.0;
+        }
+    }
+
 
     public COLOUR getColour() {
         return colour;
@@ -102,16 +117,26 @@ public final class TreeNode implements Serializable {
         return parent;
     }
 
-    public static Double getWinnerValue(COLOUR rootColour, Optional<COLOUR> actualColour) {
-        if (actualColour.isPresent()) {
-            if (rootColour.equals(actualColour.get())) {
-                return 1.0;
-            } else {
-                return 0.0;
+    ImmutableList<Double> getTrainingPolicy() {
+        ImmutableList.Builder<Double> builder = ImmutableList.builder();
+        for (int y = 0; y < currentBoard.getBoardSize(); y++) {
+            for (int x = 0; x < currentBoard.getBoardSize(); x++) {
+                ImmutablePosition position = ImmutablePosition.builder().x(x).y(y).build();
+                Boolean contains = false;
+                for (TreeNode child : getChildren()) {
+                    if (child.getPositionToCreateBoard().equals(position) && getNumberOfSimulations() > 0) {
+                        //todo find good policy values
+                        builder.add((child.getNumberOfWins() / child.getNumberOfSimulations()));
+                        contains = true;
+                        break;
+                    }
+                }
+                if (!contains) {
+                    builder.add(0.0);
+                }
             }
-        } else {
-            return 0.0;
         }
+        return builder.build();
     }
 
     Double getNumberOfSimulations() {
@@ -161,13 +186,30 @@ public final class TreeNode implements Serializable {
                 bestValue = uctValue;
             }
         }
-        if (selected == null) {
-            return this;
+        return selected;
+    }
+
+    public TreeNode selectAlphaZeroMove(Double cpuct) {
+        Random random = new Random();
+        ImmutableList<TreeNode> children = getChildren();
+        double bestValue = Double.MIN_VALUE;
+        TreeNode selected = children.get(random.nextInt(children.size()));
+        for (TreeNode child : children) {
+            ImmutablePosition position = child.positionToCreateBoard;
+            int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();
+            if (policy == null) {
+                getNNPrediction();
+            }
+            double uctValue = child.numberOfWins + (cpuct * policy.get(integerPosition)
+                    * (Math.sqrt(numberOfSimulations) / (1 + child.numberOfSimulations)));
+            if (uctValue > bestValue) {
+                selected = child;
+                bestValue = uctValue;
+            }
         }
         return selected;
     }
 
-    //todo get policy vector
     double getNNPrediction() {
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
@@ -188,9 +230,17 @@ public final class TreeNode implements Serializable {
                 .path(currentBoard.getBoardSize().toString())
                 .path(stringBoard.toString()).request()
                 .accept(MediaType.APPLICATION_JSON).get(String.class);
-
         try {
-            return Double.parseDouble(jsonResponse);
+            String[] response = jsonResponse.split(":");
+            Double v = Double.parseDouble(response[1]);
+            String[] stringPolicy = response[0].split(",");
+            ImmutableList.Builder<Double> builder = ImmutableList.builder();
+            for (String i : stringPolicy
+            ) {
+                builder.add(Double.parseDouble(i));
+            }
+            policy = builder.build();
+            return v;
         } catch (NumberFormatException e) {
             System.out.println("error");
             System.out.println("jsonResponse = " + jsonResponse);
@@ -362,11 +412,11 @@ public final class TreeNode implements Serializable {
         return rotateBoard(unrotatedBoard);
     }
 
-    ImmutableList<Integer> rotateBoard(ImmutableList<Integer> intArray) {
-        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+    ImmutableList rotateBoard(ImmutableList intArray) {
+        ImmutableList.Builder builder = ImmutableList.builder();
         for (int y = 0; y < currentBoard.getBoardSize(); y++) {
             for (int x = currentBoard.getBoardSize() - 1; x >= 0; x--) {
-                Integer value = intArray.get(x * currentBoard.getBoardSize() + y);
+                Object value = intArray.get(x * currentBoard.getBoardSize() + y);
                 builder.add(value);
             }
         }

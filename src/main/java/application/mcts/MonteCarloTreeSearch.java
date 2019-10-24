@@ -13,9 +13,10 @@ public class MonteCarloTreeSearch {
     private final TreeNode root;
     private final Integer waitTime;
     private final Boolean useNN;
+    private final Double cpuct;
 
 
-    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN, String hostname) {
+    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN, String hostname, Double cpuct) {
         root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
@@ -27,14 +28,21 @@ public class MonteCarloTreeSearch {
         root.visited();
         this.waitTime = waitTime;
         this.useNN = useNN;
+        this.cpuct = cpuct;
+
+        //initialize policy vector
+        if (useNN) {
+            root.getNNPrediction();
+        }
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Boolean useNN) {
+    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Boolean useNN, Double cpuct) {
         root = node;
         root.visited();
         root.setRoot();
         this.waitTime = waitTime;
         this.useNN = useNN;
+        this.cpuct = cpuct;
     }
 
     public TreeNode run() {
@@ -51,8 +59,12 @@ public class MonteCarloTreeSearch {
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
-
-        TreeNode selectMove = root.selectUCTMove();
+        TreeNode selectMove;
+        if (useNN) {
+            selectMove = root.selectAlphaZeroMove(cpuct);
+        } else {
+            selectMove = root.selectUCTMove();
+        }
         System.out.println("selectMove value= " + selectMove.getNumberOfWins());
         System.out.println("selectMove sims = " + selectMove.getNumberOfSimulations());
         return selectMove;
@@ -60,7 +72,7 @@ public class MonteCarloTreeSearch {
 
     private void propagateResult(TreeNode node, Double result) {
         node = node.getParent();
-        while (!node.getRoot()) {
+        while (node.getParent() != null) {
             node.addResult(result);
             node = node.getParent();
         }

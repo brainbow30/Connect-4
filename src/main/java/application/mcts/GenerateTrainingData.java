@@ -45,9 +45,9 @@ public class GenerateTrainingData {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             ImmutableList<Integer> oppIntBoard = terminalNode.changeBoardPerspective(intBoard);
-            write(intBoard, result);
+            write(intBoard, terminalNode.getTrainingPolicy(), result);
             builder.append(",");
-            write(oppIntBoard, oppResult);
+            write(oppIntBoard, terminalNode.rotateBoard(terminalNode.getTrainingPolicy()), oppResult);
             builder.append(",");
 
             terminalNode = terminalNode.getParent();
@@ -62,8 +62,8 @@ public class GenerateTrainingData {
         }
     }
 
-    //todo write policy vector for node
-    void write(ImmutableList<Integer> intBoard, Integer result) {
+
+    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             builder.append(intBoard.get(pos));
@@ -71,9 +71,15 @@ public class GenerateTrainingData {
                 builder.append(",");
             }
         }
-        if (result == 0) {
-            result = -1;
+
+        builder.append("],[");
+        for (int pos = 0; pos < policyBoard.size(); pos++) {
+            builder.append(String.format("%.8f", policyBoard.get(pos)));
+            if (pos + 1 != policyBoard.size()) {
+                builder.append(",");
+            }
         }
+
         builder.append("]," + result);
         builder.append("]");
 
