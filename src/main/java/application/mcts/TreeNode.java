@@ -126,7 +126,7 @@ public final class TreeNode implements Serializable {
                 for (TreeNode child : getChildren()) {
                     if (child.getPositionToCreateBoard().equals(position) && child.getNumberOfSimulations() > 0) {
                         //todo find good policy values
-                        builder.add((child.getNumberOfWins() / child.getNumberOfSimulations()));
+                        builder.add((child.getNumberOfSimulations() / getNumberOfSimulations()));
                         contains = true;
                         break;
                     }
