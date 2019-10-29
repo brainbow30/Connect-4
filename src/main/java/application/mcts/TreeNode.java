@@ -174,19 +174,23 @@ public final class TreeNode implements Serializable {
     public TreeNode selectUCTMove() {
         Random random = new Random();
         ImmutableList<TreeNode> children = getChildren();
-        double bestValue = Double.MIN_VALUE;
-        TreeNode selected = children.get(random.nextInt(children.size()));
-        for (TreeNode child : children) {
-            double epsilon = 1e-6;
-            double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
-                    Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
-                    random.nextDouble() * epsilon;
-            if (uctValue > bestValue) {
-                selected = child;
-                bestValue = uctValue;
+        if (children.size() > 0) {
+            double bestValue = Double.MIN_VALUE;
+            TreeNode selected = children.get(random.nextInt(children.size()));
+            for (TreeNode child : children) {
+                double epsilon = 1e-6;
+                double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
+                        Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+                        random.nextDouble() * epsilon;
+                if (uctValue > bestValue) {
+                    selected = child;
+                    bestValue = uctValue;
+                }
             }
+            return selected;
+        } else {
+            return this;
         }
-        return selected;
     }
 
     public TreeNode selectAlphaZeroMove(Double cpuct) {
@@ -288,7 +292,7 @@ public final class TreeNode implements Serializable {
             if (useNN) {
                 result = getNNPrediction();
             } else {
-                result = selectRandomMove().simulateGame(false);
+                result = selectUCTMove().simulateGame(false);
             }
 
         }
