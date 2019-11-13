@@ -12,11 +12,11 @@ public class MonteCarloTreeSearch {
 
     private final TreeNode root;
     private final Integer waitTime;
-    private final Boolean useNN;
+    private final Integer nnFunction;
     private final Double cpuct;
 
 
-    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Boolean useNN, String hostname, Double cpuct) {
+    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Integer nnFunction, String hostname, Double cpuct) {
         root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
@@ -27,21 +27,23 @@ public class MonteCarloTreeSearch {
                 .build();
         root.visited();
         this.waitTime = waitTime;
-        this.useNN = useNN;
+        this.nnFunction = nnFunction;
         this.cpuct = cpuct;
 
         //initialize policy vector
-        if (useNN) {
-            root.getNNPrediction();
+        if (this.nnFunction.equals(1)) {
+            root.getNNPrediction(false);
+        } else if (this.nnFunction.equals(2)) {
+            root.getNNPrediction(true);
         }
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Boolean useNN, Double cpuct) {
+    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Integer nnFunction, Double cpuct) {
         root = node;
         root.visited();
         root.setRoot();
         this.waitTime = waitTime;
-        this.useNN = useNN;
+        this.nnFunction = nnFunction;
         this.cpuct = cpuct;
     }
 
@@ -55,13 +57,15 @@ public class MonteCarloTreeSearch {
                 selectedNode = selectedNode.selectRandomMove();
             }
 
-            Double result = selectedNode.simulateGame(useNN);
+            Double result = selectedNode.simulateGame(nnFunction);
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
         TreeNode selectMove;
-        if (useNN) {
-            selectMove = root.selectAlphaZeroMove(cpuct);
+        if (nnFunction.equals(1)) {
+            selectMove = root.selectAlphaZeroMove(cpuct, false);
+        } else if (nnFunction.equals(2)) {
+            selectMove = root.selectAlphaZeroMove(cpuct, true);
         } else {
             selectMove = root.selectUCTMove();
         }

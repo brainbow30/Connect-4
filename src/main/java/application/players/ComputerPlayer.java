@@ -44,9 +44,11 @@ public class ComputerPlayer implements Player {
         if (moveFunction.equals(1)) {
             position = getNextPositionHeuristic(board);
         } else if (moveFunction.equals(2)) {
-            position = getNextPositionMCTS(board, false);
+            position = getNextPositionMCTS(board, 0);
         } else if (moveFunction.equals(3)) {
-            position = getNextPositionMCTS(board, true);
+            position = getNextPositionMCTS(board, 1);
+        } else if (moveFunction.equals(4)) {
+            position = getNextPositionMCTS(board, 2);
         } else {
             System.out.println("random move");
             Random random = new Random();
@@ -86,17 +88,17 @@ public class ComputerPlayer implements Player {
 
     }
 
-    private ImmutablePosition getNextPositionMCTS(Board board, Boolean useNN) {
+    private ImmutablePosition getNextPositionMCTS(Board board, Integer nnFunction) {
         MonteCarloTreeSearch monteCarloTreeSearch;
         TreeNode currentNode;
         //todo find replacement for previous node
         if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, useNN, cpuct);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, nnFunction, cpuct);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, useNN, hostname, cpuct);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, nnFunction, hostname, cpuct);
         }
         currentNode = monteCarloTreeSearch.run();
         previousNode = currentNode;

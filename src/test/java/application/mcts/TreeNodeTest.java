@@ -71,6 +71,6 @@ public class TreeNodeTest {
 
     //@Test
     public void getNNPrediction() {
-        System.out.println(nnNode.getNNPrediction());
+        System.out.println(nnNode.getNNPrediction(false));
     }
 }

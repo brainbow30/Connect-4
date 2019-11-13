@@ -193,7 +193,7 @@ public final class TreeNode implements Serializable {
         }
     }
 
-    public TreeNode selectAlphaZeroMove(Double cpuct) {
+    public TreeNode selectAlphaZeroMove(Double cpuct, Boolean test) {
         Random random = new Random();
         ImmutableList<TreeNode> children = getChildren();
         double bestValue = Double.MIN_VALUE;
@@ -202,7 +202,7 @@ public final class TreeNode implements Serializable {
             ImmutablePosition position = child.positionToCreateBoard;
             int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();
             if (policy == null) {
-                getNNPrediction();
+                getNNPrediction(test);
             }
             double uctValue = child.numberOfWins + (cpuct * policy.get(integerPosition)
                     * (Math.sqrt(numberOfSimulations) / (1 + child.numberOfSimulations)));
@@ -214,7 +214,7 @@ public final class TreeNode implements Serializable {
         return selected;
     }
 
-    double getNNPrediction() {
+    double getNNPrediction(Boolean test) {
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
 
@@ -230,7 +230,13 @@ public final class TreeNode implements Serializable {
             }
         }
         // Get JSON for application
-        String jsonResponse = target.path("predict")
+        String path;
+        if (test) {
+            path = "testpredict";
+        } else {
+            path = "predict";
+        }
+        String jsonResponse = target.path(path)
                 .path(currentBoard.getBoardSize().toString())
                 .path(stringBoard.toString()).request()
                 .accept(MediaType.APPLICATION_JSON).get(String.class);
@@ -284,15 +290,17 @@ public final class TreeNode implements Serializable {
         }
     }
 
-    Double simulateGame(Boolean useNN) {
+    Double simulateGame(Integer nnFunction) {
         Double result;
         if (isTerminalNode()) {
             result = getWinnerValue(rootColour, currentBoard.getWinner(false));
         } else {
-            if (useNN) {
-                result = getNNPrediction();
+            if (nnFunction.equals(1)) {
+                result = getNNPrediction(false);
+            } else if (nnFunction.equals(2)) {
+                result = getNNPrediction(true);
             } else {
-                result = selectUCTMove().simulateGame(false);
+                result = selectUCTMove().simulateGame(0);
             }
 
         }
