@@ -17,9 +17,10 @@ public class OthelloVerifierTest {
 
     @Test
     public void validRightMoveTest() {
+        verifier = new OthelloVerifier();
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new OthelloVerifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(5);
@@ -32,9 +33,10 @@ public class OthelloVerifierTest {
 
     @Test
     public void validLeftMoveTest() {
+        verifier = new OthelloVerifier();
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new OthelloVerifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(2);
@@ -69,9 +71,10 @@ public class OthelloVerifierTest {
 
     @Test
     public void invalidColourTest() {
+        verifier = new OthelloVerifier();
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new OthelloVerifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
@@ -83,9 +86,10 @@ public class OthelloVerifierTest {
 
     @Test
     public void noNeighboursTest() {
+        verifier = new OthelloVerifier();
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new OthelloVerifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
@@ -97,9 +101,10 @@ public class OthelloVerifierTest {
 
     @Test
     public void occupiedSpaceTest() {
+        verifier = new OthelloVerifier();
         board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new OthelloVerifier();
+
 
         application.ImmutablePosition.Builder builder = ImmutablePosition.builder();
         builder.y(3);
