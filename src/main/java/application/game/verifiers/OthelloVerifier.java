@@ -1,22 +1,72 @@
-package application.game;
+package application.game.verifiers;
 
 import application.ImmutablePosition;
 import application.Position;
+import application.game.Board;
+import application.game.COLOUR;
+import application.game.Counter;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 
 @Component
-public
-class Verifier implements Serializable {
+@Qualifier("othello")
+@Primary
+public class OthelloVerifier implements Serializable, Verifier {
     @Autowired
-    public Verifier() {
+
+    public OthelloVerifier() {
+
+    }
+
+    public ImmutableList<ImmutableList<Optional<Counter>>> setupBoard(int boardSize) {
+        ImmutableList.Builder<ImmutableList<Optional<Counter>>> boardBuilder = ImmutableList.builder();
+
+        //create initial counter set up in centre of board
+        for (int y = 0; y < boardSize; y++) {
+            ImmutableList.Builder<Optional<Counter>> rowBuilder = ImmutableList.builder();
+            for (int x = 0; x < boardSize; x++) {
+
+                if (y == (boardSize / 2) - 1) {
+                    if (x == (boardSize / 2) - 1) {
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.WHITE)));
+                    } else if (x == (boardSize / 2)) {
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.BLACK)));
+                    } else {
+                        rowBuilder.add(Optional.absent());
+                    }
+                } else if (y == (boardSize / 2)) {
+                    if (x == (boardSize / 2) - 1) {
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.BLACK)));
+                    } else if (x == (boardSize / 2)) {
+                        rowBuilder.add(Optional.of(new Counter(COLOUR.WHITE)));
+                    } else {
+                        rowBuilder.add(Optional.absent());
+                    }
+                } else {
+                    rowBuilder.add(Optional.absent());
+                }
+            }
+            boardBuilder.add(rowBuilder.build());
+        }
+        return boardBuilder.build();
+    }
+
+    public int[] setupStats(int boardSize) {
+        int countersPlayed = 4;
+        int numberOfWhiteCounters = 2;
+        int[] stats = {countersPlayed, numberOfWhiteCounters};
+        return stats;
 
     }
 
 
-    Boolean validMove(Board board, COLOUR colour, Position position) {
+    public Boolean validMove(Board board, COLOUR colour, Position position) {
         if (position.x() >= board.getBoardSize() || position.x() < 0) {
             throw new IndexOutOfBoundsException();
         } else if (position.y() >= board.getBoardSize() || position.y() < 0) {

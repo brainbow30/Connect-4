@@ -4,7 +4,7 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
-import application.game.Verifier;
+import application.game.verifiers.OthelloVerifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +20,8 @@ public class TreeNodeTest {
 
     @Before
     public void setup() {
-        board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
-        Board nnboard = new Board(6, new Verifier(), 0.0, 0.0, 0.0);
+        board = new Board(4, new OthelloVerifier(), 0.0, 0.0, 0.0);
+        Board nnboard = new Board(6, new OthelloVerifier(), 0.0, 0.0, 0.0);
 
         TreeNode.Builder builder = TreeNode.builder();
         builder.colour(COLOUR.WHITE);

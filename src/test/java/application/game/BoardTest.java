@@ -1,6 +1,7 @@
 package application.game;
 
 import application.ImmutablePosition;
+import application.game.verifiers.OthelloVerifier;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -21,7 +22,7 @@ public class BoardTest {
 
     @Before
     public void setup() {
-        board = new Board(8, new Verifier(), 0.01, 10.0, 1.0);
+        board = new Board(8, new OthelloVerifier(), 0.01, 10.0, 1.0);
     }
 
     @Test

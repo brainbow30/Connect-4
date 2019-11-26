@@ -2,7 +2,7 @@ package application.mcts;
 
 import application.game.Board;
 import application.game.COLOUR;
-import application.game.Verifier;
+import application.game.verifiers.OthelloVerifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class GenerateTrainingDataTest {
     @Before
     public void setup() {
         generateTrainingData = new GenerateTrainingData("testWrite.txt");
-        board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
+        board = new Board(4, new OthelloVerifier(), 0.0, 0.0, 0.0);
         treeNode = TreeNode.builder().colour(COLOUR.WHITE).currentBoard(board).positionToCreateBoard(null).parent(null).rootColour(COLOUR.WHITE).hostname("127.0.0.1:5000").build();
     }
 

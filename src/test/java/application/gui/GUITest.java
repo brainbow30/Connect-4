@@ -1,7 +1,7 @@
 package application.gui;
 
 import application.game.Board;
-import application.game.Verifier;
+import application.game.verifiers.OthelloVerifier;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ public class GUITest {
 
     @Before
     public void setup() {
-        board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
+        board = new Board(4, new OthelloVerifier(), 0.0, 0.0, 0.0);
         gui = new GUI(board);
 
     }
