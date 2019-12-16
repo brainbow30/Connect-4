@@ -18,12 +18,9 @@ public class Counter implements Serializable {
 
     @Autowired
     public Counter() {
-        this.colour = COLOUR.WHITE;
+        colour = COLOUR.WHITE;
     }
 
-    public void flip() {
-        this.colour = COLOUR.opposite(colour);
-    }
 
     @Bean
     public COLOUR getColour() {

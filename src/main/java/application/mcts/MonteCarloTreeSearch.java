@@ -12,34 +12,44 @@ public class MonteCarloTreeSearch {
 
     private final TreeNode root;
     private final Integer waitTime;
+    private final Integer nnFunction;
+    private final Double cpuct;
 
 
-    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime) {
-        this.root = TreeNode.builder()
+    public MonteCarloTreeSearch(Board board, COLOUR colour, Integer waitTime, Integer nnFunction, String hostname, Double cpuct) {
+        root = TreeNode.builder()
                 .parent(null)
                 .currentBoard(board)
                 .colour(colour)
                 .rootColour(colour)
                 .positionToCreateBoard(null)
+                .hostname(hostname)
                 .build();
         root.visited();
         this.waitTime = waitTime;
+        this.nnFunction = nnFunction;
+        this.cpuct = cpuct;
 
-
-
+        //initialize policy vector
+        if (this.nnFunction.equals(1)) {
+            root.getNNPrediction(false);
+        } else if (this.nnFunction.equals(2)) {
+            root.getNNPrediction(true);
+        }
     }
 
-    public MonteCarloTreeSearch(TreeNode node, Integer waitTime) {
-        this.root = node;
+    public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Integer nnFunction, Double cpuct) {
+        root = node;
         root.visited();
         root.setRoot();
         this.waitTime = waitTime;
-
-
+        this.nnFunction = nnFunction;
+        this.cpuct = cpuct;
     }
 
     public TreeNode run() {
         Stopwatch stopwatch = Stopwatch.createStarted();
+        //todo if all nodes visited stop
         while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
 
             TreeNode selectedNode = root.selectRandomMove();
@@ -47,19 +57,25 @@ public class MonteCarloTreeSearch {
                 selectedNode = selectedNode.selectRandomMove();
             }
 
-            COLOUR result = selectedNode.simulateGame();
+            Double result = selectedNode.simulateGame(nnFunction);
             propagateResult(selectedNode, result);
             selectedNode.visited();
         }
-
-        TreeNode selectMove = root.selectUCTMove();
-        System.out.println("selectMove = " + selectMove.getNumberOfWins());
+        TreeNode selectMove;
+        if (nnFunction.equals(1)) {
+            selectMove = root.selectAlphaZeroMove(cpuct, false);
+        } else if (nnFunction.equals(2)) {
+            selectMove = root.selectAlphaZeroMove(cpuct, true);
+        } else {
+            selectMove = root.selectUCTMove();
+        }
+        System.out.println("selectMove value= " + selectMove.getNumberOfWins());
         System.out.println("selectMove sims = " + selectMove.getNumberOfSimulations());
         return selectMove;
     }
 
-    private void propagateResult(TreeNode node, COLOUR result) {
-
+    private void propagateResult(TreeNode node, Double result) {
+        node = node.getParent();
         while (node.getParent() != null) {
             node.addResult(result);
             node = node.getParent();

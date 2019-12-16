@@ -1,63 +1,67 @@
 package application.game;
 
+import application.gui.GUI;
 import application.players.ComputerPlayer;
 import application.players.HumanPlayer;
 import application.players.Player;
-import application.utils.MessageProducer;
-import com.google.gson.Gson;
+import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.LinkedList;
-import java.util.List;
 
 @Component
 public
 class Game {
     private final Player player1;
     private final Player player2;
-    private final Gson gson;
-    private final MessageProducer messageProducer;
-    private final List<Board> previousBoards = new LinkedList<>();
     private Board board;
     private Player currentTurnsPlayer;
+    private application.gui.GUI GUI;
 
 
     @Autowired
-    public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2, MessageProducer messageProducer, Gson gson,
-                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction, @Value("${mcts.waitTime}") Integer mctsWaitTime) {
-
+    public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2,
+                @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction,
+                @Value("${mcts.waitTime1}") Integer mctsWaitTime1, @Value("${mcts.waitTime2}") Integer mctsWaitTime2,
+                @Value("${hostname}") String hostname, @Value("${write.training.data}") Boolean writeTrainingData,
+                @Value("${useGUI}") Boolean useGUI, @Value("${mcts.cpuct1}") Double cpuct1, @Value("${mcts.cpuct2}") Double cpuct2) {
         this.board = board;
-        this.messageProducer = messageProducer;
-        this.gson = gson;
+        GUI = new GUI(board);
         if (humanPlayer1) {
-            this.player1 = new HumanPlayer(COLOUR.WHITE, messageProducer);
+            if (useGUI) {
+                player1 = new HumanPlayer(COLOUR.WHITE, GUI);
+            } else {
+                player1 = new HumanPlayer(COLOUR.WHITE);
+            }
         } else {
-            this.player1 = new ComputerPlayer(COLOUR.WHITE, messageProducer, computer1MoveFunction, mctsWaitTime);
+            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData, cpuct1);
         }
         if (humanPlayer2) {
-            this.player2 = new HumanPlayer(COLOUR.BLACK, messageProducer);
+            if (useGUI) {
+                player2 = new HumanPlayer(COLOUR.BLACK, GUI);
+            } else {
+                player2 = new HumanPlayer(COLOUR.BLACK);
+            }
         } else {
 
-            this.player2 = new ComputerPlayer(COLOUR.BLACK, messageProducer, computer2MoveFunction, mctsWaitTime);
+            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData, cpuct2);
         }
         currentTurnsPlayer = player1;
     }
 
-    public Player play() {
-        int numberOfConsecutivePasses = 0;
-        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
-            System.out.println(board);
+    public Optional<Player> play(Boolean useGUI) {
+        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && !board.isWinner()) {
+            if (useGUI) {
+                GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
+                GUI.show();
+            } else {
+                System.out.println(board);
+            }
+
             if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
                 board = currentTurnsPlayer.playTurn(board);
-                numberOfConsecutivePasses = 0;
             } else {
                 System.out.println("No valid moves, turn passes");
-                numberOfConsecutivePasses += 1;
             }
             if (currentTurnsPlayer.equals(player1)) {
                 currentTurnsPlayer = player2;
@@ -65,113 +69,40 @@ class Game {
                 currentTurnsPlayer = player1;
             }
         }
-        return endGame(board);
-    }
-
-    public void playKafka() {
-        messageProducer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
+        return endGame(board, useGUI);
     }
 
 
-    //@KafkaListener(topics = "${player1.topic}", groupId = "foo")
-    @SuppressWarnings("unused")
-    public void player1Turn(String data) {
-        try {
-
-            Board newBoard;
-            ByteArrayInputStream bis;
-            ObjectInputStream ois;
-            byte[] boardBytes = gson.fromJson(data, byte[].class);
-            bis = new ByteArrayInputStream(boardBytes);
-            ois = new ObjectInputStream(bis);
-            newBoard = (Board) ois.readObject();
-
-            this.board = newBoard;
-            previousBoards.add(newBoard);
-            if (previousBoards.size() > 3 && previousBoards.get(previousBoards.size() - 3).equals(newBoard)) {
-                endGame(board);
-            } else {
-                this.currentTurnsPlayer = player1;
-                System.out.println(board);
-
-                if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
-                    if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
-                        currentTurnsPlayer.playTurnKafka(board);
-                    } else {
-                        System.out.println("No valid moves, turn passes");
-                        messageProducer.sendMessage2(0, java.time.LocalDateTime.now().toString(), board);
-                    }
-                } else {
-                    endGame(board);
-                }
-            }
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
+    private Optional<Player> endGame(Board board, Boolean useGUI) {
+        if (useGUI) {
+            GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
+            GUI.show();
+        } else {
+            System.out.println(board);
         }
-    }
-
-    //@KafkaListener(topics = "${player2.topic}", groupId = "bar")
-    public void player2Turn(String data) {
-
-        try {
-            //System.out.println("player2 received board");
-
-            Board newBoard;
-            ByteArrayInputStream bis;
-            ObjectInputStream ois;
-            byte[] boardBytes = gson.fromJson(data, byte[].class);
-            bis = new ByteArrayInputStream(boardBytes);
-            ois = new ObjectInputStream(bis);
-            newBoard = (Board) ois.readObject();
-
-            this.board = newBoard;
-            previousBoards.add(newBoard);
-            if (previousBoards.size() > 3 && previousBoards.get(previousBoards.size() - 3).equals(newBoard)) {
-                endGame(board);
-            } else {
-                this.currentTurnsPlayer = player2;
-                System.out.println(board);
-
-                if (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed()) {
-                    if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
-                        currentTurnsPlayer.playTurnKafka(board);
-                    } else {
-                        System.out.println("No valid moves, turn passes");
-                        messageProducer.sendMessage1(0, java.time.LocalDateTime.now().toString(), board);
-                    }
+        Optional<COLOUR> winner = board.getWinner();
+        GUI.setWinnerText(winner);
+        if (winner.isPresent()) {
+            if (winner.get().equals(COLOUR.WHITE)) {
+                System.out.println("White wins");
+                if (player1.getCounterColour().equals(COLOUR.WHITE)) {
+                    return Optional.of(player1);
                 } else {
-                    endGame(board);
+                    return Optional.of(player2);
                 }
-            }
-        } catch (ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    private Player endGame(Board board) {
-        System.out.println("final board = " + board.printBoard());
-        COLOUR winner = board.getWinner(true);
-        if (winner.equals(COLOUR.WHITE)) {
-            System.out.println("White wins");
-            if (player1.getCounterColour().equals(COLOUR.WHITE)) {
-                return player1;
-            } else {
-                return player2;
-            }
-        } else if (winner.equals(COLOUR.BLACK)) {
-            System.out.println("Black wins");
-            if (player1.getCounterColour().equals(COLOUR.BLACK)) {
-                return player1;
-            } else {
-                return player2;
+            } else if (winner.get().equals(COLOUR.BLACK)) {
+                System.out.println("Black wins");
+                if (player1.getCounterColour().equals(COLOUR.BLACK)) {
+                    return Optional.of(player1);
+                } else {
+                    return Optional.of(player2);
+                }
             }
         } else {
             System.out.println("Draw");
-            return null;
+            return Optional.absent();
         }
-
+        return Optional.absent();
     }
 
 
