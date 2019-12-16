@@ -20,13 +20,12 @@ public class GUI {
     private JFrame frame;
     private JPanel mainPanel;
     private JLabel currentPlayerLabel;
-    private JLabel currentScoreLabel;
     private Board board;
     private COLOUR colour = COLOUR.WHITE;
 
     public GUI(Board board) {
         this.board = board;
-        frame = new JFrame("Othello");
+        frame = new JFrame("Connect 4");
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -42,14 +41,10 @@ public class GUI {
         currentPlayerLabel.setFont(new Font(null, Font.PLAIN, 20));
         mainPanel.add(currentPlayerLabel, c);
 
-        currentScoreLabel = new JLabel("Score: 0-0", JLabel.CENTER);
-        currentScoreLabel.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
-        currentScoreLabel.setFont(new Font(null, Font.PLAIN, 20));
         c.gridx = 3;
         c.gridy = 0;
         c.gridwidth = 1;
         c.gridwidth = 1;
-        mainPanel.add(currentScoreLabel, c);
 
 
         boardGridPanel = new BoardGridPanel(board);
@@ -108,7 +103,6 @@ public class GUI {
         } else if (colour.equals(COLOUR.BLACK)) {
             currentPlayerLabel.setText("Black's Turn");
         }
-        currentScoreLabel.setText("Score: " + board.getNumberOfWhiteCounters() + "-" + (board.getCountersPlayed() - board.getNumberOfWhiteCounters()));
         boardGridPanel.updateBoard(board);
     }
 

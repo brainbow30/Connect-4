@@ -16,6 +16,7 @@ public class ComputerPlayer implements Player {
 
     private final COLOUR counterColour;
     private final Integer waitTime;
+    private final Double cpuct;
     private final String hostname;
     private TreeNode previousNode;
 
@@ -24,10 +25,12 @@ public class ComputerPlayer implements Player {
     private final Boolean writeTrainingData;
 
 
-    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize, String hostname, Boolean writeTrainingData) {
+    public ComputerPlayer(COLOUR counterColour, Integer moveFunction, Integer waitTime, Integer boardSize,
+                          String hostname, Boolean writeTrainingData, Double cpuct) {
         this.counterColour = counterColour;
         this.moveFunction = moveFunction;
         this.waitTime = waitTime;
+        this.cpuct = cpuct;
         this.hostname = hostname;
         previousNode = null;
         generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
@@ -38,12 +41,12 @@ public class ComputerPlayer implements Player {
     public Board playTurn(Board board) {
         System.out.println(counterColour + "'s Turn");
         ImmutablePosition position;
-        if (moveFunction.equals(1)) {
-            position = getNextPositionHeuristic(board);
-        } else if (moveFunction.equals(2)) {
-            position = getNextPositionMCTS(board, false);
+        if (moveFunction.equals(2)) {
+            position = getNextPositionMCTS(board, 0);
         } else if (moveFunction.equals(3)) {
-            position = getNextPositionMCTS(board, true);
+            position = getNextPositionMCTS(board, 1);
+        } else if (moveFunction.equals(4)) {
+            position = getNextPositionMCTS(board, 2);
         } else {
             System.out.println("random move");
             Random random = new Random();
@@ -64,36 +67,18 @@ public class ComputerPlayer implements Player {
         return counterColour;
     }
 
-    private ImmutablePosition getNextPositionHeuristic(Board board) {
-        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(counterColour);
-        Counter counter = new Counter(counterColour);
-        Double bestBoardHeuristic = Double.MIN_VALUE;
-        ImmutablePosition bestMove = null;
-        for (ImmutablePosition position : validMoves) {
-            Board futureBoard = board.clone();
-            futureBoard.addCounter(counter, position);
-            Double boardHeuristic = futureBoard.getBoardHeuristic(counterColour, 1);
-            if (boardHeuristic > bestBoardHeuristic) {
-                bestBoardHeuristic = boardHeuristic;
-                bestMove = position;
-            }
-        }
-        return bestMove;
 
-
-    }
-
-    private ImmutablePosition getNextPositionMCTS(Board board, Boolean useNN) {
+    private ImmutablePosition getNextPositionMCTS(Board board, Integer nnFunction) {
         MonteCarloTreeSearch monteCarloTreeSearch;
         TreeNode currentNode;
         //todo find replacement for previous node
         if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, useNN);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, nnFunction, cpuct);
 
         } else {
-            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, useNN, hostname);
+            monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, nnFunction, hostname, cpuct);
         }
         currentNode = monteCarloTreeSearch.run();
         previousNode = currentNode;

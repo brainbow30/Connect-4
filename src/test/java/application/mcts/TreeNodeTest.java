@@ -4,7 +4,7 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
-import application.game.Verifier;
+import application.game.verifiers.Connect4Verifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +20,8 @@ public class TreeNodeTest {
 
     @Before
     public void setup() {
-        board = new Board(4, new Verifier(), 0.0, 0.0, 0.0);
-        Board nnboard = new Board(6, new Verifier(), 0.0, 0.0, 0.0);
+        board = new Board(4, new Connect4Verifier());
+        Board nnboard = new Board(6, new Connect4Verifier());
 
         TreeNode.Builder builder = TreeNode.builder();
         builder.colour(COLOUR.WHITE);
@@ -43,14 +43,14 @@ public class TreeNodeTest {
         ImmutableList<Integer> whiteNNBoard = whiteNode.canonicalBoard();
         ImmutableList<Integer> whiteExpected = ImmutableList.of(
                 0, 0, 0, 0,
-                0, 1, -1, 0,
-                0, -1, 1, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
                 0, 0, 0, 0);
         assertEquals(whiteExpected, whiteNNBoard);
         ImmutableList<Integer> blackExpected = ImmutableList.of(
                 0, 0, 0, 0,
-                0, 1, -1, 0,
-                0, -1, 1, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
                 0, 0, 0, 0);
         ImmutableList<Integer> blackNNBoard = blackNode.canonicalBoard();
         assertEquals(blackExpected, blackNNBoard);
@@ -71,6 +71,6 @@ public class TreeNodeTest {
 
     //@Test
     public void getNNPrediction() {
-        System.out.println(nnNode.getNNPrediction());
+        System.out.println(nnNode.getNNPrediction(false));
     }
 }

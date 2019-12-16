@@ -88,6 +88,7 @@ class Application {
         };
     }
 
+    //todo remove need to save to txt
     void trainNN() {
         System.out.println("Training Neural Network...");
         try {

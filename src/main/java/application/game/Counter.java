@@ -21,9 +21,6 @@ public class Counter implements Serializable {
         colour = COLOUR.WHITE;
     }
 
-    public void flip() {
-        colour = COLOUR.opposite(colour);
-    }
 
     @Bean
     public COLOUR getColour() {

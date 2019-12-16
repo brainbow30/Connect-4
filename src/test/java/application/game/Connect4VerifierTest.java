@@ -1,24 +1,32 @@
 package application.game;
 
 import application.ImmutablePosition;
+import application.game.verifiers.Connect4Verifier;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class VerifierTest {
+public class Connect4VerifierTest {
 
-    private Verifier verifier;
+    private Connect4Verifier verifier;
 
     private Board board;
     private Counter counter;
     private application.ImmutablePosition position;
 
+    @Before
+    private void setup() {
+        verifier = new Connect4Verifier();
+        board = new Board(8, verifier);
+    }
 
     @Test
     public void validRightMoveTest() {
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
+        verifier = new Connect4Verifier();
+        board = new Board(8, verifier);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new Verifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(5);
@@ -31,9 +39,9 @@ public class VerifierTest {
 
     @Test
     public void validLeftMoveTest() {
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
+
         counter = new Counter(COLOUR.WHITE);
-        verifier = new Verifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.x(2);
@@ -46,8 +54,6 @@ public class VerifierTest {
 
     @Test
     public void validDiagonalMoveTest() {
-        verifier = new Verifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -68,9 +74,8 @@ public class VerifierTest {
 
     @Test
     public void invalidColourTest() {
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new Verifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
@@ -82,9 +87,8 @@ public class VerifierTest {
 
     @Test
     public void noNeighboursTest() {
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new Verifier();
+
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
         builder.y(3);
@@ -96,9 +100,8 @@ public class VerifierTest {
 
     @Test
     public void occupiedSpaceTest() {
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
-        verifier = new Verifier();
+
 
         application.ImmutablePosition.Builder builder = ImmutablePosition.builder();
         builder.y(3);

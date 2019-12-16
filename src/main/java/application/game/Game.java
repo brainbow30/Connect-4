@@ -23,7 +23,8 @@ class Game {
     public Game(Board board, @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2,
                 @Value("${computer1.moveFunction}") Integer computer1MoveFunction, @Value("${computer2.moveFunction}") Integer computer2MoveFunction,
                 @Value("${mcts.waitTime1}") Integer mctsWaitTime1, @Value("${mcts.waitTime2}") Integer mctsWaitTime2,
-                @Value("${hostname}") String hostname, @Value("${write.training.data}") Boolean writeTrainingData, @Value("${useGUI}") Boolean useGUI) {
+                @Value("${hostname}") String hostname, @Value("${write.training.data}") Boolean writeTrainingData,
+                @Value("${useGUI}") Boolean useGUI, @Value("${mcts.cpuct1}") Double cpuct1, @Value("${mcts.cpuct2}") Double cpuct2) {
         this.board = board;
         GUI = new GUI(board);
         if (humanPlayer1) {
@@ -33,7 +34,7 @@ class Game {
                 player1 = new HumanPlayer(COLOUR.WHITE);
             }
         } else {
-            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData);
+            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData, cpuct1);
         }
         if (humanPlayer2) {
             if (useGUI) {
@@ -43,14 +44,13 @@ class Game {
             }
         } else {
 
-            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData);
+            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData, cpuct2);
         }
         currentTurnsPlayer = player1;
     }
 
     public Optional<Player> play(Boolean useGUI) {
-        int numberOfConsecutivePasses = 0;
-        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
+        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && !board.isWinner()) {
             if (useGUI) {
                 GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
                 GUI.show();
@@ -60,10 +60,8 @@ class Game {
 
             if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
                 board = currentTurnsPlayer.playTurn(board);
-                numberOfConsecutivePasses = 0;
             } else {
                 System.out.println("No valid moves, turn passes");
-                numberOfConsecutivePasses += 1;
             }
             if (currentTurnsPlayer.equals(player1)) {
                 currentTurnsPlayer = player2;
@@ -82,7 +80,7 @@ class Game {
         } else {
             System.out.println(board);
         }
-        Optional<COLOUR> winner = board.getWinner(true);
+        Optional<COLOUR> winner = board.getWinner();
         GUI.setWinnerText(winner);
         if (winner.isPresent()) {
             if (winner.get().equals(COLOUR.WHITE)) {
