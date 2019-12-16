@@ -11,7 +11,6 @@ import java.io.IOException;
 public class GenerateTrainingData {
     private BufferedWriter outputWriter;
     private String filename;
-    private StringBuilder builder;
 
     public GenerateTrainingData(String filename) {
         this.filename = filename;
@@ -27,7 +26,7 @@ public class GenerateTrainingData {
     }
 
     public void save(TreeNode terminalNode) {
-        builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         builder.append("[");
         Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner();
         int result = 0;
@@ -45,9 +44,9 @@ public class GenerateTrainingData {
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = terminalNode.canonicalBoard();
             ImmutableList<Integer> oppIntBoard = terminalNode.changeBoardPerspective(intBoard);
-            write(intBoard, terminalNode.getTrainingPolicy(), result);
+            builder.append(write(intBoard, terminalNode.getTrainingPolicy(), result));
             builder.append(",");
-            write(oppIntBoard, terminalNode.rotateBoard(terminalNode.getTrainingPolicy()), oppResult);
+            builder.append(write(oppIntBoard, terminalNode.getTrainingPolicy(), oppResult));
             builder.append(",");
 
             terminalNode = terminalNode.getParent();
@@ -58,12 +57,14 @@ public class GenerateTrainingData {
             outputWriter.write(builder.toString());
             outputWriter.flush();
         } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
 
 
-    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
+    String write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
+        StringBuilder builder = new StringBuilder();
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             builder.append(intBoard.get(pos));
@@ -82,6 +83,7 @@ public class GenerateTrainingData {
 
         builder.append("]," + result);
         builder.append("]");
+        return builder.toString();
 
 
     }

@@ -415,18 +415,6 @@ public final class TreeNode implements Serializable {
                 builder.add(0);
             }
         }
-        ImmutableList<Integer> unrotatedBoard = ImmutableList.copyOf(builder.build());
-        return rotateBoard(unrotatedBoard);
-    }
-
-    ImmutableList rotateBoard(ImmutableList intArray) {
-        ImmutableList.Builder builder = ImmutableList.builder();
-        for (int y = 0; y < currentBoard.getBoardSize(); y++) {
-            for (int x = currentBoard.getBoardSize() - 1; x >= 0; x--) {
-                Object value = intArray.get(x * currentBoard.getBoardSize() + y);
-                builder.add(value);
-            }
-        }
         return builder.build();
     }
 

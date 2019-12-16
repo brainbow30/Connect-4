@@ -50,7 +50,7 @@ public class BoardGridPanel extends JPanel {
 
     private JButton[][] createButtons(Board board) {
         JButton[][] buttons = new JButton[board.getBoardSize()][board.getBoardSize()];
-        Color boardBG = new Color(0, 102, 0);
+        Color boardBG = new Color(0, 0, 102);
         for (int i = 0; i < board.getBoardSize(); i++) {
             for (int j = 0; j < board.getBoardSize(); j++) {
                 buttons[i][j] = new JButton();

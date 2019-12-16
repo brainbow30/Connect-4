@@ -25,7 +25,7 @@ public class GUI {
 
     public GUI(Board board) {
         this.board = board;
-        frame = new JFrame("Othello");
+        frame = new JFrame("Connect 4");
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

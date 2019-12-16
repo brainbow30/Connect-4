@@ -158,6 +158,9 @@ public class Board implements Serializable {
 
     public ImmutableList<ImmutablePosition> getValidMoves(COLOUR colour) {
         ImmutableList.Builder<ImmutablePosition> validMoves = ImmutableList.builder();
+        if (isWinner()) {
+            return validMoves.build();
+        }
         for (int y = 0; y < boardSize; y++) {
             for (int x = 0; x < boardSize; x++) {
                 ImmutablePosition immutablePosition = ImmutablePosition.builder().x(x).y(y).build();
@@ -195,11 +198,11 @@ public class Board implements Serializable {
         for (int y = boardSize; y >= 0; y--) {
             for (int x = 0; x < boardSize; x++) {
                 ImmutablePosition position = ImmutablePosition.builder().x(x).y(y).build();
-                Boolean verticle = fourVerticle(position);
+                Boolean vertical = fourVerticle(position);
                 Boolean horizontal = fourHorizontal(position);
                 Boolean right = fourDiagonalRight(position);
                 Boolean left = fourDiagonalLeft(position);
-                if (verticle || horizontal || right || left) {
+                if (vertical || horizontal || right || left) {
                     return Optional.of(getCounter(position).get().getColour());
                 }
 
