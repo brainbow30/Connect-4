@@ -21,29 +21,19 @@ public class Board implements Serializable {
     private Integer numberOfWhiteCounters;
     private final Integer boardSize;
 
-    //heuristic values
-    private final Double evaluationDiscValue;
-    private final Double evaluationMobilityValue;
-    private final Double evaluationStableDiscValue;
 
     @Autowired
-    public Board(@Value("${board.size}") Integer boardSize, @Qualifier("othello") Verifier verifier,
-                 @Value("${evaluationValue.discNum}") Double evaluationDiscValue,
-                 @Value("${evaluationValue.mobility}") Double evaluationMobilityValue,
-                 @Value("${evaluationValue.stableNum}") Double evaluationStableDiscValue) {
+    public Board(@Value("${board.size}") Integer boardSize, @Qualifier("connect4") Verifier verifier) {
         this.boardSize = boardSize;
         this.verifier = verifier;
-        this.evaluationStableDiscValue = evaluationStableDiscValue;
-        this.evaluationMobilityValue = evaluationMobilityValue;
-        this.evaluationDiscValue = evaluationDiscValue;
         setup();
     }
 
     private void setup() {
         board = verifier.setupBoard(boardSize);
         int[] stats = verifier.setupStats(boardSize);
-        countersPlayed = stats[0];
         numberOfWhiteCounters = stats[1];
+        countersPlayed = stats[0] + stats[1];
     }
 
     public void reset() {
@@ -61,6 +51,10 @@ public class Board implements Serializable {
 
     public Integer getNumberOfWhiteCounters() {
         return numberOfWhiteCounters;
+    }
+
+    public Integer getNumberOfBlackCounters() {
+        return countersPlayed - numberOfWhiteCounters;
     }
 
     public Optional<Counter> getCounter(Position position) {
@@ -82,20 +76,6 @@ public class Board implements Serializable {
     public Boolean addCounter(Counter newCounter, Position position) {
         try {
             if (verifier.validMove(this, newCounter.getColour(), position)) {
-                //flip counter
-                //horizontal flips
-                flipCounters(newCounter.getColour(), position, 1, 0);
-                flipCounters(newCounter.getColour(), position, -1, 0);
-                //vertical flips
-                flipCounters(newCounter.getColour(), position, 0, -1);
-                flipCounters(newCounter.getColour(), position, 0, 1);
-
-                //diagonal flips
-                flipCounters(newCounter.getColour(), position, 1, 1);
-                flipCounters(newCounter.getColour(), position, -1, 1);
-                flipCounters(newCounter.getColour(), position, 1, -1);
-                flipCounters(newCounter.getColour(), position, -1, -1);
-
 
                 ImmutableList.Builder<Optional<Counter>> rowBuilder = ImmutableList.builder();
                 Integer x = 0;
@@ -176,36 +156,6 @@ public class Board implements Serializable {
         return printBoard();
     }
 
-    private void flipCounters(COLOUR colour, Position position, Integer xDirection, Integer yDirection) {
-        ImmutablePosition.Builder tempPosition = ImmutablePosition.builder();
-        tempPosition.from(position);
-        int numberOfCounters = 0;
-        tempPosition.x(position.x() + xDirection);
-        tempPosition.y(position.y() + yDirection);
-
-        while (getCounter(tempPosition.build()).isPresent() && !(getCounter(tempPosition.build()).get().getColour().equals(colour))) {
-            numberOfCounters++;
-            tempPosition.x(tempPosition.build().x() + xDirection);
-            tempPosition.y(tempPosition.build().y() + yDirection);
-        }
-
-
-        if (numberOfCounters > 0 && getCounter(tempPosition.build()).isPresent() && getCounter(tempPosition.build()).get().getColour().equals(colour)) {
-            while (numberOfCounters > 0) {
-                tempPosition.x(tempPosition.build().x() - xDirection);
-                tempPosition.y(tempPosition.build().y() - yDirection);
-
-                getCounter(tempPosition.build()).get().flip();
-                if (colour.equals(COLOUR.WHITE)) {
-                    numberOfWhiteCounters++;
-                } else {
-                    numberOfWhiteCounters--;
-                }
-                numberOfCounters--;
-            }
-        }
-    }
-
     public ImmutableList<ImmutablePosition> getValidMoves(COLOUR colour) {
         ImmutableList.Builder<ImmutablePosition> validMoves = ImmutableList.builder();
         for (int y = 0; y < boardSize; y++) {
@@ -233,91 +183,124 @@ public class Board implements Serializable {
         return count;
     }
 
-    private Integer numberOfStableDiscs(COLOUR colour) {
-        int stableCounters = 0;
-
-        for (int y = 0; y < boardSize; y++) {
-            for (int x = 0; x < boardSize; x++) {
-                if (board.get(y).get(x).isPresent() && board.get(y).get(x).get().getColour().equals(colour)) {
-                    //divide board into 4 regions with the intersection of the 4 regions being the current counter location
-                    //then check if any of the regions are of the same colour
-                    //if so then counter stable
-                    ImmutablePosition counterPosition = ImmutablePosition.builder().x(x).y(y).build();
-                    ImmutablePosition topLeft = ImmutablePosition.builder().x(0).y(0).build();
-                    ImmutablePosition bottomRight = ImmutablePosition.builder().x(boardSize - 1).y(boardSize - 1).build();
-                    ImmutablePosition midLeft = ImmutablePosition.builder().x(0).y(counterPosition.y()).build();
-                    ImmutablePosition bottomMid = ImmutablePosition.builder().x(counterPosition.x()).y(boardSize - 1).build();
-                    ImmutablePosition topMid = ImmutablePosition.builder().x(counterPosition.x()).y(0).build();
-                    ImmutablePosition midRight = ImmutablePosition.builder().x(boardSize - 1).y(counterPosition.y()).build();
-
-                    if (areaSameColour(colour, topLeft, counterPosition) || areaSameColour(colour, counterPosition, bottomRight) || areaSameColour(colour, midLeft, bottomMid) || areaSameColour(colour, topMid, midRight)) {
-                        stableCounters++;
-                    }
-                }
-            }
+    public Boolean isWinner() {
+        if (getWinner().isPresent()) {
+            return true;
+        } else {
+            return false;
         }
-        return stableCounters;
     }
 
-    private Boolean areaSameColour(COLOUR colour, ImmutablePosition startPosition, ImmutablePosition endPosition) {
+    public Optional<COLOUR> getWinner() {
+        for (int y = boardSize; y >= 0; y--) {
+            for (int x = 0; x < boardSize; x++) {
+                ImmutablePosition position = ImmutablePosition.builder().x(x).y(y).build();
+                Boolean verticle = fourVerticle(position);
+                Boolean horizontal = fourHorizontal(position);
+                Boolean right = fourDiagonalRight(position);
+                Boolean left = fourDiagonalLeft(position);
+                if (verticle || horizontal || right || left) {
+                    return Optional.of(getCounter(position).get().getColour());
+                }
 
-        for (int y = startPosition.y(); y <= endPosition.y(); y++) {
-            for (int x = startPosition.x(); x <= endPosition.x(); x++) {
-                ImmutablePosition.Builder currentPosition = ImmutablePosition.builder();
-                currentPosition.x(x).y(y);
-                if (!getCounter(currentPosition.build()).isPresent() || !getCounter(currentPosition.build()).get().getColour().equals(colour)) {
+            }
+        }
+        return Optional.absent();
+    }
+
+    private Boolean fourVerticle(ImmutablePosition startPosition) {
+        Optional<Counter> startCounter = getCounter(startPosition);
+        if (startCounter.isPresent()) {
+
+            ImmutablePosition.Builder position = ImmutablePosition.builder().x(startPosition.x());
+            for (int y = startPosition.y(); y < startPosition.y() + 4; y++) {
+                position.y(y);
+                Optional<Counter> currentCounter = getCounter(position.build());
+                if (!(currentCounter.isPresent() && currentCounter.get().getColour().equals(startCounter.get().getColour()))) {
                     return false;
                 }
             }
-        }
-        return true;
-    }
-
-    public Double getBoardHeuristic(COLOUR colour, int evaluationFunction) {
-        double heuristicValue;
-        if (evaluationFunction == 1) {
-            heuristicValue = numberOfValidMoves(colour) * evaluationMobilityValue
-                    + numberOfStableDiscs(colour) * evaluationStableDiscValue;
-            if (colour.equals(COLOUR.WHITE)) {
-                heuristicValue += numberOfWhiteCounters * evaluationDiscValue;
-            } else {
-                heuristicValue += (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
-            }
-
+            return true;
         } else {
-            System.out.println("Using basic heuristic function");
-            if (colour.equals(COLOUR.WHITE)) {
-                heuristicValue = numberOfWhiteCounters * evaluationDiscValue;
-            } else {
-                heuristicValue = (countersPlayed - numberOfWhiteCounters) * evaluationDiscValue;
-            }
+            return false;
         }
-        return heuristicValue;
     }
 
+    private Boolean fourHorizontal(ImmutablePosition startPosition) {
+        Optional<Counter> startCounter = getCounter(startPosition);
+        if (startCounter.isPresent()) {
 
-    public Optional<COLOUR> getWinner(Boolean printScore) {
-        int whiteCounters = 0;
-        for (ImmutableList<Optional<Counter>> row : board) {
-            for (Optional<Counter> counter : row) {
-
-                if (counter.isPresent() && counter.get().getColour().equals(COLOUR.WHITE)) {
-                    whiteCounters++;
+            ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
+            for (int x = startPosition.x(); x < startPosition.x() + 4; x++) {
+                if (x >= boardSize) {
+                    return false;
+                }
+                position.x(x);
+                Optional<Counter> currentCounter = getCounter(position.build());
+                if (!(currentCounter.isPresent() && currentCounter.get().getColour().equals(startCounter.get().getColour()))) {
+                    return false;
                 }
             }
-        }
-        if (printScore) {
-            System.out.println("Score: " + whiteCounters + ":" + (countersPlayed - whiteCounters));
-        }
-        double halfTotalCounters = countersPlayed / 2.0;
-        if (whiteCounters > halfTotalCounters) {
-            return Optional.of(COLOUR.WHITE);
-        } else if (whiteCounters < halfTotalCounters) {
-            return Optional.of(COLOUR.BLACK);
+            return true;
         } else {
-            return Optional.absent();
+            return false;
         }
     }
+
+    private Boolean fourDiagonalRight(ImmutablePosition startPosition) {
+        Optional<Counter> startCounter = getCounter(startPosition);
+        if (startCounter.isPresent()) {
+
+            ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
+            for (int i = 0; i < 4; i++) {
+                int x = startPosition.x() + i;
+                int y = startPosition.y() + i;
+                if (x >= boardSize) {
+                    return false;
+                }
+                if (y >= boardSize) {
+                    return false;
+                }
+                position.x(x);
+                position.y(y);
+                Optional<Counter> currentCounter = getCounter(position.build());
+                if (!(currentCounter.isPresent() && currentCounter.get().getColour().equals(startCounter.get().getColour()))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private Boolean fourDiagonalLeft(ImmutablePosition startPosition) {
+        Optional<Counter> startCounter = getCounter(startPosition);
+        if (startCounter.isPresent()) {
+
+            ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
+            for (int i = 0; i < 4; i++) {
+                int x = startPosition.x() - i;
+                int y = startPosition.y() + i;
+                if (x < 0) {
+                    return false;
+                }
+                if (y >= boardSize) {
+                    return false;
+                }
+                position.x(x);
+                position.y(y);
+                Optional<Counter> currentCounter = getCounter(position.build());
+                if (!(currentCounter.isPresent() && currentCounter.get().getColour().equals(startCounter.get().getColour()))) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     @Override
     public Board clone() {

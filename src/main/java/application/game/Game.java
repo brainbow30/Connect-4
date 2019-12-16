@@ -50,8 +50,7 @@ class Game {
     }
 
     public Optional<Player> play(Boolean useGUI) {
-        int numberOfConsecutivePasses = 0;
-        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && numberOfConsecutivePasses < 2) {
+        while (Math.pow(board.getBoardSize(), 2) > board.getCountersPlayed() && !board.isWinner()) {
             if (useGUI) {
                 GUI.updateBoard(board.clone(), currentTurnsPlayer.getCounterColour());
                 GUI.show();
@@ -61,10 +60,8 @@ class Game {
 
             if (board.numberOfValidMoves(currentTurnsPlayer.getCounterColour()) > 0) {
                 board = currentTurnsPlayer.playTurn(board);
-                numberOfConsecutivePasses = 0;
             } else {
                 System.out.println("No valid moves, turn passes");
-                numberOfConsecutivePasses += 1;
             }
             if (currentTurnsPlayer.equals(player1)) {
                 currentTurnsPlayer = player2;
@@ -83,7 +80,7 @@ class Game {
         } else {
             System.out.println(board);
         }
-        Optional<COLOUR> winner = board.getWinner(true);
+        Optional<COLOUR> winner = board.getWinner();
         GUI.setWinnerText(winner);
         if (winner.isPresent()) {
             if (winner.get().equals(COLOUR.WHITE)) {

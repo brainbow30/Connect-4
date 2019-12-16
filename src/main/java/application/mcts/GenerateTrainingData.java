@@ -29,7 +29,7 @@ public class GenerateTrainingData {
     public void save(TreeNode terminalNode) {
         builder = new StringBuilder();
         builder.append("[");
-        Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner(false);
+        Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner();
         int result = 0;
         int oppResult = 0;
         if (winner.isPresent()) {

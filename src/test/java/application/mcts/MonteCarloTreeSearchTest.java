@@ -3,11 +3,11 @@ package application.mcts;
 import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
-import application.game.verifiers.OthelloVerifier;
+import application.game.verifiers.Connect4Verifier;
 import org.junit.Test;
 
 public class MonteCarloTreeSearchTest {
-    private final Board board = new Board(8, new OthelloVerifier(), 0.01, 10.0, 1.0);
+    private final Board board = new Board(8, new Connect4Verifier());
 
 
     @Test

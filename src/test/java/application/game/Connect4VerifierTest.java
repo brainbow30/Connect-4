@@ -1,24 +1,30 @@
 package application.game;
 
 import application.ImmutablePosition;
-import application.game.verifiers.OthelloVerifier;
+import application.game.verifiers.Connect4Verifier;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class OthelloVerifierTest {
+public class Connect4VerifierTest {
 
-    private OthelloVerifier verifier;
+    private Connect4Verifier verifier;
 
     private Board board;
     private Counter counter;
     private application.ImmutablePosition position;
 
+    @Before
+    private void setup() {
+        verifier = new Connect4Verifier();
+        board = new Board(8, verifier);
+    }
 
     @Test
     public void validRightMoveTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
+        verifier = new Connect4Verifier();
+        board = new Board(8, verifier);
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -33,8 +39,7 @@ public class OthelloVerifierTest {
 
     @Test
     public void validLeftMoveTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
+
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -49,8 +54,6 @@ public class OthelloVerifierTest {
 
     @Test
     public void validDiagonalMoveTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -71,8 +74,6 @@ public class OthelloVerifierTest {
 
     @Test
     public void invalidColourTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -86,8 +87,6 @@ public class OthelloVerifierTest {
 
     @Test
     public void noNeighboursTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
 
 
@@ -101,8 +100,6 @@ public class OthelloVerifierTest {
 
     @Test
     public void occupiedSpaceTest() {
-        verifier = new OthelloVerifier();
-        board = new Board(8, verifier, 0.01, 10.0, 1.0);
         counter = new Counter(COLOUR.WHITE);
 
 

@@ -41,9 +41,7 @@ public class ComputerPlayer implements Player {
     public Board playTurn(Board board) {
         System.out.println(counterColour + "'s Turn");
         ImmutablePosition position;
-        if (moveFunction.equals(1)) {
-            position = getNextPositionHeuristic(board);
-        } else if (moveFunction.equals(2)) {
+        if (moveFunction.equals(2)) {
             position = getNextPositionMCTS(board, 0);
         } else if (moveFunction.equals(3)) {
             position = getNextPositionMCTS(board, 1);
@@ -69,24 +67,6 @@ public class ComputerPlayer implements Player {
         return counterColour;
     }
 
-    private ImmutablePosition getNextPositionHeuristic(Board board) {
-        ImmutableList<ImmutablePosition> validMoves = board.getValidMoves(counterColour);
-        Counter counter = new Counter(counterColour);
-        Double bestBoardHeuristic = Double.MIN_VALUE;
-        ImmutablePosition bestMove = null;
-        for (ImmutablePosition position : validMoves) {
-            Board futureBoard = board.clone();
-            futureBoard.addCounter(counter, position);
-            Double boardHeuristic = futureBoard.getBoardHeuristic(counterColour, 1);
-            if (boardHeuristic > bestBoardHeuristic) {
-                bestBoardHeuristic = boardHeuristic;
-                bestMove = position;
-            }
-        }
-        return bestMove;
-
-
-    }
 
     private ImmutablePosition getNextPositionMCTS(Board board, Integer nnFunction) {
         MonteCarloTreeSearch monteCarloTreeSearch;

@@ -57,12 +57,7 @@ public final class TreeNode implements Serializable {
         COLOUR newColour = COLOUR.opposite(colour);
 
         if (validMoves.size() == 0) {
-            validMoves = currentBoard.getValidMoves(newColour);
-            if (validMoves.size() == 0) {
                 setTerminalNode();
-            }
-            counter.flip();
-            newColour = COLOUR.opposite(newColour);
         }
 
         for (ImmutablePosition move : validMoves) {
@@ -293,7 +288,7 @@ public final class TreeNode implements Serializable {
     Double simulateGame(Integer nnFunction) {
         Double result;
         if (isTerminalNode()) {
-            result = getWinnerValue(rootColour, currentBoard.getWinner(false));
+            result = getWinnerValue(rootColour, currentBoard.getWinner());
         } else {
             if (nnFunction.equals(1)) {
                 result = getNNPrediction(false);
