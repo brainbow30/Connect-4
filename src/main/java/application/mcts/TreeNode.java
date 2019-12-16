@@ -4,32 +4,45 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import org.glassfish.jersey.client.ClientConfig;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import java.io.*;
 import java.util.Random;
 
 
-public class TreeNode implements Serializable {
+public final class TreeNode implements Serializable {
     private final Board currentBoard;
     private final COLOUR colour;
     private final COLOUR rootColour;
-    private TreeNode parent;
-    private Integer numberOfWins = 0;
-    private Integer numberOfSimulations = 0;
+    private final TreeNode parent;
+    private Double numberOfWins = 0.0;
+    private Double numberOfSimulations = 0.0;
     private Boolean visited = false;
     private ImmutableList<TreeNode> children;
     private Boolean terminalNode = false;
-    private ImmutablePosition positionToCreateBoard;
+    private final ImmutablePosition positionToCreateBoard;
+    private Boolean isRoot = false;
+    private final String hostname;
 
 
     private TreeNode(Builder builder) {
-        this.parent = builder.parent;
-        this.currentBoard = builder.currentBoard;
-        this.colour = builder.colour;
-        this.rootColour = builder.rootColour;
-        this.positionToCreateBoard = builder.positionToCreateBoard;
-        this.children = ImmutableList.of();
+        parent = builder.parent;
+        currentBoard = builder.currentBoard;
+        colour = builder.colour;
+        rootColour = builder.rootColour;
+        if (builder.positionToCreateBoard == null) {
+            isRoot = true;
+        }
+        positionToCreateBoard = builder.positionToCreateBoard;
+        children = ImmutableList.of();
+        hostname = builder.hostname;
     }
 
     public static Builder builder() {
@@ -45,7 +58,7 @@ public class TreeNode implements Serializable {
         if (validMoves.size() == 0) {
             validMoves = currentBoard.getValidMoves(newColour);
             if (validMoves.size() == 0) {
-                this.setTerminalNode();
+                setTerminalNode();
             }
             counter.flip();
             newColour = COLOUR.opposite(newColour);
@@ -58,20 +71,236 @@ public class TreeNode implements Serializable {
                     .parent(this)
                     .currentBoard(clone)
                     .colour(newColour)
-                    .rootColour(this.rootColour)
+                    .rootColour(rootColour)
                     .positionToCreateBoard(move)
+                    .hostname(hostname)
                     .build();
             builder.add(childNode);
         }
         return builder.build();
     }
 
+
+    public COLOUR getColour() {
+        return colour;
+    }
+
+    public COLOUR getRootColour() {
+        return rootColour;
+    }
+
+    public ImmutablePosition getPositionToCreateBoard() {
+        return positionToCreateBoard;
+    }
+
+    public void visited() {
+        visited = true;
+    }
+
+    public TreeNode getParent() {
+        return parent;
+    }
+
+    public static Double getWinnerValue(COLOUR rootColour, Optional<COLOUR> actualColour) {
+        if (actualColour.isPresent()) {
+            if (rootColour.equals(actualColour.get())) {
+                return 1.0;
+            } else {
+                return 0.0;
+            }
+        } else {
+            return 0.0;
+        }
+    }
+
+    Double getNumberOfSimulations() {
+        return numberOfSimulations;
+    }
+
+
+    Double getNumberOfWins() {
+        return numberOfWins;
+    }
+
+    public Boolean isVisited() {
+        return visited;
+    }
+
+    ImmutableList<TreeNode> getChildren() {
+        if (children.isEmpty()) {
+            children = ImmutableList.copyOf(generateChildren());
+        }
+        return children;
+    }
+
+    private void setTerminalNode() {
+        terminalNode = true;
+    }
+
+    public Boolean isTerminalNode() {
+        if (currentBoard.getCountersPlayed() == currentBoard.getBoardSize() * currentBoard.getBoardSize()) {
+            return true;
+        } else {
+            return terminalNode;
+        }
+    }
+
+    public TreeNode selectUCTMove() {
+        Random random = new Random();
+        ImmutableList<TreeNode> children = getChildren();
+        double bestValue = Double.MIN_VALUE;
+        TreeNode selected = children.get(random.nextInt(children.size()));
+        for (TreeNode child : children) {
+            double epsilon = 1e-6;
+            double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
+                    Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+                    random.nextDouble() * epsilon;
+            if (uctValue > bestValue) {
+                selected = child;
+                bestValue = uctValue;
+            }
+        }
+        if (selected == null) {
+            return this;
+        }
+        return selected;
+    }
+
+    double getNNPrediction() {
+        ClientConfig config = new ClientConfig();
+        Client client = ClientBuilder.newClient(config);
+
+        WebTarget target = client.target(UriBuilder.fromUri(
+                hostname).build());
+
+        StringBuilder stringBoard = new StringBuilder();
+        ImmutableList<Integer> intBoard = canonicalBoard();
+        for (int pos = 0; pos < intBoard.size(); pos++) {
+            stringBoard.append(intBoard.get(pos));
+            if (pos + 1 != intBoard.size()) {
+                stringBoard.append(",");
+            }
+        }
+        // Get JSON for application
+        String jsonResponse = target.path("predict")
+                .path(currentBoard.getBoardSize().toString())
+                .path(stringBoard.toString()).request()
+                .accept(MediaType.APPLICATION_JSON).get(String.class);
+
+        try {
+            return Double.parseDouble(jsonResponse);
+        } catch (NumberFormatException e) {
+            System.out.println("error");
+            System.out.println("jsonResponse = " + jsonResponse);
+            e.printStackTrace();
+            return 0.0;
+        }
+    }
+
+    public TreeNode findChildBoardMatch(Board board) {
+        if (currentBoard.equals(board)) {
+            return this;
+        } else if (currentBoard.getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
+            for (TreeNode child : getChildren()) {
+                if (child.currentBoard.equals(board)) {
+                    return child;
+                }
+            }
+        } else if (currentBoard.getCountersPlayed() < board.getCountersPlayed()) {
+            System.out.println("recursive board search");
+            for (TreeNode child : getChildren()) {
+                TreeNode childBoardMatch = child.findChildBoardMatch(board);
+                if (childBoardMatch != null) {
+                    return childBoardMatch;
+                }
+            }
+        }
+        return null;
+    }
+
+    public TreeNode selectRandomMove() {
+        ImmutableList<TreeNode> children = getChildren();
+        if (children.size() > 0) {
+            Random random = new Random();
+            return this.children.get(random.nextInt(children.size()));
+        } else {
+            return this;
+        }
+    }
+
+    Double simulateGame(Boolean useNN) {
+        if (useNN) {
+            double nnPrediction = getNNPrediction();
+            addResult(nnPrediction);
+            return nnPrediction;
+        } else {
+            Double result;
+            if (isTerminalNode()) {
+                result = getWinnerValue(rootColour, currentBoard.getWinner(false));
+            } else {
+                result = selectRandomMove().simulateGame(false);
+            }
+            addResult(result);
+            return result;
+        }
+    }
+
+    Board getCurrentBoard() {
+        return currentBoard;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        try {
+            TreeNode node = (TreeNode) object;
+            return node.currentBoard.equals(currentBoard)
+                    && positionToCreateBoard.equals(node.positionToCreateBoard)
+                    && colour.equals(node.colour)
+                    && rootColour.equals(node.rootColour);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void setRoot() {
+        isRoot = true;
+    }
+
+    public Boolean getRoot() {
+        return isRoot;
+    }
+
+    @Override
+    public TreeNode clone() {
+        //noinspection DuplicatedCode
+        try {
+            TreeNode newTreeNode;
+            ByteArrayInputStream bis;
+            ObjectInputStream ois;
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(this);
+            oos.flush();
+            byte[] data = bos.toByteArray();
+            bis = new ByteArrayInputStream(data);
+            ois = new ObjectInputStream(bis);
+            newTreeNode = (TreeNode) ois.readObject();
+            return newTreeNode;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @SuppressWarnings("ReturnOfThis")
     public static class Builder {
         private Board currentBoard;
         private COLOUR colour;
         private COLOUR rootColour;
         private TreeNode parent;
         private ImmutablePosition positionToCreateBoard;
+        private String hostname;
 
 
         public Builder currentBoard(Board currentBoard) {
@@ -99,163 +328,55 @@ public class TreeNode implements Serializable {
             return this;
         }
 
+        public Builder hostname(String hostname) {
+            this.hostname = hostname;
+            return this;
+        }
+
         public TreeNode build() {
             return new TreeNode(this);
         }
     }
 
-    public ImmutablePosition getPositionToCreateBoard() {
-        return positionToCreateBoard;
-    }
-
-    public void visited() {
-        visited = true;
-    }
-
-    public TreeNode getParent() {
-        return parent;
-    }
-
-    Integer getNumberOfWins() {
-        return numberOfWins;
-    }
-
-    Integer getNumberOfSimulations() {
-        return numberOfSimulations;
-    }
-
-    public Boolean isVisited() {
-        return visited;
-    }
-
-    private ImmutableList<TreeNode> getChildren() {
-        if (children.isEmpty()) {
-            children = ImmutableList.copyOf(generateChildren());
+    ImmutableList<Integer> canonicalBoard() {
+        ImmutableList<Integer> intBoard = currentBoard.asIntArray();
+        if (rootColour.equals(COLOUR.BLACK)) {
+            return changeBoardPerspective(intBoard);
         }
-        return children;
+        return intBoard;
     }
 
-    private void setTerminalNode() {
-        terminalNode = true;
-    }
-
-    public Boolean isTerminalNode() {
-        return terminalNode;
-    }
-
-    public COLOUR simulateGame() {
-        COLOUR result;
-        if (this.isTerminalNode()) {
-            result = this.getCurrentBoard().getWinner(false);
-        } else {
-            result = this.selectRandomMove().simulateGame();
-        }
-        addResult(result);
-        return result;
-    }
-
-    public TreeNode selectUCTMove() {
-        Random random = new Random();
-        ImmutableList<TreeNode> children = this.getChildren();
-        double bestValue = Double.MIN_VALUE;
-        TreeNode selected = null;
-        for (TreeNode child : children) {
-            double epsilon = 1e-6;
-            double uctValue = child.getNumberOfWins() / (child.getNumberOfSimulations() + epsilon) +
-                    Math.sqrt(Math.log(this.getNumberOfSimulations() + 1) / (child.getNumberOfSimulations() + epsilon)) +
-                    random.nextDouble() * epsilon;
-            //System.out.println("uctValue = " + uctValue);
-            if (uctValue > bestValue) {
-                selected = child;
-                bestValue = uctValue;
+    ImmutableList<Integer> changeBoardPerspective(ImmutableList<Integer> intBoard) {
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        for (Integer pos : intBoard) {
+            if (pos == 1) {
+                builder.add(-1);
+            } else if (pos == -1) {
+                builder.add(1);
+            } else {
+                builder.add(0);
             }
         }
-        if (selected == null) {
-            return this;
-        }
-        return selected;
+        ImmutableList<Integer> unrotatedBoard = ImmutableList.copyOf(builder.build());
+        return rotateBoard(unrotatedBoard);
     }
 
-    public TreeNode selectRandomMove() {
-        ImmutableList<TreeNode> children = this.getChildren();
-        if (children.size() > 0) {
-            Random random = new Random();
-            return this.children.get(random.nextInt(children.size()));
-        } else {
-            return this;
-        }
-    }
-
-    public void addResult(COLOUR result) {
-        this.numberOfSimulations++;
-        if (result != null && result.equals(rootColour)) {
-            numberOfWins++;
-        }
-    }
-
-    private Board getCurrentBoard() {
-        return currentBoard;
-    }
-
-    public TreeNode findChildBoardMatch(Board board) {
-        if (this.getCurrentBoard().equals(board)) {
-            return this;
-        } else if (this.getCurrentBoard().getCountersPlayed().equals(board.getCountersPlayed() - 1)) {
-            for (TreeNode child : this.getChildren()) {
-                if (child.getCurrentBoard().equals(board)) {
-                    return child.clone();
-                }
-            }
-        } else if (this.getCurrentBoard().getCountersPlayed() < board.getCountersPlayed()) {
-            System.out.println("recursive board search");
-            for (TreeNode child : this.getChildren()) {
-                TreeNode childBoardMatch = child.clone().findChildBoardMatch(board);
-                if (childBoardMatch != null) {
-                    return childBoardMatch;
-                }
+    ImmutableList<Integer> rotateBoard(ImmutableList<Integer> intArray) {
+        ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+        for (int y = 0; y < currentBoard.getBoardSize(); y++) {
+            for (int x = currentBoard.getBoardSize() - 1; x >= 0; x--) {
+                Integer value = intArray.get(x * currentBoard.getBoardSize() + y);
+                builder.add(value);
             }
         }
-        return null;
+        return builder.build();
     }
 
-    public void setRoot() {
-        this.parent = null;
-        this.positionToCreateBoard = null;
+
+    public void addResult(Double result) {
+        numberOfSimulations++;
+        numberOfWins += result;
     }
 
-    @Override
-    public TreeNode clone() {
-        //noinspection DuplicatedCode
-        try {
-            TreeNode newTreeNode;
-            ByteArrayInputStream bis;
-            ObjectInputStream ois;
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(this);
-            oos.flush();
-            byte[] data = bos.toByteArray();
-            bis = new ByteArrayInputStream(data);
-            ois = new ObjectInputStream(bis);
-            newTreeNode = (TreeNode) ois.readObject();
-            return newTreeNode;
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    @Override
-    public boolean equals(Object object) {
-        try {
-            TreeNode node = (TreeNode) object;
-            return node.getCurrentBoard().equals(this.getCurrentBoard())
-                    && this.positionToCreateBoard.equals(node.positionToCreateBoard)
-                    && this.colour.equals(node.colour)
-                    && this.rootColour.equals(node.rootColour);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 }

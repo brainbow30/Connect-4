@@ -16,7 +16,7 @@ class Verifier implements Serializable {
     }
 
 
-    public Boolean validMove(Board board, COLOUR colour, Position position) {
+    Boolean validMove(Board board, COLOUR colour, Position position) {
         if (position.x() >= board.getBoardSize() || position.x() < 0) {
             throw new IndexOutOfBoundsException();
         } else if (position.y() >= board.getBoardSize() || position.y() < 0) {
