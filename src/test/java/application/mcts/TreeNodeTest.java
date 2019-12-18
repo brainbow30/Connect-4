@@ -40,7 +40,7 @@ public class TreeNodeTest {
 
     @Test
     public void canonicalBoardTest() {
-        ImmutableList<Integer> whiteNNBoard = whiteNode.canonicalBoard();
+        ImmutableList<Integer> whiteNNBoard = GenerateNNData.canonicalBoard(whiteNode);
         ImmutableList<Integer> whiteExpected = ImmutableList.of(
                 0, 0, 0, 0,
                 0, 0, 0, 0,
@@ -52,7 +52,7 @@ public class TreeNodeTest {
                 0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0);
-        ImmutableList<Integer> blackNNBoard = blackNode.canonicalBoard();
+        ImmutableList<Integer> blackNNBoard = GenerateNNData.canonicalBoard(blackNode);
         assertEquals(blackExpected, blackNNBoard);
     }
 

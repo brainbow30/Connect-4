@@ -4,7 +4,7 @@ import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
 import application.game.Counter;
-import application.mcts.GenerateTrainingData;
+import application.mcts.GenerateNNData;
 import application.mcts.MonteCarloTreeSearch;
 import application.mcts.TreeNode;
 import com.google.common.collect.ImmutableList;
@@ -21,7 +21,7 @@ public class ComputerPlayer implements Player {
     private TreeNode previousNode;
 
     private final Integer moveFunction;
-    private final GenerateTrainingData generateTrainingData;
+    private final GenerateNNData generateNNData;
     private final Boolean writeTrainingData;
 
 
@@ -33,7 +33,7 @@ public class ComputerPlayer implements Player {
         this.cpuct = cpuct;
         this.hostname = hostname;
         previousNode = null;
-        generateTrainingData = new GenerateTrainingData("training" + boardSize + ".txt");
+        generateNNData = new GenerateNNData("training" + boardSize + ".txt");
         this.writeTrainingData = writeTrainingData;
 
     }
@@ -84,9 +84,9 @@ public class ComputerPlayer implements Player {
         previousNode = currentNode;
         final TreeNode trainingNode = currentNode;
         if (currentNode.isTerminalNode() && writeTrainingData) {
-            generateTrainingData.open();
-            generateTrainingData.save(trainingNode);
-            generateTrainingData.close();
+            generateNNData.open();
+            generateNNData.save(trainingNode);
+            generateNNData.close();
 
         }
         return currentNode.getPositionToCreateBoard();
