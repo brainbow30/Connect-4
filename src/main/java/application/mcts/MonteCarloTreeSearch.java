@@ -5,7 +5,7 @@ import application.game.Board;
 import application.game.COLOUR;
 import com.google.common.base.Stopwatch;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 
 public class MonteCarloTreeSearch {
@@ -51,15 +51,29 @@ public class MonteCarloTreeSearch {
         Stopwatch stopwatch = Stopwatch.createStarted();
         //todo if all nodes visited stop
         while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
+            final ExecutorService service = Executors.newSingleThreadExecutor();
 
-            TreeNode selectedNode = root.selectRandomMove();
-            while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
-                selectedNode = selectedNode.selectRandomMove();
+            try {
+                final Future<Object> f = service.submit(() -> {
+                    TreeNode selectedNode = root.selectRandomMove();
+                    while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
+                        selectedNode = selectedNode.selectRandomMove();
+                    }
+
+                    Double result = selectedNode.simulateGame(nnFunction);
+                    propagateResult(selectedNode, result);
+                    selectedNode.visited();
+                    return true;
+                });
+
+                f.get(waitTime - stopwatch.elapsed(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
+            } catch (final TimeoutException e) {
+                System.err.println("Interupt");
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                service.shutdown();
             }
-
-            Double result = selectedNode.simulateGame(nnFunction);
-            propagateResult(selectedNode, result);
-            selectedNode.visited();
         }
         TreeNode selectMove;
         if (nnFunction.equals(1)) {
