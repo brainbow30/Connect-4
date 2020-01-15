@@ -18,7 +18,7 @@ public class Counter implements Serializable {
 
     @Autowired
     public Counter() {
-        colour = COLOUR.WHITE;
+        colour = COLOUR.RED;
     }
 
 

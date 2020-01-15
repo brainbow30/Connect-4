@@ -29,22 +29,22 @@ class Game {
         GUI = new GUI(board);
         if (humanPlayer1) {
             if (useGUI) {
-                player1 = new HumanPlayer(COLOUR.WHITE, GUI);
+                player1 = new HumanPlayer(COLOUR.RED, GUI);
             } else {
-                player1 = new HumanPlayer(COLOUR.WHITE);
+                player1 = new HumanPlayer(COLOUR.RED);
             }
         } else {
-            player1 = new ComputerPlayer(COLOUR.WHITE, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData, cpuct1);
+            player1 = new ComputerPlayer(COLOUR.RED, computer1MoveFunction, mctsWaitTime1, board.getBoardSize(), hostname, writeTrainingData, cpuct1);
         }
         if (humanPlayer2) {
             if (useGUI) {
-                player2 = new HumanPlayer(COLOUR.BLACK, GUI);
+                player2 = new HumanPlayer(COLOUR.YELLOW, GUI);
             } else {
-                player2 = new HumanPlayer(COLOUR.BLACK);
+                player2 = new HumanPlayer(COLOUR.YELLOW);
             }
         } else {
 
-            player2 = new ComputerPlayer(COLOUR.BLACK, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData, cpuct2);
+            player2 = new ComputerPlayer(COLOUR.YELLOW, computer2MoveFunction, mctsWaitTime2, board.getBoardSize(), hostname, writeTrainingData, cpuct2);
         }
         currentTurnsPlayer = player1;
     }
@@ -83,16 +83,16 @@ class Game {
         Optional<COLOUR> winner = board.getWinner();
         GUI.setWinnerText(winner);
         if (winner.isPresent()) {
-            if (winner.get().equals(COLOUR.WHITE)) {
-                System.out.println("White wins");
-                if (player1.getCounterColour().equals(COLOUR.WHITE)) {
+            if (winner.get().equals(COLOUR.RED)) {
+                System.out.println("Red's wins");
+                if (player1.getCounterColour().equals(COLOUR.RED)) {
                     return Optional.of(player1);
                 } else {
                     return Optional.of(player2);
                 }
-            } else if (winner.get().equals(COLOUR.BLACK)) {
-                System.out.println("Black wins");
-                if (player1.getCounterColour().equals(COLOUR.BLACK)) {
+            } else if (winner.get().equals(COLOUR.YELLOW)) {
+                System.out.println("Yellow wins");
+                if (player1.getCounterColour().equals(COLOUR.YELLOW)) {
                     return Optional.of(player1);
                 } else {
                     return Optional.of(player2);

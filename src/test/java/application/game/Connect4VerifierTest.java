@@ -25,7 +25,7 @@ public class Connect4VerifierTest {
     public void validRightMoveTest() {
         verifier = new Connect4Verifier();
         board = new Board(8, verifier);
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
@@ -40,7 +40,7 @@ public class Connect4VerifierTest {
     @Test
     public void validLeftMoveTest() {
 
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
@@ -54,7 +54,7 @@ public class Connect4VerifierTest {
 
     @Test
     public void validDiagonalMoveTest() {
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
@@ -66,7 +66,7 @@ public class Connect4VerifierTest {
 
         builder.y(2);
         position = builder.build();
-        counter = new Counter(COLOUR.BLACK);
+        counter = new Counter(COLOUR.YELLOW);
         assertEquals(true, verifier.validMove(board, counter.getColour(), position));
 
 
@@ -74,7 +74,7 @@ public class Connect4VerifierTest {
 
     @Test
     public void invalidColourTest() {
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
@@ -87,7 +87,7 @@ public class Connect4VerifierTest {
 
     @Test
     public void noNeighboursTest() {
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = application.ImmutablePosition.builder();
@@ -100,7 +100,7 @@ public class Connect4VerifierTest {
 
     @Test
     public void occupiedSpaceTest() {
-        counter = new Counter(COLOUR.WHITE);
+        counter = new Counter(COLOUR.RED);
 
 
         application.ImmutablePosition.Builder builder = ImmutablePosition.builder();

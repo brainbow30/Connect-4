@@ -30,16 +30,16 @@ public class BoardTest {
         application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(3).y(3);
         //noinspection OptionalGetWithoutIsPresent
-        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.WHITE);
+        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.RED);
         positionBuilder.x(3).y(4);
         //noinspection OptionalGetWithoutIsPresent
-        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.BLACK);
+        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.YELLOW);
         positionBuilder.x(4).y(4);
         //noinspection OptionalGetWithoutIsPresent
-        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.WHITE);
+        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.RED);
         positionBuilder.x(4).y(3);
         //noinspection OptionalGetWithoutIsPresent
-        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.BLACK);
+        assertEquals(board.getCounter(positionBuilder.build()).get().getColour(), COLOUR.YELLOW);
 
     }
 
@@ -141,7 +141,7 @@ public class BoardTest {
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter1, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(4);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class BoardTest {
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter1, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(3);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
@@ -169,7 +169,7 @@ public class BoardTest {
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter1, board.getCounter(positionBuilder.build()).get());
         positionBuilder.y(4);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
@@ -181,7 +181,7 @@ public class BoardTest {
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter1, board.getCounter(positionBuilder.build()).get());
         positionBuilder.y(3);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
@@ -190,14 +190,14 @@ public class BoardTest {
         application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
         board.addCounter(counter1, positionBuilder.build());
-        Counter counter2 = new Counter(COLOUR.BLACK);
+        Counter counter2 = new Counter(COLOUR.YELLOW);
         positionBuilder.x(5).y(2);
         board.addCounter(counter2, positionBuilder.build());
         System.out.println("board = " + board);
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter2, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(4).y(3);
-        assertEquals(COLOUR.BLACK, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.YELLOW, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
@@ -206,46 +206,46 @@ public class BoardTest {
         application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(5).y(3);
         board.addCounter(counter1, positionBuilder.build());
-        Counter counter2 = new Counter(COLOUR.BLACK);
+        Counter counter2 = new Counter(COLOUR.YELLOW);
         positionBuilder.x(5).y(2);
         board.addCounter(counter2, positionBuilder.build());
         System.out.println("board = " + board);
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter2, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(4).y(3);
-        assertEquals(COLOUR.BLACK, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.YELLOW, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
     public void flipRightDownCounterTest() {
-        Counter counter1 = new Counter(COLOUR.BLACK);
+        Counter counter1 = new Counter(COLOUR.YELLOW);
         application.ImmutablePosition.Builder positionBuilder = application.ImmutablePosition.builder();
         positionBuilder.x(2).y(3);
         board.addCounter(counter1, positionBuilder.build());
-        Counter counter2 = new Counter(COLOUR.WHITE);
+        Counter counter2 = new Counter(COLOUR.RED);
         positionBuilder.x(2).y(2);
         board.addCounter(counter2, positionBuilder.build());
         System.out.println("board = " + board);
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter2, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(3).y(3);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test
     public void flipLeftUpCounterTest() {
-        Counter counter1 = new Counter(COLOUR.BLACK);
+        Counter counter1 = new Counter(COLOUR.YELLOW);
         application.ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
         positionBuilder.x(5).y(4);
         board.addCounter(counter1, positionBuilder.build());
-        Counter counter2 = new Counter(COLOUR.WHITE);
+        Counter counter2 = new Counter(COLOUR.RED);
         positionBuilder.x(5).y(5);
         board.addCounter(counter2, positionBuilder.build());
         System.out.println("board = " + board);
         assertTrue(board.getCounter(positionBuilder.build()).isPresent());
         assertEquals(counter2, board.getCounter(positionBuilder.build()).get());
         positionBuilder.x(4).y(4);
-        assertEquals(COLOUR.WHITE, board.getCounter(positionBuilder.build()).get().getColour());
+        assertEquals(COLOUR.RED, board.getCounter(positionBuilder.build()).get().getColour());
     }
 
     @Test

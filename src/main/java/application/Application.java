@@ -66,7 +66,7 @@ class Application {
 
                 Optional<Player> winner = game.play(useGUI);
                 if (winner.isPresent()) {
-                    if (winner.get().getCounterColour().equals(COLOUR.WHITE)) {
+                    if (winner.get().getCounterColour().equals(COLOUR.RED)) {
                         player1Wins++;
                     }
                 } else {

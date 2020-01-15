@@ -99,7 +99,7 @@ public class Board implements Serializable {
                 }
                 board = boardBuilder.build();
                 countersPlayed++;
-                if (newCounter.getColour().equals(COLOUR.WHITE)) {
+                if (newCounter.getColour().equals(COLOUR.RED)) {
                     numberOfWhiteCounters++;
                 }
 
@@ -131,7 +131,7 @@ public class Board implements Serializable {
             boardString.append(y).append(" |");
             for (Optional<Counter> counterOptional : row) {
                 if (counterOptional.isPresent()) {
-                    if (counterOptional.get().getColour().equals(COLOUR.WHITE)) {
+                    if (counterOptional.get().getColour().equals(COLOUR.RED)) {
                         boardString.append("O|");
                     } else {
                         boardString.append("X|");
@@ -345,7 +345,7 @@ public class Board implements Serializable {
             for (Optional<Counter> counterOptional : row) {
                 if (counterOptional.isPresent()) {
                     Counter counter = counterOptional.get();
-                    if (counter.getColour().equals(COLOUR.WHITE)) {
+                    if (counter.getColour().equals(COLOUR.RED)) {
                         builder.add(1);
                     } else {
                         builder.add(-1);

@@ -19,7 +19,7 @@ public class GenerateTrainingDataTest {
     public void setup() {
         generateNNData = new GenerateNNData("testWrite.txt");
         board = new Board(4, new Connect4Verifier());
-        treeNode = TreeNode.builder().colour(COLOUR.WHITE).currentBoard(board).positionToCreateBoard(null).parent(null).rootColour(COLOUR.WHITE).hostname("127.0.0.1:5000").build();
+        treeNode = TreeNode.builder().colour(COLOUR.RED).currentBoard(board).positionToCreateBoard(null).parent(null).rootColour(COLOUR.RED).hostname("127.0.0.1:5000").build();
     }
 
     public void writeSingleBoardTest() {

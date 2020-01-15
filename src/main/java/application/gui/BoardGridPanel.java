@@ -20,8 +20,8 @@ public class BoardGridPanel extends JPanel {
     private static final int width = 60;
     private static final int height = 60;
     private static final Dimension BTN_PREF_SIZE = new Dimension(width + 5, height + 5);
-    private static final BufferedImage whiteCircle = createCircle(Color.WHITE);
-    private static final BufferedImage blackCircle = createCircle(Color.BLACK);
+    private static final BufferedImage whiteCircle = createCircle(Color.RED);
+    private static final BufferedImage blackCircle = createCircle(Color.YELLOW);
     private JButton[][] buttons;
     private Optional<ImmutablePosition> clickedPos;
 
@@ -67,9 +67,9 @@ public class BoardGridPanel extends JPanel {
                 });
                 ImmutablePosition pos = ImmutablePosition.builder().x(j).y(i).build();
                 if (board.getCounter(pos).isPresent()) {
-                    if (board.getCounter(pos).get().getColour().equals(COLOUR.WHITE)) {
+                    if (board.getCounter(pos).get().getColour().equals(COLOUR.RED)) {
                         buttons[i][j].setIcon(new ImageIcon(whiteCircle));
-                    } else if (board.getCounter(pos).get().getColour().equals(COLOUR.BLACK)) {
+                    } else if (board.getCounter(pos).get().getColour().equals(COLOUR.YELLOW)) {
                         buttons[i][j].setIcon(new ImageIcon(blackCircle));
                     }
                 }

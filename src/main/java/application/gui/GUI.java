@@ -21,7 +21,7 @@ public class GUI {
     private JPanel mainPanel;
     private JLabel currentPlayerLabel;
     private Board board;
-    private COLOUR colour = COLOUR.WHITE;
+    private COLOUR colour = COLOUR.RED;
 
     public GUI(Board board) {
         this.board = board;
@@ -36,7 +36,7 @@ public class GUI {
         c.gridwidth = 1;
         c.gridx = 0;
         c.gridy = 0;
-        currentPlayerLabel = new JLabel("White's Turn", JLabel.CENTER);
+        currentPlayerLabel = new JLabel("Yellow's Turn", JLabel.CENTER);
         currentPlayerLabel.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
         currentPlayerLabel.setFont(new Font(null, Font.PLAIN, 20));
         mainPanel.add(currentPlayerLabel, c);
@@ -98,20 +98,20 @@ public class GUI {
         mainPanel.requestFocusInWindow();
         this.board = board;
         this.colour = colour;
-        if (colour.equals(COLOUR.WHITE)) {
-            currentPlayerLabel.setText("White's Turn");
-        } else if (colour.equals(COLOUR.BLACK)) {
-            currentPlayerLabel.setText("Black's Turn");
+        if (colour.equals(COLOUR.RED)) {
+            currentPlayerLabel.setText("Red's Turn");
+        } else if (colour.equals(COLOUR.YELLOW)) {
+            currentPlayerLabel.setText("Yellow's Turn");
         }
         boardGridPanel.updateBoard(board);
     }
 
     public void setWinnerText(Optional<COLOUR> colour) {
         if (colour.isPresent()) {
-            if (colour.get().equals(COLOUR.WHITE)) {
-                currentPlayerLabel.setText("White Wins");
-            } else if (colour.get().equals(COLOUR.BLACK)) {
-                currentPlayerLabel.setText("Black Wins");
+            if (colour.get().equals(COLOUR.RED)) {
+                currentPlayerLabel.setText("Red Wins");
+            } else if (colour.get().equals(COLOUR.YELLOW)) {
+                currentPlayerLabel.setText("Yellow Wins");
             }
         } else {
             currentPlayerLabel.setText("Draw");
