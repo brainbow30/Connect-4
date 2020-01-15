@@ -190,6 +190,9 @@ public final class TreeNode implements Serializable {
         double bestValue = Double.MIN_VALUE;
         TreeNode selected = children.get(random.nextInt(children.size()));
         for (TreeNode child : children) {
+            if (child.isTerminalNode() && getWinnerValue(rootColour, child.getCurrentBoard().getWinner()) == 1.0) {
+                return child;
+            }
             ImmutablePosition position = child.positionToCreateBoard;
             int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();
             if (policy == null) {
