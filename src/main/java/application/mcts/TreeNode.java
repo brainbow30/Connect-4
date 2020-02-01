@@ -87,7 +87,7 @@ public final class TreeNode implements Serializable {
             }
             //draw
         } else {
-            return -1.0;
+            return 0.0;
         }
     }
 
@@ -112,7 +112,7 @@ public final class TreeNode implements Serializable {
         return parent;
     }
 
-    ImmutableList<Double> getTrainingPolicy() {
+    ImmutableList<Double> getTrainingPolicy(int result) {
         ImmutableList.Builder<Double> builder = ImmutableList.builder();
         for (int y = 0; y < currentBoard.getBoardSize(); y++) {
             for (int x = 0; x < currentBoard.getBoardSize(); x++) {
@@ -121,7 +121,7 @@ public final class TreeNode implements Serializable {
                 for (TreeNode child : getChildren()) {
                     if (child.getPositionToCreateBoard().equals(position) && child.getNumberOfSimulations() > 0) {
                         //todo find good policy values
-                        builder.add((child.getNumberOfSimulations() / getNumberOfSimulations()));
+                        builder.add((((child.getNumberOfSimulations() / getNumberOfSimulations()) * result) + 1) / 2.0);
                         contains = true;
                         break;
                     }
@@ -198,8 +198,10 @@ public final class TreeNode implements Serializable {
             if (policy == null) {
                 getNNPrediction(test);
             }
-            double uctValue = child.numberOfWins + (cpuct * policy.get(integerPosition)
-                    * (Math.sqrt(numberOfSimulations) / (1 + child.numberOfSimulations)));
+            double epsilon = 1e-6;
+            double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
+                    (cpuct * policy.get(integerPosition)) * Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+                    random.nextDouble() * epsilon;
             if (uctValue > bestValue) {
                 selected = child;
                 bestValue = uctValue;
@@ -394,7 +396,6 @@ public final class TreeNode implements Serializable {
             return new TreeNode(this);
         }
     }
-
 
 
     public void addResult(Double result) {

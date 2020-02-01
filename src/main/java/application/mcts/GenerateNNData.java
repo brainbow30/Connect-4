@@ -11,6 +11,7 @@ import java.io.IOException;
 public class GenerateNNData {
     private BufferedWriter outputWriter;
     private String filename;
+    private StringBuilder builder;
 
     public GenerateNNData(String filename) {
         this.filename = filename;
@@ -27,15 +28,14 @@ public class GenerateNNData {
 
     static ImmutableList<Integer> canonicalBoard(TreeNode node) {
         ImmutableList<Integer> intBoard = node.getCurrentBoard().asIntArray();
-        if (node.getRootColour().equals(COLOUR.YELLOW)) {
+        if (node.getColour().equals(COLOUR.YELLOW)) {
             return changeBoardPerspective(intBoard);
         }
         return intBoard;
     }
 
 
-    String write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
-        StringBuilder builder = new StringBuilder();
+    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             builder.append(intBoard.get(pos));
@@ -54,7 +54,6 @@ public class GenerateNNData {
 
         builder.append("]," + result);
         builder.append("]");
-        return builder.toString();
 
 
     }
@@ -82,16 +81,17 @@ public class GenerateNNData {
     }
 
     public void save(TreeNode terminalNode) {
-        StringBuilder builder = new StringBuilder();
+        builder = new StringBuilder();
         builder.append("[");
         Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner();
         int result = 0;
         int oppResult = 0;
+
         if (winner.isPresent()) {
-            if (winner.get().equals(terminalNode.getRootColour())) {
+            if (winner.get().equals(COLOUR.RED)) {
                 result = 1;
                 oppResult = -1;
-            } else if (!winner.get().equals(terminalNode.getRootColour())) {
+            } else if (winner.get().equals(COLOUR.YELLOW)) {
                 result = -1;
                 oppResult = 1;
             }
@@ -99,22 +99,30 @@ public class GenerateNNData {
         Integer boardSize = terminalNode.getCurrentBoard().getBoardSize();
         while (terminalNode.getParent() != null) {
             ImmutableList<Integer> intBoard = canonicalBoard(terminalNode);
-            ImmutableList<Integer> oppIntBoard = changeBoardPerspective(intBoard);
-            builder.append(write(intBoard, terminalNode.getTrainingPolicy(), result));
-            builder.append(",");
-            builder.append(write(oppIntBoard, terminalNode.getTrainingPolicy(), oppResult));
-            builder.append(",");
+            if (terminalNode.getColour().equals(COLOUR.RED)) {
+                write(intBoard, terminalNode.getTrainingPolicy(result), result);
+                builder.append(",");
+            } else if (terminalNode.getColour().equals(COLOUR.YELLOW)) {
+                write(intBoard, terminalNode.getTrainingPolicy(oppResult), oppResult);
+                builder.append(",");
+            }
+
 
             terminalNode = terminalNode.getParent();
         }
-        builder.deleteCharAt(builder.length() - 1);
+        ImmutableList<Integer> intBoard = canonicalBoard(terminalNode);
+        if (terminalNode.getColour().equals(COLOUR.RED)) {
+            write(intBoard, terminalNode.getTrainingPolicy(result), result);
+        } else if (terminalNode.getColour().equals(COLOUR.YELLOW)) {
+            write(intBoard, terminalNode.getTrainingPolicy(oppResult), oppResult);
+        }
         builder.append("]");
         try {
             outputWriter.write(builder.toString());
             outputWriter.flush();
         } catch (IOException e) {
-
             e.printStackTrace();
         }
     }
+
 }
