@@ -35,7 +35,7 @@ public class GenerateNNData {
     }
 
 
-    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Integer result) {
+    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Double result) {
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             builder.append(intBoard.get(pos));
@@ -81,9 +81,10 @@ public class GenerateNNData {
     }
 
     public void save(TreeNode terminalNode) {
+        TreeNode node = terminalNode;
         builder = new StringBuilder();
         builder.append("[");
-        Optional<COLOUR> winner = terminalNode.getCurrentBoard().getWinner();
+        Optional<COLOUR> winner = node.getCurrentBoard().getWinner();
         int result = 0;
         int oppResult = 0;
 
@@ -96,25 +97,24 @@ public class GenerateNNData {
                 oppResult = 1;
             }
         }
-        Integer boardSize = terminalNode.getCurrentBoard().getBoardSize();
-        while (terminalNode.getParent() != null) {
-            ImmutableList<Integer> intBoard = canonicalBoard(terminalNode);
-            if (terminalNode.getColour().equals(COLOUR.RED)) {
-                write(intBoard, terminalNode.getTrainingPolicy(result), result);
+        while (node.getParent() != null) {
+            ImmutableList<Integer> intBoard = canonicalBoard(node);
+            if (node.getColour().equals(COLOUR.RED)) {
+                write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0);
                 builder.append(",");
-            } else if (terminalNode.getColour().equals(COLOUR.YELLOW)) {
-                write(intBoard, terminalNode.getTrainingPolicy(oppResult), oppResult);
+            } else if (node.getColour().equals(COLOUR.YELLOW)) {
+                write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0);
                 builder.append(",");
             }
 
 
-            terminalNode = terminalNode.getParent();
+            node = node.getParent();
         }
-        ImmutableList<Integer> intBoard = canonicalBoard(terminalNode);
-        if (terminalNode.getColour().equals(COLOUR.RED)) {
-            write(intBoard, terminalNode.getTrainingPolicy(result), result);
-        } else if (terminalNode.getColour().equals(COLOUR.YELLOW)) {
-            write(intBoard, terminalNode.getTrainingPolicy(oppResult), oppResult);
+        ImmutableList<Integer> intBoard = canonicalBoard(node);
+        if (node.getColour().equals(COLOUR.RED)) {
+            write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0);
+        } else if (node.getColour().equals(COLOUR.YELLOW)) {
+            write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0);
         }
         builder.append("]");
         try {

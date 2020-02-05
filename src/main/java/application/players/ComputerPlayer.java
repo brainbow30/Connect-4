@@ -75,12 +75,14 @@ public class ComputerPlayer implements Player {
         if (previousNode != null && !previousNode.isTerminalNode()) {
 
             currentNode = previousNode.findChildBoardMatch(board);
-            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode.clone(), waitTime, nnFunction, cpuct);
+            currentNode.setRoot();
+            monteCarloTreeSearch = new MonteCarloTreeSearch(currentNode, waitTime, nnFunction, cpuct);
 
         } else {
             monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, nnFunction, hostname, cpuct);
         }
         currentNode = monteCarloTreeSearch.run();
+        currentNode.createTrainingPolicy();
         previousNode = currentNode;
         final TreeNode trainingNode = currentNode;
         if (currentNode.isTerminalNode() && writeTrainingData) {

@@ -28,7 +28,7 @@ public class GenerateTrainingDataTest {
         try {
             ImmutableList.Builder<Double> builder = ImmutableList.builder();
             builder.add(0.0);
-            generateNNData.write(board.asIntArray(), builder.build(), 1);
+            generateNNData.write(board.asIntArray(), builder.build(), 1.0);
             String expected = "[[0,0,0,0,0,1,-1,0,0,-1,1,0,0,0,0,0],[0.0],1]";
             assertEquals(expected, readFile().get(0));
         } catch (FileNotFoundException e) {
