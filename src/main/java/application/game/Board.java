@@ -21,7 +21,7 @@ public class Board implements Serializable {
     private Integer numberOfWhiteCounters;
     private final Integer boardSize;
 
-
+    //todo separate boardsize into width and height
     @Autowired
     public Board(@Value("${board.size}") Integer boardSize, @Qualifier("connect4") Verifier verifier) {
         this.boardSize = boardSize;
