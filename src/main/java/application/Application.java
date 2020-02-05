@@ -34,15 +34,20 @@ class Application {
     private final Integer boardSize;
     private final Boolean train;
     private final Boolean useGUI;
+    private final boolean humanPlayer1;
+    private final boolean humanPlayer2;
 
     @Autowired
     public Application(Game game, @Value("${numberOfGames}") Integer numberOfGames, @Value("${board.size}") Integer boardSize,
-                       @Value("${nn.train}") Boolean train, @Value("${useGUI}") Boolean useGUI) {
+                       @Value("${nn.train}") Boolean train, @Value("${useGUI}") Boolean useGUI,
+                       @Value("${player1.human}") Boolean humanPlayer1, @Value("${player2.human}") Boolean humanPlayer2) {
         this.game = game;
         this.numberOfGames = numberOfGames;
         this.boardSize = boardSize;
         this.train = train;
         this.useGUI = useGUI;
+        this.humanPlayer1 = humanPlayer1;
+        this.humanPlayer2 = humanPlayer2;
     }
 
 
@@ -73,10 +78,12 @@ class Application {
                     draws++;
                 }
                 //rest time before next game
-                try {
-                    TimeUnit.MILLISECONDS.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if (humanPlayer1 || humanPlayer2) {
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (train) {
                     trainNN();
@@ -100,7 +107,6 @@ class Application {
             in.close();
             String trainingData = sb.toString();
             String trainingDataJSON = "{\"data\":\"" + trainingData + "\"}";
-            Thread.sleep(1000);
             ClientConfig config = new ClientConfig();
             Client client = ClientBuilder.newClient(config);
 
@@ -112,7 +118,7 @@ class Application {
 
 
             System.out.println(jsonResponse);
-        } catch (InterruptedException | FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
