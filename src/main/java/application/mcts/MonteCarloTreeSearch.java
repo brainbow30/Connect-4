@@ -25,7 +25,6 @@ public class MonteCarloTreeSearch {
                 .positionToCreateBoard(null)
                 .hostname(hostname)
                 .build();
-        root.visited();
         this.waitTime = waitTime;
         this.nnFunction = nnFunction;
         this.cpuct = cpuct;
@@ -40,7 +39,6 @@ public class MonteCarloTreeSearch {
 
     public MonteCarloTreeSearch(TreeNode node, Integer waitTime, Integer nnFunction, Double cpuct) {
         root = node;
-        root.visited();
         root.setRoot();
         this.waitTime = waitTime;
         this.nnFunction = nnFunction;
@@ -55,9 +53,15 @@ public class MonteCarloTreeSearch {
 
             try {
                 final Future<Object> f = service.submit(() -> {
-                    TreeNode selectedNode = root.selectRandomMove();
+                    TreeNode selectedNode = root.selectUCTMove();
                     while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
-                        selectedNode = selectedNode.selectRandomMove();
+                        if (nnFunction.equals(1)) {
+                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, false);
+                        } else if (nnFunction.equals(2)) {
+                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, true);
+                        } else {
+                            selectedNode = selectedNode.selectUCTMove();
+                        }
                     }
 
                     Double result = selectedNode.simulateGame(nnFunction);
@@ -90,7 +94,7 @@ public class MonteCarloTreeSearch {
 
     private void propagateResult(TreeNode node, Double result) {
         node = node.getParent();
-        while (node.getParent() != null) {
+        while (node.getRoot() != true) {
             node.addResult(result);
             node = node.getParent();
         }
