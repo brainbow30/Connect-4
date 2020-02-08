@@ -28,7 +28,7 @@ public class GenerateNNData {
 
     static ImmutableList<Integer> canonicalBoard(TreeNode node) {
         ImmutableList<Integer> intBoard = node.getCurrentBoard().asIntArray();
-        if (node.getColour().equals(COLOUR.YELLOW)) {
+        if (node.getRootColour().equals(COLOUR.YELLOW)) {
             return changeBoardPerspective(intBoard);
         }
         return intBoard;
@@ -98,24 +98,43 @@ public class GenerateNNData {
             }
         }
         while (node.getParent() != null) {
+            double trainingResult;
             ImmutableList<Integer> intBoard = canonicalBoard(node);
+            if (!node.getRootColour().equals(node.getColour())) {
+                intBoard = changeBoardPerspective(intBoard);
+            }
             if (node.getColour().equals(COLOUR.RED)) {
-                write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0);
+                if (node.isTerminalNode()) {
+                    trainingResult = result;
+                } else {
+                    if (node.getNumberOfSimulations() > 0) {
+                        trainingResult = ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0;
+                    } else {
+                        trainingResult = result;
+                    }
+                }
+
+
+                write(intBoard, node.getTrainingPolicy(), trainingResult);
                 builder.append(",");
             } else if (node.getColour().equals(COLOUR.YELLOW)) {
-                write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0);
+                if (node.isTerminalNode()) {
+                    trainingResult = oppResult;
+                } else {
+                    if (node.getNumberOfSimulations() > 0) {
+                        trainingResult = ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0;
+                    } else {
+                        trainingResult = oppResult;
+                    }
+                }
+                write(intBoard, node.getTrainingPolicy(), trainingResult);
                 builder.append(",");
             }
 
 
             node = node.getParent();
         }
-        ImmutableList<Integer> intBoard = canonicalBoard(node);
-        if (node.getColour().equals(COLOUR.RED)) {
-            write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0);
-        } else if (node.getColour().equals(COLOUR.YELLOW)) {
-            write(intBoard, node.getTrainingPolicy(), ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0);
-        }
+        builder.deleteCharAt(builder.length() - 1);
         builder.append("]");
         try {
             outputWriter.write(builder.toString());

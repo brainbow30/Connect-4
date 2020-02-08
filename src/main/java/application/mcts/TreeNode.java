@@ -107,7 +107,6 @@ public final class TreeNode implements Serializable {
 
     public void visited() {
         visited = true;
-        createTrainingPolicy();
     }
 
     public TreeNode getParent() {
@@ -124,7 +123,7 @@ public final class TreeNode implements Serializable {
                 for (TreeNode child : getChildren()) {
 
                     if (child.getPositionToCreateBoard().equals(position) && child.getNumberOfSimulations() > 0) {
-                        if (visited) {
+                        if (visited && getNumberOfSimulations() > 1) {
                             builder.add(child.getNumberOfSimulations() / (getNumberOfSimulations() - 1));
                         } else {
                             builder.add(child.getNumberOfSimulations() / getNumberOfSimulations());
@@ -192,13 +191,14 @@ public final class TreeNode implements Serializable {
                     bestValue = uctValue;
                 }
             }
+            selected.createTrainingPolicy();
             return selected;
         } else {
             return this;
         }
     }
 
-    public TreeNode selectAlphaZeroMove(Double cpuct, Boolean test) {
+    public TreeNode selectAlphaZeroMove(Double cpuct, Boolean test, Double temp) {
         Random random = new Random();
         ImmutableList<TreeNode> children = getChildren();
         if (children.size() > 0) {
@@ -216,13 +216,18 @@ public final class TreeNode implements Serializable {
                 }
                 double epsilon = 1e-6;
                 double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
-                        (cpuct * policy.get(integerPosition)) * Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+                        (temp * cpuct * policy.get(integerPosition)) * Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
                         random.nextDouble() * epsilon;
-                if (uctValue > bestValue) {
+                int opponentsTurn = -1;
+                if (!rootColour.equals(colour)) {
+                    opponentsTurn = 1;
+                }
+                if ((uctValue * opponentsTurn) > bestValue) {
                     selected = child;
                     bestValue = uctValue;
                 }
             }
+            selected.createTrainingPolicy();
             return selected;
         } else {
             return this;
