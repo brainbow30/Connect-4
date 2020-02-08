@@ -45,7 +45,7 @@ public class MonteCarloTreeSearch {
         this.cpuct = cpuct;
     }
 
-    public TreeNode run() {
+    public TreeNode run(double temp) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         //todo if all nodes visited stop
         while (stopwatch.elapsed(TimeUnit.MILLISECONDS) < waitTime) {
@@ -56,9 +56,9 @@ public class MonteCarloTreeSearch {
                     TreeNode selectedNode = root.selectUCTMove();
                     while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
                         if (nnFunction.equals(1)) {
-                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, false);
+                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, false, temp);
                         } else if (nnFunction.equals(2)) {
-                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, true);
+                            selectedNode = selectedNode.selectAlphaZeroMove(cpuct, true, temp);
                         } else {
                             selectedNode = selectedNode.selectUCTMove();
                         }
@@ -81,9 +81,9 @@ public class MonteCarloTreeSearch {
         }
         TreeNode selectMove;
         if (nnFunction.equals(1)) {
-            selectMove = root.selectAlphaZeroMove(cpuct, false);
+            selectMove = root.selectAlphaZeroMove(cpuct, false, temp);
         } else if (nnFunction.equals(2)) {
-            selectMove = root.selectAlphaZeroMove(cpuct, true);
+            selectMove = root.selectAlphaZeroMove(cpuct, true, temp);
         } else {
             selectMove = root.selectUCTMove();
         }
