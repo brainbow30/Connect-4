@@ -85,49 +85,29 @@ public class GenerateNNData {
         builder = new StringBuilder();
         builder.append("[");
         Optional<COLOUR> winner = node.getCurrentBoard().getWinner();
-        int result = 0;
-        int oppResult = 0;
+        double result = 0.0;
+        double oppResult = 0.0;
 
         if (winner.isPresent()) {
             if (winner.get().equals(COLOUR.RED)) {
-                result = 1;
-                oppResult = -1;
+                result = 1.0;
+                oppResult = -1.0;
             } else if (winner.get().equals(COLOUR.YELLOW)) {
-                result = -1;
-                oppResult = 1;
+                result = -1.0;
+                oppResult = 1.0;
             }
         }
-        while (node.getParent() != null) {
-            double trainingResult;
+        node = node.getParent();
+        while (node != null && node.getParent() != null) {
             ImmutableList<Integer> intBoard = canonicalBoard(node);
             if (!node.getRootColour().equals(node.getColour())) {
                 intBoard = changeBoardPerspective(intBoard);
             }
             if (node.getColour().equals(COLOUR.RED)) {
-                if (node.isTerminalNode()) {
-                    trainingResult = result;
-                } else {
-                    if (node.getNumberOfSimulations() > 0) {
-                        trainingResult = ((node.getNumberOfWins() / node.getNumberOfSimulations()) + result) / 2.0;
-                    } else {
-                        trainingResult = result;
-                    }
-                }
-
-
-                write(intBoard, node.getTrainingPolicy(), trainingResult);
+                write(intBoard, node.getTrainingPolicy(result), result);
                 builder.append(",");
             } else if (node.getColour().equals(COLOUR.YELLOW)) {
-                if (node.isTerminalNode()) {
-                    trainingResult = oppResult;
-                } else {
-                    if (node.getNumberOfSimulations() > 0) {
-                        trainingResult = ((node.getNumberOfWins() / node.getNumberOfSimulations()) + oppResult) / 2.0;
-                    } else {
-                        trainingResult = oppResult;
-                    }
-                }
-                write(intBoard, node.getTrainingPolicy(), trainingResult);
+                write(intBoard, node.getTrainingPolicy(result), oppResult);
                 builder.append(",");
             }
 

@@ -94,7 +94,7 @@ public class MonteCarloTreeSearch {
 
     private void propagateResult(TreeNode node, Double result) {
         node = node.getParent();
-        while (node.getRoot() != true) {
+        while (node.getParent() != null) {
             node.addResult(result);
             node = node.getParent();
         }

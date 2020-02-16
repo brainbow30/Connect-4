@@ -80,7 +80,7 @@ class Application {
                 //rest time before next game
                 if (humanPlayer1 || humanPlayer2) {
                     try {
-                        TimeUnit.MILLISECONDS.sleep(500);
+                        TimeUnit.MILLISECONDS.sleep(5000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

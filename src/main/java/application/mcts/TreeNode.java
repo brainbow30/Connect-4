@@ -57,22 +57,23 @@ public final class TreeNode implements Serializable {
         ImmutableList<ImmutablePosition> validMoves = currentBoard.getValidMoves(colour);
         COLOUR newColour = COLOUR.opposite(colour);
 
-        if (validMoves.size() == 0) {
+        if (validMoves.size() == 0 || getCurrentBoard().isWinner()) {
             setTerminalNode();
-        }
 
-        for (ImmutablePosition move : validMoves) {
-            Board clone = currentBoard.clone();
-            clone.addCounter(counter, move);
-            TreeNode childNode = TreeNode.builder()
-                    .parent(this)
-                    .currentBoard(clone)
-                    .colour(newColour)
-                    .rootColour(rootColour)
-                    .positionToCreateBoard(move)
-                    .hostname(hostname)
-                    .build();
-            builder.add(childNode);
+        } else {
+            for (ImmutablePosition move : validMoves) {
+                Board clone = currentBoard.clone();
+                clone.addCounter(counter, move);
+                TreeNode childNode = TreeNode.builder()
+                        .parent(this)
+                        .currentBoard(clone)
+                        .colour(newColour)
+                        .rootColour(rootColour)
+                        .positionToCreateBoard(move)
+                        .hostname(hostname)
+                        .build();
+                builder.add(childNode);
+            }
         }
         return builder.build();
     }
@@ -113,7 +114,7 @@ public final class TreeNode implements Serializable {
         return parent;
     }
 
-    public void createTrainingPolicy() {
+    public ImmutableList<Double> getTrainingPolicy(double result) {
         ImmutableList.Builder<Double> builder = ImmutableList.builder();
         for (int y = 0; y < currentBoard.getBoardSize(); y++) {
             for (int x = 0; x < currentBoard.getBoardSize(); x++) {
@@ -123,11 +124,7 @@ public final class TreeNode implements Serializable {
                 for (TreeNode child : getChildren()) {
 
                     if (child.getPositionToCreateBoard().equals(position) && child.getNumberOfSimulations() > 0) {
-                        if (visited && getNumberOfSimulations() > 1) {
-                            builder.add(child.getNumberOfSimulations() / (getNumberOfSimulations() - 1));
-                        } else {
-                            builder.add(child.getNumberOfSimulations() / getNumberOfSimulations());
-                        }
+                        builder.add((child.getNumberOfSimulations() / getNumberOfSimulations()));
                         contains = true;
                         break;
                     }
@@ -137,15 +134,9 @@ public final class TreeNode implements Serializable {
                 }
             }
         }
-        trainingPolicy = builder.build();
+        return builder.build();
     }
 
-    ImmutableList<Double> getTrainingPolicy() {
-        if (trainingPolicy == null) {
-            createTrainingPolicy();
-        }
-        return trainingPolicy;
-    }
 
     Double getNumberOfSimulations() {
         return numberOfSimulations;
@@ -191,7 +182,6 @@ public final class TreeNode implements Serializable {
                     bestValue = uctValue;
                 }
             }
-            selected.createTrainingPolicy();
             return selected;
         } else {
             return this;
@@ -206,28 +196,39 @@ public final class TreeNode implements Serializable {
             double bestValue = Double.MIN_VALUE;
             TreeNode selected = children.get(random.nextInt(children.size()));
             for (TreeNode child : children) {
-                if (child.isTerminalNode() && getWinnerValue(rootColour, child.getCurrentBoard().getWinner()) == 1.0) {
+                if (getWinnerValue(rootColour, child.getCurrentBoard().getWinner()) == 1.0) {
                     return child;
                 }
-                ImmutablePosition position = child.positionToCreateBoard;
-                int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();
-                if (policy == null) {
-                    getNNPrediction(test);
+                boolean leadsToLoss = false;
+                //if the next move you play does not result in loss you can play that move
+                for (TreeNode grandchild : child.getChildren()) {
+                    if (getWinnerValue(rootColour, grandchild.getCurrentBoard().getWinner()) == -1.0) {
+                        leadsToLoss = true;
+                        break;
+                    }
                 }
-                double epsilon = 1e-6;
-                double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
-                        (temp * cpuct * policy.get(integerPosition)) * Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
-                        random.nextDouble() * epsilon;
-                int opponentsTurn = -1;
-                if (!rootColour.equals(colour)) {
-                    opponentsTurn = 1;
+                if (!leadsToLoss) {
+                    ImmutablePosition position = child.positionToCreateBoard;
+                    int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();
+                    if (policy == null) {
+                        getNNPrediction(test);
+                    }
+                    double epsilon = 1e-6;
+                    double uctValue = child.numberOfWins / (child.numberOfSimulations + epsilon) +
+                            (temp * cpuct * policy.get(integerPosition)) * Math.sqrt(Math.log(numberOfSimulations + 1) / (child.numberOfSimulations + epsilon)) +
+                            random.nextDouble() * epsilon;
+                    int opponentsTurn = -1;
+                    if (!rootColour.equals(colour)) {
+                        opponentsTurn = 1;
+                    }
+                    if ((uctValue * opponentsTurn) > bestValue) {
+                        selected = child;
+                        bestValue = uctValue;
+                    }
                 }
-                if ((uctValue * opponentsTurn) > bestValue) {
-                    selected = child;
-                    bestValue = uctValue;
-                }
+
             }
-            selected.createTrainingPolicy();
+
             return selected;
         } else {
             return this;

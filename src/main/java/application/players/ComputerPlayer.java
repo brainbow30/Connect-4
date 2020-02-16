@@ -90,7 +90,6 @@ public class ComputerPlayer implements Player {
             monteCarloTreeSearch = new MonteCarloTreeSearch(board, counterColour, waitTime, nnFunction, hostname, cpuct);
         }
         currentNode = monteCarloTreeSearch.run(temp);
-        currentNode.createTrainingPolicy();
         previousNode = currentNode;
         final TreeNode trainingNode = currentNode;
         if (currentNode.isTerminalNode() && writeTrainingData) {
