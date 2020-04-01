@@ -4,27 +4,7 @@ import application.game.COLOUR;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
 public class GenerateNNData {
-    private BufferedWriter outputWriter;
-    private String filename;
-    private StringBuilder builder;
-
-    public GenerateNNData(String filename) {
-        this.filename = filename;
-        open();
-    }
-
-    public void open() {
-        try {
-            outputWriter = new BufferedWriter(new FileWriter("intBoards/" + filename, false));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     static ImmutableList<Integer> canonicalBoard(TreeNode node) {
         ImmutableList<Integer> intBoard = node.getCurrentBoard().asIntArray();
@@ -35,7 +15,8 @@ public class GenerateNNData {
     }
 
 
-    void write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Double result) {
+    static String write(ImmutableList<Integer> intBoard, ImmutableList<Double> policyBoard, Double result) {
+        StringBuilder builder = new StringBuilder();
         builder.append("[[");
         for (int pos = 0; pos < intBoard.size(); pos++) {
             builder.append(intBoard.get(pos));
@@ -54,17 +35,9 @@ public class GenerateNNData {
 
         builder.append("]," + result);
         builder.append("]");
-
-
+        return builder.toString();
     }
 
-    public void close() {
-        try {
-            outputWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     static ImmutableList<Integer> changeBoardPerspective(ImmutableList<Integer> intBoard) {
         ImmutableList.Builder<Integer> builder = ImmutableList.builder();
@@ -80,34 +53,35 @@ public class GenerateNNData {
         return ImmutableList.copyOf(builder.build());
     }
 
-    public void save(TreeNode terminalNode) {
+
+    public static String save(TreeNode terminalNode) {
         TreeNode node = terminalNode;
-        builder = new StringBuilder();
-        builder.append("[");
+        StringBuilder builder = new StringBuilder();
+
         Optional<COLOUR> winner = node.getCurrentBoard().getWinner();
         double result = 0.0;
         double oppResult = 0.0;
 
         if (winner.isPresent()) {
-            if (winner.get().equals(COLOUR.RED)) {
+            if (winner.get().equals(terminalNode.getRootColour())) {
                 result = 1.0;
                 oppResult = -1.0;
-            } else if (winner.get().equals(COLOUR.YELLOW)) {
+            } else if (winner.get().equals(COLOUR.opposite(terminalNode.getRootColour()))) {
                 result = -1.0;
                 oppResult = 1.0;
             }
         }
         node = node.getParent();
         while (node != null && node.getParent() != null) {
-            ImmutableList<Integer> intBoard = canonicalBoard(node);
+            ImmutableList<Integer> intBoard = node.getCurrentBoard().asIntArray();
             if (!node.getRootColour().equals(node.getColour())) {
                 intBoard = changeBoardPerspective(intBoard);
             }
             if (node.getColour().equals(COLOUR.RED)) {
-                write(intBoard, node.getTrainingPolicy(result), result);
+                builder.append(write(intBoard, node.getTrainingPolicy(), result));
                 builder.append(",");
             } else if (node.getColour().equals(COLOUR.YELLOW)) {
-                write(intBoard, node.getTrainingPolicy(result), oppResult);
+                builder.append(write(intBoard, node.getTrainingPolicy(), oppResult));
                 builder.append(",");
             }
 
@@ -115,13 +89,7 @@ public class GenerateNNData {
             node = node.getParent();
         }
         builder.deleteCharAt(builder.length() - 1);
-        builder.append("]");
-        try {
-            outputWriter.write(builder.toString());
-            outputWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        return builder.toString();
     }
 
 }

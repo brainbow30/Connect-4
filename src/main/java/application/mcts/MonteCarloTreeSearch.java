@@ -53,8 +53,8 @@ public class MonteCarloTreeSearch {
 
             try {
                 final Future<Object> f = service.submit(() -> {
-                    TreeNode selectedNode = root.selectUCTMove();
-                    while (selectedNode.isVisited() && !selectedNode.isTerminalNode()) {
+                    TreeNode selectedNode = root;
+                    while (!selectedNode.isTerminalNode() && (selectedNode.isVisited() || selectedNode.getRoot())) {
                         if (nnFunction.equals(1)) {
                             selectedNode = selectedNode.selectAlphaZeroMove(cpuct, false, temp);
                         } else if (nnFunction.equals(2)) {
@@ -88,17 +88,18 @@ public class MonteCarloTreeSearch {
             selectMove = root.selectUCTMove();
         }
         System.out.println("selectMove value= " + selectMove.getNumberOfWins());
-        System.out.println("selectMove sims = " + selectMove.getNumberOfSimulations());
+        System.out.println("selectMove sims = " + selectMove.getCurrentSimulations());
         return selectMove;
     }
 
     private void propagateResult(TreeNode node, Double result) {
         node = node.getParent();
-        while (node.getParent() != null) {
+        while (node.getRoot() != true) {
             node.addResult(result);
             node = node.getParent();
         }
         node.addResult(result);
+
 
     }
 
