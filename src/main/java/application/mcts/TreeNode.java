@@ -213,17 +213,17 @@ public final class TreeNode implements Serializable {
                 Double q = 0.0;
                 if (child.currentSimulations > 0) {
                     q = child.numberOfWins / child.currentSimulations;
+                    if (rootColour.equals(child.getColour())) {
+                        q *= -1;
+                    }
                 }
 
                 double epsilon = 1e-6;
                 double uctValue = q +
                         (temp * cpuct * policy.get(integerPosition)) * (Math.sqrt(currentSimulations) / (child.currentSimulations + 1)) +
                         random.nextDouble() * epsilon;
-                int opponentsTurn = -1;
-                if (rootColour.equals(colour)) {
-                    opponentsTurn = 1;
-                }
-                if ((uctValue * opponentsTurn) > bestValue) {
+
+                if (uctValue > bestValue) {
                     selected = child;
                     bestValue = uctValue;
                 }
