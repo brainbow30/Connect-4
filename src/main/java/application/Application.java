@@ -145,7 +145,7 @@ class Application {
             System.out.println("Game Number: " + i);
             Optional<Player> winner = game.play(useGUI);
             if (winner.isPresent()) {
-                if (winner.get().getCounterColour().equals(COLOUR.YELLOW)) {
+                if (winner.get().getCounterColour().equals(COLOUR.RED)) {
                     player1Wins++;
                 }
             } else {
@@ -301,27 +301,28 @@ class Application {
         }
         String trainingData = "";
         if (player1 instanceof ComputerPlayer && ((ComputerPlayer) player1).getPreviousNode() != null && ((ComputerPlayer) player1).getPreviousNode().isTerminalNode()) {
-            trainingData += GenerateNNData.save(((ComputerPlayer) player1).getPreviousNode(), winner) + ",";
-        }
-        if (player2 instanceof ComputerPlayer && ((ComputerPlayer) player2).getPreviousNode() != null && ((ComputerPlayer) player2).getPreviousNode().isTerminalNode()) {
+            trainingData += GenerateNNData.save(((ComputerPlayer) player1).getPreviousNode(), winner);
+        } else if (player2 instanceof ComputerPlayer && ((ComputerPlayer) player2).getPreviousNode() != null && ((ComputerPlayer) player2).getPreviousNode().isTerminalNode()) {
             trainingData += GenerateNNData.save(((ComputerPlayer) player2).getPreviousNode(), winner);
-        } else {
-            trainingData = trainingData.substring(0, trainingData.length() - 1);
         }
-        trainingData = "[" + trainingData + "]";
-        System.out.println("trainingData = " + trainingData);
-        String trainingDataJSON = "{\"data\":\"" + trainingData + "\"}";
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
+        if (trainingData != "") {
+            trainingData = "[" + trainingData + "]";
+            System.out.println("trainingData = " + trainingData);
+            String trainingDataJSON = "{\"data\":\"" + trainingData + "\"}";
+            ClientConfig config = new ClientConfig();
+            Client client = ClientBuilder.newClient(config);
 
-        WebTarget target = client.target(UriBuilder.fromUri(
-                "http://127.0.0.1:5000").build());
+            WebTarget target = client.target(UriBuilder.fromUri(
+                    "http://127.0.0.1:5000").build());
 
-        // Get JSON for application
-        String jsonResponse = target.path("train").path(boardSize.toString()).request().put(Entity.json(trainingDataJSON)).toString();
+            // Get JSON for application
+            String jsonResponse = target.path("train").path(boardSize.toString()).request().put(Entity.json(trainingDataJSON)).toString();
 
 
-        System.out.println(jsonResponse);
+            System.out.println(jsonResponse);
+        } else {
+            System.out.println("No training data");
+        }
 
     }
 
