@@ -42,6 +42,9 @@ public final class TreeNode {
         if (builder.positionToCreateBoard == null) {
             setRoot();
         }
+        if (Math.pow(currentBoard.getBoardSize(), 2) == currentBoard.getCountersPlayed() || currentBoard.isWinner()) {
+            setTerminalNode();
+        }
         positionToCreateBoard = builder.positionToCreateBoard;
         children = ImmutableList.of();
         hostname = builder.hostname;
@@ -79,11 +82,7 @@ public final class TreeNode {
         ImmutableList.Builder<TreeNode> builder = ImmutableList.builder();
         ImmutableList<ImmutablePosition> validMoves = currentBoard.getValidMoves(colour);
         COLOUR newColour = COLOUR.opposite(colour);
-
-        if (getCurrentBoard().getCountersPlayed() >= Math.pow(getCurrentBoard().getBoardSize(), 2) || getCurrentBoard().isWinner()) {
-            setTerminalNode();
-
-        } else {
+        if (!isTerminalNode()) {
             for (ImmutablePosition move : validMoves) {
                 Board clone = currentBoard.clone();
                 clone.addCounter(counter, move);
@@ -212,11 +211,8 @@ public final class TreeNode {
             double bestValue = Double.MAX_VALUE * -1.0;
             TreeNode selected = children.get(random.nextInt(children.size()));
             for (TreeNode child : children) {
-                if (child.isTerminalNode()) {
-                    Optional<COLOUR> winner = child.getCurrentBoard().getWinner();
-                    if (winner.isPresent() && winner.get().equals(COLOUR.opposite(child.getColour()))) {
-                        return child;
-                    }
+                if (child.isTerminalNode() && getWinnerValue(COLOUR.opposite(child.getColour()), child.getCurrentBoard().getWinner()) == 1.0) {
+                    return child;
                 }
                 ImmutablePosition position = child.positionToCreateBoard;
                 int integerPosition = position.x() + position.y() * currentBoard.getBoardSize();

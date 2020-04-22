@@ -205,7 +205,7 @@ public class Board implements Serializable {
                     Boolean right = fourDiagonalRight(position);
                     Boolean left = fourDiagonalLeft(position);
                     if (vertical || horizontal || right || left) {
-                        return Optional.of(getCounter(position).get().getColour());
+                        return Optional.of(startCounter.get().getColour());
                     }
                 }
 

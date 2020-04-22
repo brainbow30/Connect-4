@@ -44,13 +44,7 @@ public class GenerateNNData {
     static ImmutableList<Integer> changeBoardPerspective(ImmutableList<Integer> intBoard) {
         ImmutableList.Builder<Integer> builder = ImmutableList.builder();
         for (Integer pos : intBoard) {
-            if (pos == 1) {
-                builder.add(-1);
-            } else if (pos == -1) {
-                builder.add(1);
-            } else {
-                builder.add(0);
-            }
+            builder.add(pos * -1);
         }
         return ImmutableList.copyOf(builder.build());
     }
