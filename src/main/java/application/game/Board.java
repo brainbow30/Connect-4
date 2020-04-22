@@ -21,7 +21,7 @@ public class Board implements Serializable {
     private Integer numberOfWhiteCounters;
     private final Integer boardSize;
 
-
+    //todo separate boardsize into width and height
     @Autowired
     public Board(@Value("${board.size}") Integer boardSize, @Qualifier("connect4") Verifier verifier) {
         this.boardSize = boardSize;
@@ -99,13 +99,12 @@ public class Board implements Serializable {
                 }
                 board = boardBuilder.build();
                 countersPlayed++;
-                if (newCounter.getColour().equals(COLOUR.WHITE)) {
+                if (newCounter.getColour().equals(COLOUR.RED)) {
                     numberOfWhiteCounters++;
                 }
 
                 return true;
             } else {
-                System.out.println("invalid move");
                 return false;
             }
         } catch (IndexOutOfBoundsException e) {
@@ -131,7 +130,7 @@ public class Board implements Serializable {
             boardString.append(y).append(" |");
             for (Optional<Counter> counterOptional : row) {
                 if (counterOptional.isPresent()) {
-                    if (counterOptional.get().getColour().equals(COLOUR.WHITE)) {
+                    if (counterOptional.get().getColour().equals(COLOUR.RED)) {
                         boardString.append("O|");
                     } else {
                         boardString.append("X|");
@@ -198,12 +197,15 @@ public class Board implements Serializable {
         for (int y = boardSize; y >= 0; y--) {
             for (int x = 0; x < boardSize; x++) {
                 ImmutablePosition position = ImmutablePosition.builder().x(x).y(y).build();
-                Boolean vertical = fourVerticle(position);
-                Boolean horizontal = fourHorizontal(position);
-                Boolean right = fourDiagonalRight(position);
-                Boolean left = fourDiagonalLeft(position);
-                if (vertical || horizontal || right || left) {
-                    return Optional.of(getCounter(position).get().getColour());
+                Optional<Counter> startCounter = getCounter(position);
+                if (startCounter.isPresent()) {
+                    Boolean vertical = fourVerticle(position);
+                    Boolean horizontal = fourHorizontal(position);
+                    Boolean right = fourDiagonalRight(position);
+                    Boolean left = fourDiagonalLeft(position);
+                    if (vertical || horizontal || right || left) {
+                        return Optional.of(startCounter.get().getColour());
+                    }
                 }
 
             }
@@ -213,7 +215,6 @@ public class Board implements Serializable {
 
     private Boolean fourVerticle(ImmutablePosition startPosition) {
         Optional<Counter> startCounter = getCounter(startPosition);
-        if (startCounter.isPresent()) {
 
             ImmutablePosition.Builder position = ImmutablePosition.builder().x(startPosition.x());
             for (int y = startPosition.y(); y < startPosition.y() + 4; y++) {
@@ -224,15 +225,10 @@ public class Board implements Serializable {
                 }
             }
             return true;
-        } else {
-            return false;
-        }
     }
 
     private Boolean fourHorizontal(ImmutablePosition startPosition) {
         Optional<Counter> startCounter = getCounter(startPosition);
-        if (startCounter.isPresent()) {
-
             ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
             for (int x = startPosition.x(); x < startPosition.x() + 4; x++) {
                 if (x >= boardSize) {
@@ -245,15 +241,10 @@ public class Board implements Serializable {
                 }
             }
             return true;
-        } else {
-            return false;
-        }
     }
 
     private Boolean fourDiagonalRight(ImmutablePosition startPosition) {
         Optional<Counter> startCounter = getCounter(startPosition);
-        if (startCounter.isPresent()) {
-
             ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
             for (int i = 0; i < 4; i++) {
                 int x = startPosition.x() + i;
@@ -272,15 +263,10 @@ public class Board implements Serializable {
                 }
             }
             return true;
-        } else {
-            return false;
-        }
     }
 
     private Boolean fourDiagonalLeft(ImmutablePosition startPosition) {
         Optional<Counter> startCounter = getCounter(startPosition);
-        if (startCounter.isPresent()) {
-
             ImmutablePosition.Builder position = ImmutablePosition.builder().y(startPosition.y());
             for (int i = 0; i < 4; i++) {
                 int x = startPosition.x() - i;
@@ -299,9 +285,6 @@ public class Board implements Serializable {
                 }
             }
             return true;
-        } else {
-            return false;
-        }
     }
 
 
@@ -345,7 +328,7 @@ public class Board implements Serializable {
             for (Optional<Counter> counterOptional : row) {
                 if (counterOptional.isPresent()) {
                     Counter counter = counterOptional.get();
-                    if (counter.getColour().equals(COLOUR.WHITE)) {
+                    if (counter.getColour().equals(COLOUR.RED)) {
                         builder.add(1);
                     } else {
                         builder.add(-1);

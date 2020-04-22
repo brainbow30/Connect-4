@@ -1,21 +1,21 @@
 package application.game;
 
 public enum COLOUR {
-    BLACK,
-    WHITE;
+    YELLOW,
+    RED;
 
     public static COLOUR opposite(COLOUR colour) {
-        if (colour.equals(WHITE)) {
-            return BLACK;
+        if (colour.equals(RED)) {
+            return YELLOW;
         } else {
-            return WHITE;
+            return RED;
         }
     }
 
     public static Double getColourValue(COLOUR colour) {
-        if (colour.equals(WHITE)) {
+        if (colour.equals(RED)) {
             return 1.0;
-        } else if (colour.equals(BLACK)) {
+        } else if (colour.equals(YELLOW)) {
             return -1.0;
         } else {
             return 0.0;

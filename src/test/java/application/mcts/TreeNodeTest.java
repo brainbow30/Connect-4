@@ -24,13 +24,13 @@ public class TreeNodeTest {
         Board nnboard = new Board(6, new Connect4Verifier());
 
         TreeNode.Builder builder = TreeNode.builder();
-        builder.colour(COLOUR.WHITE);
+        builder.colour(COLOUR.RED);
         builder.currentBoard(board);
-        builder.rootColour(COLOUR.WHITE);
+        builder.rootColour(COLOUR.RED);
         builder.parent(null);
         builder.positionToCreateBoard(null);
         whiteNode = builder.build();
-        builder.colour(COLOUR.BLACK);
+        builder.colour(COLOUR.YELLOW);
         blackNode = builder.build();
         builder.currentBoard(nnboard);
         nnNode = builder.build();
@@ -40,7 +40,7 @@ public class TreeNodeTest {
 
     @Test
     public void canonicalBoardTest() {
-        ImmutableList<Integer> whiteNNBoard = whiteNode.canonicalBoard();
+        ImmutableList<Integer> whiteNNBoard = GenerateNNData.canonicalBoard(whiteNode);
         ImmutableList<Integer> whiteExpected = ImmutableList.of(
                 0, 0, 0, 0,
                 0, 0, 0, 0,
@@ -52,13 +52,13 @@ public class TreeNodeTest {
                 0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0);
-        ImmutableList<Integer> blackNNBoard = blackNode.canonicalBoard();
+        ImmutableList<Integer> blackNNBoard = GenerateNNData.canonicalBoard(blackNode);
         assertEquals(blackExpected, blackNNBoard);
     }
 
     @Test
     public void findChildBoardMatchTest() {
-        Counter counter1 = new Counter(COLOUR.WHITE);
+        Counter counter1 = new Counter(COLOUR.RED);
         application.ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
         positionBuilder.x(2).y(0);
         Board clone = board.clone();
