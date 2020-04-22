@@ -1,16 +1,13 @@
 package application.mcts;
 
-import application.ImmutablePosition;
 import application.game.Board;
 import application.game.COLOUR;
-import application.game.Counter;
 import application.game.verifiers.Connect4Verifier;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TreeNodeTest {
     private TreeNode whiteNode;
@@ -56,18 +53,6 @@ public class TreeNodeTest {
         assertEquals(blackExpected, blackNNBoard);
     }
 
-    @Test
-    public void findChildBoardMatchTest() {
-        Counter counter1 = new Counter(COLOUR.RED);
-        application.ImmutablePosition.Builder positionBuilder = ImmutablePosition.builder();
-        positionBuilder.x(2).y(0);
-        Board clone = board.clone();
-        clone.addCounter(counter1, positionBuilder.build());
-        TreeNode childBoardMatch = whiteNode.findChildBoardMatch(clone);
-        assertTrue(whiteNode.getChildren().contains(childBoardMatch));
-
-
-    }
 
     //@Test
     public void getNNPrediction() {
