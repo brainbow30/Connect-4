@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @SpringBootApplication
-class Application {
+public class Application {
 
     private final Game game;
     private final Integer numberOfGames;

@@ -279,15 +279,11 @@ public final class TreeNode {
             }
             policy = builder.build();
             return v;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             System.out.println("error");
             System.out.println("jsonResponse = " + jsonResponse);
-            e.printStackTrace();
-            return 0.0;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("error");
-            System.out.println("jsonResponse = " + jsonResponse);
-            e.printStackTrace();
+            System.out.println("Neural Network Error");
+            System.exit(0);
             return 0.0;
         }
     }
