@@ -105,7 +105,6 @@ public class Board implements Serializable {
 
                 return true;
             } else {
-                System.out.println("invalid move");
                 return false;
             }
         } catch (IndexOutOfBoundsException e) {

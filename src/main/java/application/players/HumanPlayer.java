@@ -33,6 +33,7 @@ public class HumanPlayer implements Player {
         while (invalidMove) {
             ImmutablePosition position;
             if (gui != null) {
+                gui.getFocus();
                 Optional<ImmutablePosition> clickedPos = Optional.absent();
                 while (!clickedPos.isPresent()) {
                     clickedPos = gui.getClickedPos();
@@ -44,12 +45,21 @@ public class HumanPlayer implements Player {
                 }
                 position = clickedPos.get();
 
+
             } else {
                 position = getUserInput(board.getBoardSize());
 
 
             }
             invalidMove = !board.addCounter(counter, position);
+            position = ImmutablePosition.builder().x(position.x()).y(position.y() + 1).build();
+            while (invalidMove && position.y() < board.getBoardSize()) {
+                invalidMove = !board.addCounter(counter, position);
+                position = ImmutablePosition.builder().x(position.x()).y(position.y() + 1).build();
+            }
+            if (invalidMove) {
+                System.out.println("invalid move");
+            }
         }
         return board;
 
@@ -61,14 +71,12 @@ public class HumanPlayer implements Player {
         Scanner input = new Scanner(System.in);
         boolean invalid = true;
         int x = 0;
-        int y = 0;
         while (invalid) {
             try {
                 System.out.print("Enter x coordinate: ");
                 x = input.nextInt();
-                System.out.print("Enter y coordinate: ");
-                y = input.nextInt();
-                if (x > boardSize || y > boardSize || x <= 0 || y <= 0) {
+
+                if (x > boardSize || x <= 0) {
                     throw new IndexOutOfBoundsException();
                 }
                 invalid = false;
@@ -80,7 +88,7 @@ public class HumanPlayer implements Player {
             }
 
         }
-        return ImmutablePosition.builder().x(x - 1).y(y - 1).build();
+        return ImmutablePosition.builder().x(x - 1).y(0).build();
 
     }
 
