@@ -22,7 +22,6 @@ public class GUI {
     private JLabel currentPlayerLabel;
     private Board board;
     private COLOUR colour = COLOUR.RED;
-
     public GUI(Board board) {
         this.board = board;
         frame = new JFrame("Connect 4");

@@ -95,7 +95,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>application.Application</mainClass>
+                    <mainClass>application.GUIApplication</mainClass>
                 </configuration>
             </plugin>
 
