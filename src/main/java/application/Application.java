@@ -2,7 +2,6 @@ package application;
 
 import application.game.COLOUR;
 import application.game.Game;
-import application.gui.GUI;
 import application.mcts.GenerateNNData;
 import application.players.ComputerPlayer;
 import application.players.Player;
@@ -12,24 +11,21 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
+import javax.swing.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 
-@SpringBootApplication
-class Application {
+@Component
+public class Application {
 
     private final Game game;
     private final Integer numberOfGames;
@@ -62,35 +58,47 @@ class Application {
         this.hostname = hostname;
     }
 
-
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(Application.class).headless(false).run(args);
-        GUI frame = context.getBean(GUI.class);
-
+    public Application(Game game, Properties properties) {
+        this.game = game;
+        this.numberOfGames = Integer.valueOf(properties.getProperty("numberOfGames"));
+        this.boardSize = Integer.valueOf(properties.getProperty("board.size"));
+        this.train = Boolean.valueOf(properties.getProperty("nn.train"));
+        this.useGUI = Boolean.valueOf(properties.getProperty("useGUI"));
+        this.humanPlayer1 = Boolean.valueOf(properties.getProperty("player1.human"));
+        this.humanPlayer2 = Boolean.valueOf(properties.getProperty("player2.human"));
+        this.eval = Boolean.valueOf(properties.getProperty("eval"));
+        this.evalMode = Integer.valueOf(properties.getProperty("evalMode"));
+        this.evalGames = Integer.valueOf(properties.getProperty("evalGames"));
+        this.evalIncrease = Double.valueOf(properties.getProperty("evalIncrease"));
+        this.hostname = properties.getProperty("hostname");
 
     }
 
-    @Bean
-    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
-        return args -> {
 
-            if (!eval) {
-                Integer player1Wins, draws;
-                Integer[] stats = play(numberOfGames);
-                player1Wins = stats[0];
-                draws = stats[1];
+
+    public void run() {
+
+        if (!eval) {
+            Integer player1Wins, draws;
+            Integer[] stats = play(numberOfGames);
+            player1Wins = stats[0];
+            draws = stats[1];
+            if (useGUI) {
+                JOptionPane.showMessageDialog(null, "Final Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
+            }
                 System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
-            } else {
-                ImmutableList<ImmutableList<Double>> evaluationResults;
-                String evaluation;
-                StringBuilder resultString = new StringBuilder();
-                if (evalMode == 0) {
-                    evaluationResults = evalCpuct(numberOfGames);
-                    evaluation = "Cpuct";
-                    resultString.append("null");
-                    resultString.append("#");
-                    for (ImmutableList<Double> entry : evaluationResults) {
-                        resultString.append(entry.get(0) + ":" + entry.get(1) + ",");
+
+        } else {
+            ImmutableList<ImmutableList<Double>> evaluationResults;
+            String evaluation;
+            StringBuilder resultString = new StringBuilder();
+            if (evalMode == 0) {
+                evaluationResults = evalCpuct(numberOfGames);
+                evaluation = "Cpuct";
+                resultString.append("null");
+                resultString.append("#");
+                for (ImmutableList<Double> entry : evaluationResults) {
+                    resultString.append(entry.get(0) + ":" + entry.get(1) + ",");
                     }
                     resultString.deleteCharAt(resultString.length() - 1);
                     resultString.append(";");
@@ -133,7 +141,7 @@ class Application {
                 System.out.println("jsonResponse = " + jsonResponse);
 
             }
-        };
+
     }
 
     private Integer[] play(Integer numberOfGames) {

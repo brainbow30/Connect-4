@@ -1,5 +1,6 @@
 package application.game;
 
+import application.game.verifiers.Connect4Verifier;
 import application.gui.GUI;
 import application.players.ComputerPlayer;
 import application.players.HumanPlayer;
@@ -8,6 +9,8 @@ import com.google.common.base.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.Properties;
 
 @Component
 public
@@ -45,6 +48,31 @@ class Game {
         } else {
 
             player2 = new ComputerPlayer(COLOUR.YELLOW, computer2MoveFunction, mctsWaitTime2, hostname, cpuct2, tempThreshold2);
+        }
+        currentTurnsPlayer = player1;
+    }
+
+    public Game(Properties properties) {
+        this.board = new Board(Integer.valueOf(properties.getProperty("board.size")), new Connect4Verifier());
+        GUI = new GUI(board);
+        if (Boolean.valueOf(properties.getProperty("player1.human"))) {
+            if (Boolean.valueOf(properties.getProperty("useGUI"))) {
+                player1 = new HumanPlayer(COLOUR.RED, GUI);
+            } else {
+                player1 = new HumanPlayer(COLOUR.RED);
+            }
+        } else {
+            player1 = new ComputerPlayer(COLOUR.RED, Integer.valueOf(properties.getProperty("computer1.moveFunction")), Integer.valueOf(properties.getProperty("mcts.waitTime1")), properties.getProperty("hostname"), Double.valueOf(properties.getProperty("mcts.cpuct1")), Integer.valueOf(properties.getProperty("mcts.tempThreshold1")));
+        }
+        if (Boolean.valueOf(properties.getProperty("player2.human"))) {
+            if (Boolean.valueOf(properties.getProperty("useGUI"))) {
+                player2 = new HumanPlayer(COLOUR.YELLOW, GUI);
+            } else {
+                player2 = new HumanPlayer(COLOUR.YELLOW);
+            }
+        } else {
+
+            player2 = new ComputerPlayer(COLOUR.YELLOW, Integer.valueOf(properties.getProperty("computer2.moveFunction")), Integer.valueOf(properties.getProperty("mcts.waitTime2")), properties.getProperty("hostname"), Double.valueOf(properties.getProperty("mcts.cpuct2")), Integer.valueOf(properties.getProperty("mcts.tempThreshold2")));
         }
         currentTurnsPlayer = player1;
     }
