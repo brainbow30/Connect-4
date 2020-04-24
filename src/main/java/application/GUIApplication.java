@@ -3,6 +3,7 @@ package application;
 
 import application.game.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -13,9 +14,8 @@ import org.springframework.context.annotation.Bean;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -35,24 +35,31 @@ public class GUIApplication {
     private JPanel extraSettings1;
     private JPanel extraSettings2;
     private Properties properties = new Properties();
-    private String fileLocation = "src\\main\\resources\\application.properties";
+    private String fileLocation = "/application.properties";
     private boolean play = false;
     private JFrame frame;
 
 
     @Autowired
-    public GUIApplication() {
-        frame = new JFrame("Connect-4");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    public GUIApplication(@Value("${settingsGUI}") Boolean settingsGUI, Application application) {
+        if (settingsGUI) {
+            frame = new JFrame("Connect-4");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            URL url = getClass().getResource("/icon.jpg");
+            ImageIcon img = new ImageIcon(url);
+            frame.setIconImage(img.getImage());
 
-        contentPane = new JPanel();
+            contentPane = new JPanel();
 
-        load();
-        setup();
-        frame.getContentPane().add(contentPane, BorderLayout.CENTER);
-        frame.pack();
-        frame.setLocationByPlatform(true);
-        frame.setVisible(true);
+            load();
+            setup();
+            frame.getContentPane().add(contentPane, BorderLayout.CENTER);
+            frame.pack();
+            frame.setLocationByPlatform(true);
+            frame.setVisible(true);
+        } else {
+            application.run();
+        }
     }
 
     public static void main(String[] args) {
@@ -195,8 +202,6 @@ public class GUIApplication {
         JRadioButton humanBtn = new JRadioButton("Human");
         humanBtn.setActionCommand("Human");
 
-        JRadioButton heuristicBtn = new JRadioButton("Heuristic");
-        heuristicBtn.setActionCommand("Heuristic");
 
         JRadioButton mctsBtn = new JRadioButton("MCTS");
         mctsBtn.setActionCommand("MCTS");
@@ -208,14 +213,12 @@ public class GUIApplication {
         //Group the radio buttons.
         ButtonGroup buttonGroup = new ButtonGroup();
         buttonGroup.add(humanBtn);
-        buttonGroup.add(heuristicBtn);
         buttonGroup.add(mctsBtn);
         buttonGroup.add(alphazeroBtn);
 
 
         JPanel radioPanel = new JPanel(new GridLayout(0, 1));
         radioPanel.add(humanBtn);
-        radioPanel.add(heuristicBtn);
         radioPanel.add(mctsBtn);
         radioPanel.add(alphazeroBtn);
         int moveFunction = 0;
@@ -240,9 +243,6 @@ public class GUIApplication {
         switch (moveFunction) {
             case 0:
                 humanBtn.setSelected(true);
-                break;
-            case 1:
-                heuristicBtn.setSelected(true);
                 break;
             case 2:
                 mctsBtn.setSelected(true);
@@ -269,21 +269,6 @@ public class GUIApplication {
             contentPane.removeAll();
             setup();
 
-
-        });
-        heuristicBtn.addActionListener(e -> {
-            switch (playerNum) {
-                case 1:
-                    properties.setProperty("player1.human", "false");
-                    properties.setProperty("computer1.moveFunction", "1");
-                    break;
-                case 2:
-                    properties.setProperty("player2.human", "false");
-                    properties.setProperty("computer2.moveFunction", "1");
-                    break;
-            }
-            contentPane.removeAll();
-            setup();
 
         });
         mctsBtn.addActionListener(e -> {
@@ -351,12 +336,6 @@ public class GUIApplication {
             waitTimeTxt.setName("mcts.waitTime" + playerNum.toString());
             waitTimeTxt.setPreferredSize(new Dimension(100, 20));
             extraSettingsPanel.add(waitTimeTxt);
-        } else if (moveFunction == 1) {
-            //heuristic
-            JLabel noneLbl = new JLabel("No Extra Settings", JLabel.LEFT);
-            noneLbl.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
-            noneLbl.setFont(new Font(null, Font.PLAIN, 12));
-            extraSettingsPanel.add(noneLbl);
         } else {
             JLabel noneLbl = new JLabel("No Extra Settings", JLabel.LEFT);
             noneLbl.setBorder(new EmptyBorder(10, 0, 10, 0));//top,left,bottom,right
@@ -409,8 +388,6 @@ public class GUIApplication {
     }
 
     private boolean save() {
-        try {
-            FileOutputStream out = new FileOutputStream(fileLocation);
             properties.setProperty("board.size", boardSizeTxt.getText());
             properties.setProperty("numberOfGames", numGamesTxt.getText());
             Component[] components1 = extraSettings1.getComponents();
@@ -435,22 +412,15 @@ public class GUIApplication {
                 }
 
             }
-            properties.store(out, null);
-            out.close();
             play = true;
             return true;
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+
     }
 
     private boolean load() {
         try {
-            FileInputStream in = new FileInputStream(fileLocation);
-            properties.load(in);
-            in.close();
+            properties.load((GUIApplication.class.getResourceAsStream(fileLocation)));
             return true;
 
         } catch (IOException e) {

@@ -2,7 +2,6 @@ package application;
 
 import application.game.COLOUR;
 import application.game.Game;
-import application.gui.GUI;
 import application.mcts.GenerateNNData;
 import application.players.ComputerPlayer;
 import application.players.Player;
@@ -12,8 +11,6 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.javatuples.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -78,12 +75,6 @@ public class Application {
     }
 
 
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = new SpringApplicationBuilder(Application.class).headless(false).run(args);
-        GUI frame = context.getBean(GUI.class);
-
-
-    }
 
     public void run() {
 
@@ -94,9 +85,9 @@ public class Application {
             draws = stats[1];
             if (useGUI) {
                 JOptionPane.showMessageDialog(null, "Final Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
-            } else {
-                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
             }
+                System.out.println("\n\nFinal Score after " + numberOfGames + " games\n" + player1Wins + ":" + ((numberOfGames - player1Wins) - draws + " with " + draws + " draws"));
+
         } else {
             ImmutableList<ImmutableList<Double>> evaluationResults;
             String evaluation;
