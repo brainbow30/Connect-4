@@ -5,4 +5,6 @@ Computer.moveFunction =2 (MCTS) =3 (AlphaZero)
 
 Hostname specifies web address where predictions and training calls are made to neural network
 
+A part of Alpha-Zero-Neural-Network. It was one of the game implemented for my 3rd Year Durham University Dissertation Project, where I trained a neural network to best me at a game of Connect-4. This achieved a mark of 77%. See Alpha-Zero-Neural-Network for more details, https://github.com/brainbow30/Alpha-Zero-Neural-Network
+
 
